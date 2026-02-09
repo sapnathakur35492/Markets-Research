@@ -20,6 +20,7 @@ urlpatterns = [
     path('reports/', include('reports.frontend_urls')), # Frontend Reports
     path('api/', include('reports.urls')),
     path('api/leads/', include('leads.urls')),
+    path("robots.txt", TemplateView.as_view(template_name="robots.txt", content_type="text/plain")),
     path('blog/', include('blog.urls')),
     path('', include('pages.urls')),  # Static pages
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
