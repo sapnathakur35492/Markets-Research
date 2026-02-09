@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ meta_title }}{% endblock %}
+
+{% block content %}
+<style>
+    .page-hero {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        color: white;
+        padding: 4rem 0 3rem;
+        margin-bottom: 3rem;
+    }
+
+    .page-hero h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
+
+    .content-section {
+        max-width: 900px;
+        margin: 0 auto 3rem;
+        padding: 0 1rem;
+    }
+
+    .content-section h2 {
+        color: #1e3a8a;
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin: 2rem 0 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #f97316;
+    }
+
+    .content-section p,
+    .content-section ul {
+        line-height: 1.8;
+        color: #374151;
+        margin-bottom: 1rem;
+    }
+
+    .content-section ul {
+        margin-left: 1.5rem;
+    }
+</style>
+
+<section class="page-hero">
+    <div class="container">
+        <h1>Privacy Policy</h1>
+    </div>
+</section>
+
+<div class="container">
+    <article class="content-section">
+        <p>Markets NXT ("we," "our," or "us") respects your privacy and is committed to protecting personal and
+            corporate information.</p>
+
+        <h2>Information We Collect</h2>
+        <ul>
+            <li>Contact details provided via forms or email</li>
+            <li>Business and corporate inquiry information</li>
+            <li>Website usage data through cookies and analytics tools</li>
+        </ul>
+
+        <h2>Use of Information</h2>
+        <p>We use collected information to:</p>
+        <ul>
+            <li>Respond to inquiries</li>
+            <li>Deliver research and consulting services</li>
+            <li>Improve website and service offerings</li>
+            <li>Comply with legal and regulatory requirements</li>
+        </ul>
+
+        <h2>Data Security</h2>
+        <p>We implement reasonable administrative and technical safeguards to protect information against unauthorized
+            access or disclosure.</p>
+
+        <h2>Third-Party Sharing</h2>
+        <p>We do not sell personal data. Information may be shared with trusted service providers solely for operational
+            purposes.</p>
+
+        <h2>Cookies</h2>
+        <p>Our website may use cookies to enhance user experience and analyze website traffic.</p>
+
+        <h2>Policy Updates</h2>
+        <p>This policy may be updated periodically. Continued use of our website constitutes acceptance of changes.</p>
+
+        <p style="margin-top: 2rem; font-size: 0.9rem; color: #6b7280;">Last updated: January 2026</p>
+    </article>
+</div>
+{% endblock %}

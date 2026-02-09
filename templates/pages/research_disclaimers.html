@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ meta_title }}{% endblock %}
+
+{% block content %}
+<style>
+    .page-hero {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        color: white;
+        padding: 4rem 0 3rem;
+        margin-bottom: 3rem;
+    }
+
+    .page-hero h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
+
+    .content-section {
+        max-width: 900px;
+        margin: 0 auto 3rem;
+        padding: 0 1rem;
+    }
+
+    .content-section h2 {
+        color: #1e3a8a;
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin: 2rem 0 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #f97316;
+    }
+
+    .content-section h3 {
+        color: #2563eb;
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin: 1.5rem 0 1rem;
+    }
+
+    .content-section p,
+    .content-section ul {
+        line-height: 1.8;
+        color: #374151;
+        margin-bottom: 1rem;
+    }
+
+    .content-section ul {
+        margin-left: 1.5rem;
+    }
+</style>
+
+<section class="page-hero">
+    <div class="container">
+        <h1>Research Disclaimers & Citations</h1>
+    </div>
+</section>
+
+<div class="container">
+    <article class="content-section">
+        <h2>Research Source Disclosure</h2>
+        <p>Markets NXT research outputs are developed using a combination of primary research, secondary data sources,
+            industry databases, public disclosures, and proprietary analytical models. Sources may include, but are not
+            limited to:</p>
+        <ul>
+            <li>Government and regulatory publications</li>
+            <li>Corporate filings and annual reports</li>
+            <li>Industry associations and technical bodies</li>
+            <li>Trade journals, academic literature, and technical publications</li>
+            <li>Proprietary surveys, interviews, and expert consultations</li>
+        </ul>
+
+        <h2>Citation Standards</h2>
+        <p>Markets NXT follows internal citation and source validation protocols aligned with academic and institutional
+            research standards. Where applicable, references are attributed to publicly available sources. Proprietary
+            datasets and expert interviews are anonymized and aggregated to preserve confidentiality.</p>
+
+        <h2>Methodology Transparency Statement</h2>
+        <p>All research is developed using structured methodologies that include:</p>
+        <ul>
+            <li>Market definition and segmentation frameworks</li>
+            <li>Multi-source data triangulation</li>
+            <li>Quantitative modeling and scenario analysis</li>
+            <li>Expert validation and internal peer review</li>
+        </ul>
+        <p>Assumptions and forecasting models are documented internally and reviewed for methodological consistency.</p>
+
+        <h2>Research Limitations Disclaimer</h2>
+        <p>Markets NXT research may include estimates, forecasts, and assumptions based on available information at the
+            time of publication. Actual market outcomes may differ due to factors including:</p>
+        <ul>
+            <li>Economic and geopolitical developments</li>
+            <li>Regulatory changes</li>
+            <li>Technological disruptions</li>
+            <li>Market behavior and competitive dynamics</li>
+        </ul>
+
+        <h2>No Investment or Professional Advice Disclaimer</h2>
+        <p>Markets NXT research and publications are provided for informational and analytical purposes only and do not
+            constitute:</p>
+        <ul>
+            <li>Investment advice</li>
+            <li>Legal advice</li>
+            <li>Financial or tax advice</li>
+            <li>Professional consulting advice without a formal engagement agreement</li>
+        </ul>
+        <p>Users should consult qualified professionals before making decisions based on Markets NXT content.</p>
+
+        <h2>Intellectual Property & Usage Rights</h2>
+        <p>All research content, methodologies, and analytical models are proprietary to Markets NXT. Unauthorized
+            reproduction, redistribution, or commercial use without written permission is prohibited.</p>
+
+        <h2>Third-Party Data Disclaimer</h2>
+        <p>Markets NXT may incorporate third-party data believed to be reliable. However, the Company does not guarantee
+            the accuracy, completeness, or reliability of third-party data and is not responsible for errors or
+            omissions.</p>
+
+        <h2>Peer Review & Quality Assurance Statement</h2>
+        <p>Research outputs undergo internal peer review and quality assurance processes to ensure analytical rigor,
+            methodological consistency, and factual accuracy. External expert validation may be conducted where
+            applicable.</p>
+    </article>
+</div>
+{% endblock %}

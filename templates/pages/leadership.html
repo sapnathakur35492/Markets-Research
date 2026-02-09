@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ meta_title }}{% endblock %}
+
+{% block content %}
+<style>
+    .page-hero {
+        background: linear-gradient(135deg, #334155 0%, #475569 100%);
+        /* Slate */
+        color: white;
+        padding: 4rem 0 3rem;
+        margin-bottom: 3rem;
+    }
+
+    .page-hero h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
+
+    .content-section {
+        max-width: 900px;
+        margin: 0 auto 3rem;
+        padding: 0 1rem;
+    }
+
+    .content-section h2 {
+        color: #1e3a8a;
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin: 2rem 0 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #f97316;
+    }
+
+    .content-section h3 {
+        color: #2563eb;
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin: 1.5rem 0 1rem;
+    }
+
+    .content-section p,
+    .content-section ul {
+        line-height: 1.8;
+        color: #374151;
+        margin-bottom: 1rem;
+    }
+
+    .content-section ul {
+        margin-left: 1.5rem;
+    }
+</style>
+
+<section class="page-hero">
+    <div class="container">
+        <h1>Leadership & Analysts</h1>
+    </div>
+</section>
+
+<div class="container">
+    <article class="content-section">
+        <h2>Leadership Team</h2>
+
+        <h3>Managing Partner & Executive Leadership</h3>
+        <p>Markets NXT is led by senior professionals with backgrounds in strategy consulting, corporate research,
+            finance, technology, and policy advisory. The leadership team brings experience across enterprise strategy,
+            industry intelligence, investment research, and corporate advisory engagements.</p>
+
+        <h3>Research & Intelligence Leadership</h3>
+        <p>The research leadership oversees methodology design, analyst frameworks, and data governance, ensuring all
+            outputs meet institutional research standards.</p>
+
+        <h2>Analysts & Research Associates</h2>
+        <p>Markets NXT employs a multidisciplinary team of industry analysts, economists, engineers, financial
+            researchers, and sector specialists with experience across:</p>
+        <ul>
+            <li>Technology and digital industries</li>
+            <li>Manufacturing and industrial sectors</li>
+            <li>Energy and utilities</li>
+            <li>Healthcare and life sciences</li>
+            <li>Financial services and capital markets</li>
+            <li>Consumer and retail markets</li>
+            <li>Policy, regulatory, and geopolitical analysis</li>
+        </ul>
+        <p>Our analysts combine quantitative modeling, primary research, expert interviews, and secondary data
+            validation to deliver enterprise-grade insights.</p>
+
+        <h2>Global Advisory Network</h2>
+        <p>Markets NXT maintains a network of industry advisors, academic collaborators, and domain experts across North
+            America, Europe, and Asia-Pacific, enabling localized intelligence and global perspective.</p>
+    </article>
+</div>
+{% endblock %}

@@ -1,0 +1,328 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ meta_title }}{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@25.2.0/build/css/intlTelInput.css">
+<style>
+    .page-hero {
+        background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+        color: white;
+        padding: 4rem 0 3rem;
+        margin-bottom: 3rem;
+    }
+
+    .contact-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem 5rem;
+    }
+
+    .contact-info {
+        background: white;
+        padding: 2.5rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .contact-info h2 {
+        color: #1e3a8a;
+        margin-bottom: 1.5rem;
+        border-bottom: 2px solid #06b6d4;
+        padding-bottom: 0.5rem;
+    }
+
+    .contact-info h3 {
+        color: #2563eb;
+        margin: 1.5rem 0 0.8rem;
+    }
+
+    .form-container-dark {
+        background: #0f172a;
+        padding: 2.5rem;
+        border-radius: 8px;
+        color: white;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .form-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        gap: 1.5rem;
+    }
+
+    .form-label {
+        flex: 0 0 140px;
+        font-weight: 500;
+        color: #e2e8f0;
+    }
+
+    .form-input-wrapper {
+        flex: 1;
+    }
+
+    .form-control {
+        width: 100% !important;
+        background: white !important;
+        border: none !important;
+        padding: 0.8rem 1rem !important;
+        border-radius: 6px !important;
+        color: #1e293b !important;
+    }
+
+    .iti {
+        width: 100%;
+    }
+
+    .iti__country-list {
+        color: #1e293b;
+    }
+
+    .iti__search-input {
+        width: 100% !important;
+        padding: 0.8rem 1rem !important;
+        font-size: 1rem !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 6px !important;
+        margin-bottom: 0.5rem !important;
+        outline: none !important;
+        background: #f8fafc !important;
+        color: #1e293b !important;
+    }
+
+    .iti__search-input:focus {
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+        background: #ffffff !important;
+    }
+
+    /* Fix overlapping flag/text and style the dial code */
+    .iti__selected-dial-code {
+        margin-left: 8px;
+        font-weight: 500;
+        color: #1e293b !important;
+        /* Force visibility on white bg */
+    }
+
+    .form-control#id_phone {
+        padding-left: 100px !important;
+        /* Ensure enough space for separate dial code */
+    }
+
+    .iti__selected-flag {
+        background-color: #f1f5f9 !important;
+        border-radius: 6px 0 0 6px !important;
+    }
+
+    .btn-submit {
+        background: #067ed4;
+        color: white;
+        font-weight: 700;
+        padding: 1rem;
+        border: none;
+        border-radius: 6px;
+        width: 100%;
+        margin-top: 1rem;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .btn-submit:hover {
+        background: #0891b2;
+    }
+
+    #id_country_code_wrapper {
+        display: none;
+    }
+
+    @media (max-width: 868px) {
+        .contact-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .form-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .form-label {
+            flex: none;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div class="container">
+        <h1>Contact Us</h1>
+        <p>Markets NXT — A Montclaire & Stein Venture</p>
+    </div>
+</section>
+
+<div class="container">
+    <div class="contact-grid">
+        <div class="contact-info">
+            <h2>Engage With Markets NXT</h2>
+            <p>Markets NXT works with enterprises, investors, policymakers, and organizations seeking structured market
+                intelligence.</p>
+
+            <h3>Sales & Business Development</h3>
+            <p>📧 <a href="mailto:sales@marketsnxt.com" style="color: #2563eb;">sales@marketsnxt.com</a></p>
+
+            <h3>Headquarters</h3>
+            <p><strong>Markets NXT</strong><br>200 Park Avenue, NY 10166, USA</p>
+
+            <h3>Research Team</h3>
+            <p><strong>Markets NXT</strong><br>Suite 21, Pachsil IT Enclave, Pune 411014, India</p>
+        </div>
+
+        <div class="form-container-dark">
+            <h2 style="color: #60a5fa; margin-bottom: 2rem;">Send Us a Message</h2>
+            <form method="post" id="contactForm">
+                {% csrf_token %}
+
+                <div class="form-row">
+                    <label class="form-label">First Name</label>
+                    <div class="form-input-wrapper">
+                        <input type="text" name="first_name" class="form-control" required placeholder="First Name">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label class="form-label">Last Name</label>
+                    <div class="form-input-wrapper">
+                        <input type="text" name="last_name" class="form-control" required placeholder="Last Name">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label class="form-label">Work Email</label>
+                    <div class="form-input-wrapper">
+                        <input type="email" name="email" class="form-control" required placeholder="Work Email">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label class="form-label">Work Phone</label>
+                    <div class="form-input-wrapper">
+                        <input type="tel" id="id_phone" name="phone" class="form-control" required>
+                        <div id="phone-error"
+                            style="color: #f87171; font-size: 0.85rem; margin-top: 0.5rem; display: none;">
+                            Please enter a valid phone number for the selected country.
+                        </div>
+                    </div>
+                </div>
+
+                <div id="id_country_code_wrapper">
+                    <input type="hidden" id="id_country_code" name="country_code">
+                </div>
+
+                <div class="form-row">
+                    <label class="form-label">Company Name</label>
+                    <div class="form-input-wrapper">
+                        <input type="text" name="company_name" class="form-control" required placeholder="Company Name">
+                    </div>
+                </div>
+
+                <div class="form-row" style="align-items: flex-start;">
+                    <label class="form-label" style="padding-top: 0.8rem;">Message</label>
+                    <div class="form-input-wrapper">
+                        <textarea name="message" class="form-control" rows="4" required
+                            placeholder="Your Message"></textarea>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 2rem;">
+                    {{ form.captcha }}
+                </div>
+
+                <button type="submit" class="btn-submit" id="submitBtn">Send Message</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/intl-tel-input@25.2.0/build/js/intlTelInput.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const phoneInput = document.querySelector("#id_phone");
+        const countryCodeInput = document.querySelector("#id_country_code");
+        const phoneError = document.querySelector("#phone-error");
+
+        const iti = window.intlTelInput(phoneInput, {
+            initialCountry: "auto",
+            geoIpLookup: callback => {
+                fetch("https://ipapi.co/json")
+                    .then(res => res.json())
+                    .then(data => callback(data.country_code))
+                    .catch(() => callback("us"));
+            },
+            utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@25.2.0/build/js/utils.js",
+            separateDialCode: true,
+            strictMode: true,
+        });
+
+        const form = document.querySelector("#contactForm");
+        form.addEventListener('submit', function (e) {
+            // Validate phone number
+            phoneError.style.display = 'none';
+            if (phoneInput.value.trim()) {
+                if (!iti.isValidNumber()) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                    phoneError.style.display = 'block';
+                    phoneInput.focus();
+                    return false;
+                }
+            }
+
+            // Update country code
+            const dialCode = iti.getSelectedCountryData().dialCode;
+            countryCodeInput.value = "+" + dialCode;
+
+            const btn = document.getElementById('submitBtn');
+            btn.innerHTML = 'Sending...';
+            btn.disabled = true;
+        });
+
+        // Helper to get max digits for current country
+        const setMaxLength = () => {
+            const placeholder = phoneInput.getAttribute('placeholder') || '';
+            const maxDigits = placeholder.replace(/\D/g, '').length;
+            if (maxDigits > 0) {
+                phoneInput.setAttribute('maxlength', maxDigits + 5);
+            }
+        };
+
+        // Enforce numeric only and max length
+        phoneInput.addEventListener('input', function (e) {
+            phoneError.style.display = 'none';
+
+            // Remove non-digits
+            let digits = this.value.replace(/\D/g, '');
+
+            // Get current country length
+            const placeholder = phoneInput.getAttribute('placeholder') || '';
+            const maxDigits = placeholder.replace(/\D/g, '').length;
+
+            if (maxDigits > 0 && digits.length > maxDigits) {
+                digits = digits.substring(0, maxDigits);
+            }
+
+            if (this.value !== digits) {
+                this.value = digits;
+            }
+        });
+
+        phoneInput.addEventListener('countrychange', setMaxLength);
+        setTimeout(setMaxLength, 1000);
+    });
+</script>
+{% endblock %}

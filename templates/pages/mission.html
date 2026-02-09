@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ meta_title }}{% endblock %}
+
+{% block content %}
+<style>
+    .page-hero {
+        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+        /* Royal Blue */
+        color: white;
+        padding: 4rem 0 3rem;
+        margin-bottom: 3rem;
+    }
+
+    .page-hero h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
+
+    .content-section {
+        max-width: 900px;
+        margin: 0 auto 3rem;
+        padding: 0 1rem;
+    }
+
+    .content-section h2 {
+        color: #1e3a8a;
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin: 2.5rem 0 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 3px solid #f97316;
+    }
+
+    .content-section p {
+        line-height: 1.8;
+        color: #374151;
+        margin-bottom: 1.2rem;
+    }
+
+    .mission-box {
+        background: #f0f9ff;
+        border-left: 4px solid #2563eb;
+        padding: 1.5rem;
+        margin: 2rem 0;
+        border-radius: 4px;
+    }
+
+    .mission-box h3 {
+        color: #1e3a8a;
+        margin-top: 0;
+    }
+
+    .values-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin: 2rem 0;
+    }
+
+    @media (max-width: 768px) {
+        .values-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .value-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 1.5rem;
+    }
+
+    .value-card h4 {
+        color: #2563eb;
+        font-size: 1.2rem;
+        margin: 0 0 0.8rem;
+    }
+
+    .value-card p {
+        margin: 0;
+        font-size: 0.95rem;
+    }
+</style>
+
+<section class="page-hero">
+    <div class="container">
+        <h1>Mission, Vision & Values</h1>
+    </div>
+</section>
+
+<div class="container">
+    <article class="content-section">
+        <div class="mission-box">
+            <h3>Our Mission</h3>
+            <p style="margin: 0;">To deliver rigorous, independent, and actionable market intelligence and consulting
+                insights that enable enterprises, investors, and institutions to make informed strategic decisions in a
+                complex global economy.</p>
+        </div>
+
+        <div class="mission-box" style="border-left-color: #f59e0b; background: #fef3c7;">
+            <h3 style="color: #92400e;">Our Vision</h3>
+            <p style="margin: 0;">To become a globally trusted institutional intelligence and consulting platform,
+                recognized for methodological rigor, data integrity, and strategic relevance across industries and
+                geographies.</p>
+        </div>
+
+        <h2>Our Values</h2>
+
+        <div class="values-grid">
+            <div class="value-card">
+                <h4>Intellectual Rigor</h4>
+                <p>We apply structured research methodologies, disciplined assumptions, and multi-source validation to
+                    ensure analytical accuracy.</p>
+            </div>
+
+            <div class="value-card">
+                <h4>Independence & Integrity</h4>
+                <p>We maintain independence from commercial bias, ensuring objective insights and ethical research
+                    practices.</p>
+            </div>
+
+            <div class="value-card">
+                <h4>Client-Centric Advisory</h4>
+                <p>We prioritize actionable outcomes, delivering insights that directly inform strategy, investment, and
+                    policy decisions.</p>
+            </div>
+
+            <div class="value-card">
+                <h4>Confidentiality & Trust</h4>
+                <p>We uphold strict confidentiality standards and enterprise-grade data protection practices.</p>
+            </div>
+
+            <div class="value-card">
+                <h4>Continuous Innovation</h4>
+                <p>We continuously refine research frameworks, data models, and consulting methodologies to reflect
+                    evolving market dynamics.</p>
+            </div>
+        </div>
+    </article>
+</div>
+{% endblock %}

@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ meta_title }}{% endblock %}
+
+{% block content %}
+<style>
+    .page-hero {
+        background: linear-gradient(135deg, #c2410c 0%, #f97316 100%);
+        /* Orange */
+        color: white;
+        padding: 4rem 0 3rem;
+        margin-bottom: 3rem;
+    }
+
+    .page-hero h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
+
+    .content-section {
+        max-width: 900px;
+        margin: 0 auto 3rem;
+        padding: 0 1rem;
+    }
+
+    .faq-item {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        overflow: hidden;
+    }
+
+    .faq-question {
+        padding: 1.25rem;
+        cursor: pointer;
+        font-weight: 600;
+        color: #1e3a8a;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: 0.2s;
+    }
+
+    .faq-question:hover {
+        background: #f9fafb;
+    }
+
+    .faq-answer {
+        padding: 0 1.25rem 1.25rem;
+        color: #374151;
+        line-height: 1.8;
+        display: none;
+    }
+
+    .faq-answer.active {
+        display: block;
+    }
+
+    .faq-icon {
+        font-size: 1.2rem;
+        transition: transform 0.2s;
+    }
+
+    .faq-icon.active {
+        transform: rotate(180deg);
+    }
+</style>
+
+<section class="page-hero">
+    <div class="container">
+        <h1>Frequently Asked Questions</h1>
+    </div>
+</section>
+
+<div class="container">
+    <article class="content-section">
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">
+                <span>Q1. What services does Markets NXT provide?</span>
+                <span class="faq-icon">▼</span>
+            </div>
+            <div class="faq-answer">
+                We provide market research reports, consulting services, industry intelligence, and custom research
+                engagements.
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">
+                <span>Q2. Who are your clients?</span>
+                <span class="faq-icon">▼</span>
+            </div>
+            <div class="faq-answer">
+                Our clients include enterprises, financial institutions, government-linked organizations, startups, and
+                investment firms.
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">
+                <span>Q3. Do you offer custom research?</span>
+                <span class="faq-icon">▼</span>
+            </div>
+            <div class="faq-answer">
+                Yes. We provide tailored research and consulting aligned with client requirements.
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">
+                <span>Q4. How can I purchase a report?</span>
+                <span class="faq-icon">▼</span>
+            </div>
+            <div class="faq-answer">
+                You can contact <a href="mailto:sales@marketsnxt.com" style="color: #2563eb;">sales@marketsnxt.com</a>
+                for pricing and delivery options.
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">
+                <span>Q5. Do you provide analyst support?</span>
+                <span class="faq-icon">▼</span>
+            </div>
+            <div class="faq-answer">
+                Enterprise clients may receive analyst briefings and consulting support depending on engagement terms.
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">
+                <span>Q6. How often are reports updated?</span>
+                <span class="faq-icon">▼</span>
+            </div>
+            <div class="faq-answer">
+                Update frequency depends on the industry and subscription model.
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">
+                <span>Q7. Can you customize consulting engagements?</span>
+                <span class="faq-icon">▼</span>
+            </div>
+            <div class="faq-answer">
+                Yes. We design consulting engagements based on industry, geography, and business objectives.
+            </div>
+        </div>
+    </article>
+</div>
+
+<script>
+    function toggleFAQ(element) {
+        const answer = element.nextElementSibling;
+        const icon = element.querySelector('.faq-icon');
+
+        answer.classList.toggle('active');
+        icon.classList.toggle('active');
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ meta_title }}{% endblock %}
+
+{% block content %}
+<style>
+    .page-hero {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        color: white;
+        padding: 4rem 0 3rem;
+        margin-bottom: 3rem;
+    }
+
+    .page-hero h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
+
+    .content-section {
+        max-width: 900px;
+        margin: 0 auto 3rem;
+        padding: 0 1rem;
+    }
+
+    .content-section h2 {
+        color: #1e3a8a;
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin: 2rem 0 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #f97316;
+    }
+
+    .content-section p {
+        line-height: 1.8;
+        color: #374151;
+        margin-bottom: 1rem;
+    }
+
+    .warning-box {
+        background: #fef3c7;
+        border-left: 4px solid #f59e0b;
+        padding: 1.5rem;
+        margin: 2rem 0;
+        border-radius: 4px;
+    }
+</style>
+
+<section class="page-hero">
+    <div class="container">
+        <h1>Legal Disclaimer</h1>
+    </div>
+</section>
+
+<div class="container">
+    <article class="content-section">
+        <p>The information provided by Markets NXT ("the Company") is intended for informational and analytical purposes
+            only. While reasonable efforts are made to ensure accuracy and reliability, Markets NXT makes no warranties
+            or representations regarding the completeness, accuracy, or timeliness of the information.</p>
+
+        <h2>No Professional Advice</h2>
+        <p>Content published by Markets NXT does not constitute legal, financial, investment, tax, or professional
+            advice. Users should seek independent professional counsel before making decisions based on the information
+            provided.</p>
+
+        <h2>Forward-Looking Statements</h2>
+        <p>Certain content may include forward-looking statements and projections based on assumptions and
+            methodologies. Actual outcomes may differ materially due to market conditions, regulatory changes, and other
+            factors.</p>
+
+        <h2>Limitation of Liability</h2>
+        <div class="warning-box">
+            <p style="margin: 0;"><strong>Markets NXT shall not be liable for any direct or indirect damages arising
+                    from the use of its content, reports, or website materials.</strong></p>
+        </div>
+
+        <h2>Intellectual Property</h2>
+        <p>All content, reports, methodologies, and materials are proprietary to Markets NXT and protected by applicable
+            intellectual property laws. Unauthorized reproduction or distribution is prohibited.</p>
+
+        <h2>Third-Party Information</h2>
+        <p>Markets NXT may reference third-party data and sources believed to be reliable. The Company does not
+            guarantee the accuracy of third-party information and is not responsible for errors or omissions.</p>
+
+        <p style="margin-top: 2rem; font-size: 0.9rem; color: #6b7280;">Last updated: January 2026</p>
+    </article>
+</div>
+{% endblock %}

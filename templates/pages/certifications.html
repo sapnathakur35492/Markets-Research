@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ meta_title }}{% endblock %}
+
+{% block content %}
+<style>
+    .page-hero {
+        background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%);
+        /* Teal */
+        color: white;
+        padding: 4rem 0 3rem;
+        margin-bottom: 3rem;
+    }
+
+    .page-hero h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
+
+    .content-section {
+        max-width: 900px;
+        margin: 0 auto 3rem;
+        padding: 0 1rem;
+    }
+
+    .content-section h2 {
+        color: #1e3a8a;
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin: 2rem 0 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #f97316;
+    }
+
+    .content-section p,
+    .content-section ul {
+        line-height: 1.8;
+        color: #374151;
+        margin-bottom: 1rem;
+    }
+
+    .content-section ul {
+        margin-left: 1.5rem;
+    }
+
+    .cert-badge {
+        background: #f0f9ff;
+        border-left: 4px solid #2563eb;
+        padding: 1rem 1.5rem;
+        margin: 1rem 0;
+        border-radius: 4px;
+        font-weight: 600;
+        color: #1e3a8a;
+    }
+</style>
+
+<section class="page-hero">
+    <div class="container">
+        <h1>Certifications & Standards</h1>
+    </div>
+</section>
+
+<div class="container">
+    <article class="content-section">
+        <p>Markets NXT adheres to internationally recognized quality and information security standards.</p>
+
+        <h2>ISO Certifications</h2>
+        <div class="cert-badge">✓ ISO 9001: Quality Management Systems</div>
+        <div class="cert-badge">✓ ISO 27001: Information Security Management Systems</div>
+
+        <h2>Research & Consulting Standards</h2>
+        <ul>
+            <li>Internal research methodology frameworks aligned with global consulting best practices</li>
+            <li>Data validation and multi-source verification protocols</li>
+            <li>Confidentiality and non-disclosure frameworks for client engagements</li>
+        </ul>
+
+        <h2>Corporate Governance</h2>
+        <ul>
+            <li>Ethical research standards</li>
+            <li>Conflict-of-interest policies</li>
+            <li>Independent research principles</li>
+        </ul>
+    </article>
+</div>
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ meta_title }}{% endblock %}
+
+{% block content %}
+<style>
+    .page-hero {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        color: white;
+        padding: 4rem 0 3rem;
+        margin-bottom: 3rem;
+    }
+
+    .page-hero h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
+
+    .content-section {
+        max-width: 900px;
+        margin: 0 auto 3rem;
+        padding: 0 1rem;
+    }
+
+    .content-section h2 {
+        color: #1e3a8a;
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin: 2rem 0 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #f97316;
+    }
+
+    .content-section p {
+        line-height: 1.8;
+        color: #374151;
+        margin-bottom: 1rem;
+    }
+</style>
+
+<section class="page-hero">
+    <div class="container">
+        <h1>Terms and Conditions</h1>
+    </div>
+</section>
+
+<div class="container">
+    <article class="content-section">
+        <p>By accessing this website, you agree to comply with the following terms.</p>
+
+        <h2>Use of Content</h2>
+        <p>All reports, content, and materials are proprietary to Markets NXT and protected by intellectual property
+            laws. Unauthorized reproduction or distribution is prohibited.</p>
+
+        <h2>No Investment Advice</h2>
+        <p>Content provided is for informational purposes only and does not constitute investment, legal, or financial
+            advice.</p>
+
+        <h2>Limitation of Liability</h2>
+        <p>Markets NXT is not liable for decisions made based on information provided on this website or in reports.</p>
+
+        <h2>Client Engagements</h2>
+        <p>Consulting and research engagements are governed by separate contractual agreements.</p>
+
+        <h2>Governing Law</h2>
+        <p>These terms are governed by applicable laws in the jurisdiction of Markets NXT's principal place of business.
+        </p>
+
+        <p style="margin-top: 2rem; font-size: 0.9rem; color: #6b7280;">Last updated: January 2026</p>
+    </article>
+</div>
+{% endblock %}

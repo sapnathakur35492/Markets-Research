@@ -1,0 +1,1762 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load report_filters %}
+
+{% block title %}{{ report.title }} - Market Research Platform{% endblock %}
+
+{% block content %}
+<style>
+    /* Global Background */
+    html,
+    /* Global Background */
+    html,
+    body {
+        background: radial-gradient(at 0% 0%, rgba(226, 232, 240, 0.5) 0px, transparent 50%),
+            radial-gradient(at 100% 0%, rgba(203, 213, 225, 0.4) 0px, transparent 50%),
+            radial-gradient(at 100% 100%, rgba(226, 232, 240, 0.5) 0px, transparent 50%),
+            radial-gradient(at 0% 100%, rgba(203, 213, 225, 0.4) 0px, transparent 50%),
+            #f8fafc;
+        overflow-x: hidden;
+        max-width: 100%;
+    }
+
+    /* Hero Section */
+    .detail-hero {
+        position: relative;
+        background: radial-gradient(circle at 10% 20%, #1e3a8a 0%, #1e40af 90%);
+        color: white;
+        padding: 4.5rem 0 4rem;
+        border-bottom: 5px solid #f97316;
+        margin-bottom: 0;
+        text-align: left;
+        overflow: hidden;
+    }
+
+    .detail-hero::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -10%;
+        width: 60%;
+        height: 120%;
+        background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+        border-radius: 50%;
+        filter: blur(80px);
+        pointer-events: none;
+    }
+
+    .detail-hero::after {
+        content: '';
+        position: absolute;
+        bottom: -20%;
+        right: 5%;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(249, 115, 22, 0.1) 0%, transparent 70%);
+        border-radius: 50%;
+        filter: blur(60px);
+        pointer-events: none;
+    }
+
+    .detail-hero .container {
+        position: relative;
+        z-index: 2;
+        max-width: 1540px;
+        /* Match detail-grid-container */
+        margin: 0 auto;
+        padding: 0 2rem;
+        /* Match detail-grid-container padding */
+    }
+
+    .detail-title {
+        font-size: 2rem;
+        /* Reduced from 2.4rem for H3 look */
+        font-weight: 800;
+        line-height: 1.3;
+        color: white;
+        margin-bottom: 1.5rem;
+        letter-spacing: -0.02em;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .hero-meta {
+        font-size: 0.95rem;
+        font-weight: 500;
+        opacity: 0.95;
+        display: flex;
+        gap: 1.5rem;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.1);
+        width: fit-content;
+        padding: 0.6rem 1.2rem;
+        border-radius: 99px;
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* Layout Grid */
+    .detail-grid-container {
+        max-width: 1540px;
+        /* Expanded for premium wide feel */
+        margin: 0 auto;
+        padding: 4rem 2rem;
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        /* Wider sidebar, flexible description */
+        gap: 6rem;
+        /* Large gap pushes pricing far right */
+        align-items: start;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Main Content Area */
+    .detail-main {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.05),
+            0 10px 15px -10px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        width: 100%;
+        backdrop-filter: blur(10px);
+    }
+
+    /* Tabs */
+    .tabs-header {
+        display: flex;
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+        overflow-x: auto;
+        scrollbar-width: none;
+        width: 100%;
+    }
+
+    .tabs-header::-webkit-scrollbar {
+        display: none;
+    }
+
+    .tab-btn {
+        padding: 1.25rem 2rem;
+        font-weight: 600;
+        color: #64748b;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-size: 1rem;
+        white-space: nowrap;
+        flex-shrink: 0;
+        position: relative;
+    }
+
+    .tab-btn:hover {
+        color: #1e3a8a;
+        background: rgba(30, 58, 138, 0.02);
+    }
+
+    .tab-btn.active {
+        color: #1e3a8a;
+        font-weight: 700;
+    }
+
+    .tab-btn.active::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: #1e3a8a;
+        box-shadow: 0 -2px 10px rgba(30, 58, 138, 0.2);
+    }
+
+    .tab-body {
+        padding: 3rem;
+        font-size: 1.05rem;
+        line-height: 1.8;
+        color: #334155;
+    }
+
+    /* Tab Content Logic */
+    .tab-pane {
+        display: none;
+        animation: fadeIn 0.3s;
+        /* Ensure long words don't break layout */
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        max-width: 100%;
+    }
+
+    .tab-pane.active {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(5px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .tab-pane h2 {
+        color: #1e3a8a;
+        font-size: 1.5rem;
+        margin-top: 1.5rem;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid #e2e8f0;
+        padding-bottom: 0.5rem;
+    }
+
+    .tab-pane p {
+        margin-bottom: 1.2rem;
+        text-align: justify;
+    }
+
+    /* Tables in content */
+    .tab-pane table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1.5rem 0;
+        font-size: 0.9rem;
+        display: block;
+        /* Important for horizontal scroll */
+        overflow-x: auto;
+    }
+
+    .tab-pane th,
+    .tab-pane td {
+        border: 1px solid #cbd5e1;
+        padding: 0.75rem;
+        min-width: 120px;
+        /* Ensure columns don't collapse too much */
+    }
+
+    .tab-pane th {
+        background-color: #f1f5f9;
+        font-weight: 700;
+        text-align: left;
+    }
+
+    /* Fix for large images in content */
+    .tab-pane img {
+        max-width: 75%;
+        /* Don't be too huge on desktop */
+        height: auto;
+        display: block;
+        margin: 1.5rem auto;
+        /* Center image */
+        border-radius: 4px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Sidebar */
+    .detail-sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        position: sticky;
+        top: 2rem;
+    }
+
+    /* Metadata Box */
+    .meta-box {
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        border-radius: 20px;
+        padding: 2rem;
+        display: flex;
+        gap: 1.5rem;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.03);
+        backdrop-filter: blur(10px);
+    }
+
+    .meta-thumb {
+        width: 90px;
+        height: 120px;
+        background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: 700;
+        border-radius: 12px;
+        flex-shrink: 0;
+        text-align: center;
+        padding: 0.5rem;
+        box-shadow: 0 8px 15px rgba(30, 58, 138, 0.2);
+    }
+
+    .meta-info div {
+        margin-bottom: 0.6rem;
+        font-size: 0.95rem;
+        color: #475569;
+    }
+
+    .meta-info strong {
+        color: #0f172a;
+        font-weight: 700;
+        display: block;
+        margin-bottom: 0.1rem;
+    }
+
+    /* Sidebar Buttons */
+    .sidebar-btn {
+        display: block;
+        width: 100%;
+        padding: 1rem;
+        border-radius: 12px;
+        text-align: center;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 1.05rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        margin-bottom: 1rem;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .sidebar-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.15);
+        filter: brightness(1.05);
+    }
+
+    .sidebar-btn:active {
+        transform: translateY(-1px);
+    }
+
+    .btn-green-buy {
+        background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+        color: white;
+    }
+
+    .btn-red-sample {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+    }
+
+    .btn-yellow-discount {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+    }
+
+    .btn-blue-analyst {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+    }
+
+    /* License Form Box */
+    .license-box {
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        border-top: 5px solid #1e3a8a;
+        padding: 2rem;
+        border-radius: 20px;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.03);
+        backdrop-filter: blur(10px);
+    }
+
+    .license-option {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.25rem;
+        border-radius: 12px;
+        transition: all 0.2s;
+        border: 1px solid transparent;
+        margin-bottom: 0.5rem;
+        cursor: pointer;
+    }
+
+    .license-option:hover {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+    }
+
+    .license-option:last-child {
+        border-bottom: none;
+    }
+
+    .license-label {
+        font-size: 1.1rem;
+        color: #334155;
+    }
+
+    .license-price {
+        font-weight: 700;
+        color: #1e3a8a;
+        margin-left: auto;
+    }
+
+    /* Global Box Model Fix for this page */
+    * {
+        box-sizing: border-box;
+    }
+
+    /* FAQ Section Styling */
+    .faq-section {
+        margin-top: 1.5rem;
+    }
+
+    .faq-item {
+        background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+        border: 1px solid #e2e8f0;
+        border-left: 4px solid #1e3a8a;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.25rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        transition: all 0.3s ease;
+    }
+
+    .faq-item:hover {
+        box-shadow: 0 4px 12px rgba(30, 58, 138, 0.1);
+        transform: translateY(-2px);
+        border-left-color: #3b82f6;
+    }
+
+    .faq-question {
+        font-weight: 700;
+        font-size: 1.05rem;
+        color: #1e3a8a;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .faq-question::before {
+        content: "Q:";
+        font-weight: 800;
+        color: #3b82f6;
+        flex-shrink: 0;
+    }
+
+    .faq-answer {
+        color: #475569;
+        line-height: 1.7;
+        text-align: justify;
+        padding-left: 1.75rem;
+    }
+
+    /* New Sidebar Widgets */
+    .sidebar-widget {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+
+    .widget-title {
+        color: #1e3a8a;
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    /* Related Reports Widget */
+    .related-report-item {
+        display: block;
+        text-decoration: none;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f1f5f9;
+        transition: all 0.2s;
+    }
+
+    .related-report-item:last-child {
+        border-bottom: none;
+    }
+
+    .related-report-item:hover .related-report-title {
+        color: #2563eb;
+    }
+
+    .related-report-title {
+        font-size: 0.9rem;
+        color: #334155;
+        line-height: 1.4;
+        font-weight: 500;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        margin-bottom: 0.25rem;
+    }
+
+    .related-report-date {
+        font-size: 0.75rem;
+        color: #94a3b8;
+    }
+
+    /* Why Choose Us Widget */
+    .trust-item {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .trust-icon {
+        width: 36px;
+        height: 36px;
+        background: #eff6ff;
+        color: #3b82f6;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-weight: 700;
+    }
+
+    .trust-text h4 {
+        font-size: 1.1rem;
+        color: #1e293b;
+        margin-bottom: 0.15rem;
+    }
+
+    .trust-text p {
+        font-size: 0.8rem;
+        color: #64748b;
+        line-height: 1.4;
+    }
+
+    /* Support Widget */
+    .support-widget {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        color: white;
+        border: none;
+    }
+
+    .support-widget .widget-title {
+        color: white;
+        border-bottom-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .support-text {
+        font-size: 0.9rem;
+        margin-bottom: 1.25rem;
+        line-height: 1.5;
+        opacity: 0.9;
+    }
+
+    .support-btn {
+        display: block;
+        width: 100%;
+        padding: 0.75rem;
+        background: white;
+        color: #1e3a8a;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: transform 0.2s;
+    }
+
+    .support-btn:hover {
+        transform: translateY(-2px);
+    }
+
+    /* Market Snapshot Widget */
+    .snapshot-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .snapshot-item {
+        background: #f8fafc;
+        padding: 0.75rem;
+        border-radius: 10px;
+        text-align: center;
+        border: 1px solid #f1f5f9;
+    }
+
+    .snapshot-label {
+        font-size: 0.7rem;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+        margin-bottom: 0.25rem;
+        display: block;
+    }
+
+    .snapshot-value {
+        font-size: 0.95rem;
+        color: #1e3a8a;
+        font-weight: 700;
+    }
+
+    /* Key Players Widget */
+    .company-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .company-tag {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.75rem;
+        background: #f1f5f9;
+        color: #475569;
+        border-radius: 20px;
+        border: 1px solid #e2e8f0;
+        transition: all 0.2s;
+    }
+
+    .company-tag:hover {
+        background: #e0e7ff;
+        color: #1e40af;
+        border-color: #c7d2fe;
+    }
+
+    /* Browse Categories Widget */
+    .category-link {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.6rem 0;
+        text-decoration: none;
+        color: #475569;
+        font-size: 1.1rem;
+        border-bottom: 1px solid #f1f5f9;
+        transition: color 0.2s;
+    }
+
+    .category-link:last-child {
+        border-bottom: none;
+    }
+
+    .category-link:hover {
+        color: #2563eb;
+    }
+
+    .cat-count {
+        background: #f1f5f9;
+        color: #94a3b8;
+        font-size: 0.7rem;
+        padding: 0.1rem 0.5rem;
+        border-radius: 10px;
+    }
+
+    /* Methodology Widget */
+    .method-item {
+        display: flex;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+
+    .method-icon {
+        font-size: 1.2rem;
+    }
+
+    .method-content strong {
+        display: block;
+        font-size: 1.1rem;
+        color: #1e293b;
+        margin-bottom: 0.1rem;
+    }
+
+    .method-content p {
+        font-size: 0.8rem;
+        color: #64748b;
+        margin: 0;
+        line-height: 1.4;
+    }
+
+    .sidebar-link-btn {
+        display: block;
+        text-align: center;
+        font-size: 0.85rem;
+        color: #2563eb;
+        font-weight: 600;
+        text-decoration: none;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px dashed #e2e8f0;
+    }
+
+    .sidebar-link-btn:hover {
+        text-decoration: underline;
+    }
+
+    /* Connect Widget */
+    .social-links {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .social-link {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem;
+        background: #f8fafc;
+        border-radius: 8px;
+        text-decoration: none;
+        color: #475569;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+        border: 1px solid transparent;
+    }
+
+    .social-link:hover {
+        background: white;
+        border-color: #cbd5e1;
+        color: #1e3a8a;
+        transform: translateX(2px);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Newsletter Widget */
+    .newsletter-widget {
+        background: #1e293b;
+        color: white;
+    }
+
+    .newsletter-widget .widget-title {
+        color: white;
+        border-bottom-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .newsletter-form input {
+        width: 100%;
+        padding: 0.75rem;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.05);
+        color: white;
+        margin-bottom: 0.75rem;
+        font-size: 0.9rem;
+    }
+
+    .newsletter-btn {
+        width: 100%;
+        padding: 0.75rem;
+        background: #3b82f6;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .newsletter-btn:hover {
+        background: #2563eb;
+    }
+
+    /* Sidebar - extend to match content height */
+    .detail-sidebar {
+        position: sticky;
+        top: 2rem;
+        align-self: stretch;
+        /* Stretch to match grid row height */
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+        .detail-grid-container {
+            grid-template-columns: 1fr;
+            padding: 1rem;
+            /* Ensure it fits */
+            width: 100%;
+            max-width: 100vw;
+        }
+
+        .detail-sidebar {
+            position: static;
+            order: 2;
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .sidebar-btn {
+            width: 100%;
+            max-width: 100%;
+            white-space: normal;
+            /* Allow text wrapping */
+        }
+
+        .detail-main {
+            order: 1;
+            width: 100%;
+        }
+
+        .tab-body {
+            padding: 1rem;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .detail-grid-container {
+            padding: 0.8rem;
+        }
+
+        /* Mobile Typography Fix */
+        .detail-title {
+            font-size: 1.35rem;
+            /* Smaller font */
+            line-height: 1.25;
+            /* Tighter leading */
+            hyphens: auto;
+            /* Reduce ragged right */
+        }
+
+        .detail-hero {
+            padding: 2rem 0;
+            /* Compact hero */
+        }
+
+        .hero-meta {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        /* Revert Image size on mobile */
+        .tab-pane img {
+            max-width: 100%;
+            margin: 1rem 0;
+        }
+    }
+
+    /* Ensure table overflow */
+    .tab-pane table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+    }
+</style>
+
+<!-- Hero Section -->
+<section class="detail-hero">
+    <div class="container">
+
+        <h3 class="detail-title">{{ report.title }}</h3>
+        <div class="hero-meta">
+            <span>ID: MR-{{ report.id }}</span>
+            <span class="desktop-only">|</span>
+            <span>Published: {{ report.publish_date|date:"F Y" }}</span>
+        </div>
+    </div>
+</section>
+
+<!-- Content Grid -->
+<div class="detail-grid-container">
+
+    <!-- Left Main Content -->
+    <main class="detail-main">
+        <div class="tabs-header">
+            <button class="tab-btn active" data-tab="description">Description</button>
+            <button class="tab-btn" data-tab="segmentation">Segmentation</button>
+            <button class="tab-btn" data-tab="toc">Table of Contents</button>
+            <button class="tab-btn" data-tab="methodology">Methodology</button>
+            <a href="{% url 'request-sample' report.slug %}" class="tab-btn" style="text-decoration: none;">Download PDF
+                Sample</a>
+        </div>
+
+        <div class="tab-body">
+            <!-- Description -->
+            <div id="description" class="tab-pane active">
+                <!-- Report Highlights -->
+                {% if report.report_highlights %}
+                <h2>Report Highlights</h2>
+                {{ report.report_highlights|safe }}
+                {% else %}
+                <h2>Market Overview</h2>
+                {{ report.summary|safe }}
+                {% endif %}
+
+                <!-- Bar Chart Image - ALWAYS after Report Highlights -->
+                <div style="text-align: center; margin: 3rem 0;">
+                    <img src="{% static 'images/reports/bar_chart_standard.jpg' %}" alt="Market Growth Analysis"
+                        style="max-width: 85%; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.1);">
+                    <a href="{% url 'request-sample' report.slug %}"
+                        style="display: block; margin-top: 1rem; color: #2563eb; text-decoration: underline;">Request
+                        for Download Sample</a>
+                </div>
+
+                <!-- Industry Snapshot -->
+                {% if report.industry_snapshot %}
+                <h2>Industry Snapshot</h2>
+                {{ report.industry_snapshot|safe }}
+                {% endif %}
+
+                <!-- Key Market Growth Catalysts -->
+                {% if report.market_growth_catalysts %}
+                <h2>Key Market Growth Catalysts</h2>
+                {{ report.market_growth_catalysts|safe }}
+                {% endif %}
+
+                <!-- Market Challenges and Constraints -->
+                {% if report.market_challenges %}
+                <h2>Market Challenges and Constraints</h2>
+                {{ report.market_challenges|safe }}
+                {% endif %}
+
+                <!-- Strategic Growth Opportunities -->
+                {% if report.strategic_opportunities %}
+                <h2>Strategic Growth Opportunities</h2>
+                {{ report.strategic_opportunities|safe }}
+                {% endif %}
+
+                <!-- Market Coverage Overview -->
+                {% if report.market_coverage %}
+                <h2>Market Coverage Overview</h2>
+                {{ report.market_coverage|safe }}
+                {% endif %}
+
+                <!-- Geographic Performance Analysis -->
+                {% if report.geographic_analysis %}
+                <h2>Geographic Performance Analysis</h2>
+                {{ report.geographic_analysis|safe }}
+                {% endif %}
+
+                <!-- Regional Map Image - ALWAYS after Geographic Performance Analysis -->
+                <div style="text-align: center; margin: 3rem 0;">
+                    <img src="{% static 'images/reports/regional_map_standard.png' %}" alt="Geographic Coverage Map"
+                        style="max-width: 85%; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.1);">
+                    <a href="{% url 'ask-for-discount' report.slug %}"
+                        style="display: block; margin-top: 1rem; color: #2563eb; text-decoration: underline;">Ask for
+                        Discount?</a>
+                </div>
+
+                <!-- Competitive Environment Analysis -->
+                {% if report.competitive_environment %}
+                <h2>Competitive Environment Analysis</h2>
+                {{ report.competitive_environment|safe }}
+                {% endif %}
+
+                <!-- Leading Market Participants -->
+                {% if report.leading_participants %}
+                <h2>Leading Market Participants</h2>
+                {{ report.leading_participants|downgrade_headers }}
+                {% endif %}
+
+                <!-- Deck Image - ALWAYS after Leading Market Participants -->
+                <div style="text-align: center; margin: 3rem 0;">
+                    <img src="{% static 'images/reports/deck_standard.jpg' %}" alt="Market Analysis Dashboard"
+                        style="max-width: 85%; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.1);">
+                    <a href="{% url 'ask-for-discount' report.slug %}"
+                        style="display: block; margin-top: 1rem; color: #2563eb; text-decoration: underline;">Ask for
+                        our Customization</a>
+                </div>
+
+                <!-- Long-Term Market Perspective -->
+                {% if report.long_term_perspective %}
+                <h2>Long-Term Market Perspective</h2>
+                {{ report.long_term_perspective|safe }}
+                {% endif %}
+
+                <!-- Market Segmentation (shown in both Description and Segmentation tabs) -->
+                {% if report.segmentation %}
+                <h2 style="margin-top: 3rem;">Market Segmentation</h2>
+                {{ report.segmentation|downgrade_headers }}
+                {% endif %}
+
+                <!-- FAQs (always at the end of Description) -->
+                <h2 style="margin-top: 3rem;">Frequently Asked Questions</h2>
+                <div class="faq-section">
+                    {% if report.faqs %}
+                    <!-- Convert FAQ paragraphs to styled cards -->
+                    {{ report.faqs|format_faqs }}
+                    {% else %}
+                    <!-- Fallback FAQs -->
+                    <div class="faq-item">
+                        <div class="faq-question">What is the projected market size for {{ report.category.name }}?
+                        </div>
+                        <div class="faq-answer">The market is projected to reach significant valuation by 2034, growing
+                            at a steady CAGR.</div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">Who are the key players in the {{ report.title }}?</div>
+                        <div class="faq-answer">Major players include industry leaders focusing on innovation and
+                            strategic partnerships.</div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">Which regions are covered in this report?</div>
+                        <div class="faq-answer">The report covers North America, Europe, Asia Pacific, Latin America,
+                            and Middle East & Africa.</div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Segmentation -->
+            <div id="segmentation" class="tab-pane">
+                <h2>Market Segmentation</h2>
+                {% if report.segmentation %}
+                {{ report.segmentation|downgrade_headers }}
+                {% else %}
+                <p>Detailed segmentation analysis by Type, Application, Region, and End-User is included in the full
+                    report.</p>
+                {% endif %}
+            </div>
+
+            <!-- Table of Contents -->
+            <div id="toc" class="tab-pane">
+                <h2>Table of Contents</h2>
+                {% if report.toc %}
+                {{ report.toc|safe }}
+                {% else %}
+                <p>Table of Contents not available for preview.</p>
+                {% endif %}
+            </div>
+
+            <!-- Methodology -->
+            <div id="methodology" class="tab-pane">
+                <h2>Research Methodology</h2>
+                {% if report.methodology %}
+                {{ report.methodology|safe }}
+                {% else %}
+                <p>Our research methodology involves extensive primary and secondary research, including expert
+                    interviews and data validation.</p>
+                {% endif %}
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Right Sidebar -->
+    <aside class="detail-sidebar">
+
+        <!-- Metadata Box -->
+        <div class="meta-box">
+            <div class="meta-thumb">
+                REPORT<br>COVER
+            </div>
+            <div class="meta-info">
+                <div><strong>Pages:</strong> {{ report.pages_count|default:"150+" }} Pages</div>
+                <div><strong>Format:</strong> {{ report.format_type|default:"PDF, Excel" }}</div>
+                <div><strong>Language:</strong> English</div>
+                <div><strong>Status:</strong> Available</div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="margin-bottom: 2rem;">
+            <a href="{% url 'request-sample' report.slug %}" class="sidebar-btn btn-red-sample">
+                Download PDF Sample
+            </a>
+            <a href="{% url 'ask-for-discount' report.slug %}" class="sidebar-btn btn-yellow-discount">
+                Ask For Discount
+            </a>
+            <a href="{% url 'speak-to-analyst' report.slug %}" class="sidebar-btn btn-blue-analyst">
+                Speak to Analyst
+            </a>
+        </div>
+
+        <!-- Market Snapshot Widget -->
+        <div class="sidebar-widget">
+            <h3 class="widget-title">Market Snapshot</h3>
+            <div class="snapshot-grid">
+                <div class="snapshot-item">
+                    <span class="snapshot-label">Base Year</span>
+                    <span class="snapshot-value">{{ report.base_year|default:"2024" }}</span>
+                </div>
+                <div class="snapshot-item">
+                    <span class="snapshot-label">Forecast</span>
+                    <span class="snapshot-value">{{ report.forecast_period|default:"2025-2032" }}</span>
+                </div>
+                <div class="snapshot-item">
+                    <span class="snapshot-label">CAGR</span>
+                    <span class="snapshot-value">7.5%</span>
+                </div>
+                <div class="snapshot-item">
+                    <span class="snapshot-label">Region</span>
+                    <span class="snapshot-value">{{ report.region|default:"Global" }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- License / Buy Box -->
+        <div class="license-box">
+            <h3
+                style="margin-bottom: 1rem; color: #1e3a8a; font-size: 1.1rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem;">
+                Select License Type</h3>
+
+            <form action="/checkout/{{ report.slug }}/single/" id="buyForm">
+                <label class="license-option">
+                    <input type="radio" name="license" value="single" checked
+                        onchange="updateBuyLink(this, '{{ report.slug }}')">
+                    <span class="license-label">Single User License</span>
+                    <span class="license-price">${{ report.single_user_price }}</span>
+                </label>
+
+                <label class="license-option">
+                    <input type="radio" name="license" value="multi"
+                        onchange="updateBuyLink(this, '{{ report.slug }}')">
+                    <span class="license-label">Multi User License</span>
+                    <span class="license-price">${{ report.multi_user_price }}</span>
+                </label>
+
+                <label class="license-option">
+                    <input type="radio" name="license" value="enterprise"
+                        onchange="updateBuyLink(this, '{{ report.slug }}')">
+                    <span class="license-label">Enterprise License</span>
+                    <span class="license-price">${{ report.enterprise_price }}</span>
+                </label>
+
+                <label class="license-option">
+                    <input type="radio" name="license" value="data" onchang
+                        e="updateBuyLink(this, '{{ report.slug }}')">
+                    <span class="license-label">Data Pack License</span>
+                    <span class="license-price">${{ report.data_pack_price }}</span>
+                </label>
+
+                <button type="submit" class="sidebar-btn btn-green-buy"
+                    style="margin-top: 1.5rem; border: none; cursor: pointer;">
+                    Proceed to Buy
+                </button>
+            </form>
+        </div>
+
+        {% if related_reports %}
+        <div class="sidebar-widget">
+            <h3 class="widget-title">Related Reports</h3>
+            <div class="related-reports-list">
+                {% for related in related_reports %}
+                <a href="{% url 'report-detail' related.slug %}" class="related-report-item">
+                    <div class="related-report-title">{{ related.title }}</div>
+                    <div class="related-report-date">{{ related.publish_date|date:"M Y" }}</div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Key Players Widget -->
+        {% with players=report.leading_participants|extract_companies %}
+        {% if players %}
+        <div class="sidebar-widget">
+            <h3 class="widget-title">Key Players Profiled</h3>
+            <div class="company-tags">
+                {% for player in players %}
+                <span class="company-tag">{{ player }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <!-- Why Choose Us Widget -->
+        <div class="sidebar-widget">
+            <h3 class="widget-title">Why Choose Us?</h3>
+            <div class="trust-signals">
+                <div class="trust-item">
+                    <div class="trust-icon">✓</div>
+                    <div class="trust-text">
+                        <h4>Expert Analysts</h4>
+                        <p>Industry veterans with deep domain expertise.</p>
+                    </div>
+                </div>
+                <div class="trust-item">
+                    <div class="trust-icon">✓</div>
+                    <div class="trust-text">
+                        <h4>Quality Assurance</h4>
+                        <p>Rigorous data validation & verification.</p>
+                    </div>
+                </div>
+                <div class="trust-item">
+                    <div class="trust-icon">✓</div>
+                    <div class="trust-text">
+                        <h4>24/7 Support</h4>
+                        <p>Dedicated assistance for all your queries.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Browse by Category Widget -->
+        {% if all_categories %}
+        <div class="sidebar-widget">
+            <h3 class="widget-title">Browse by Category</h3>
+            <div class="categories-list">
+                {% for cat in all_categories %}
+                <a href="{% url 'report-list' %}?category={{ cat.slug }}" class="category-link">
+                    <span>{{ cat.name }}</span>
+                    <span class="cat-count">{{ cat.report_count }}</span>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Support Widget -->
+        <div class="sidebar-widget support-widget">
+            <h3 class="widget-title">Need Assistance?</h3>
+            <p class="support-text">Our experts are here to help you find the right market insights for your business.
+            </p>
+            <a href="{% url 'speak-to-analyst' report.slug %}" class="support-btn">Speak to an Analyst</a>
+        </div>
+
+        <!-- Newsletter Widget -->
+        <div class="sidebar-widget newsletter-widget">
+            <h3 class="widget-title">Get Market Updates</h3>
+            <p style="font-size: 0.85rem; margin-bottom: 1rem; opacity: 0.8;">Subscribe to receive latest industry
+                insights and reports.</p>
+            <form class="newsletter-form" id="newsletterForm">
+                {% csrf_token %}
+                <input type="email" id="newsletterEmail" placeholder="Enter your email" required>
+                <button type="submit" class="newsletter-btn">Subscribe Now</button>
+            </form>
+            <div id="newsletterSuccess"
+                style="display:none; color: #4ade80; margin-top: 10px; font-size: 0.9rem; font-weight: 600;">
+                <i class="fas fa-check-circle"></i> Subscribed successfully!
+            </div>
+            <div id="newsletterError" style="display:none; color: #f87171; margin-top: 10px; font-size: 0.9rem;">
+                Something went wrong.
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const newsletterForm = document.getElementById('newsletterForm');
+                if (newsletterForm) {
+                    newsletterForm.addEventListener('submit', function (e) {
+                        e.preventDefault();
+                        const emailInput = document.getElementById('newsletterEmail');
+                        const btn = newsletterForm.querySelector('button');
+                        const successMsg = document.getElementById('newsletterSuccess');
+                        const errorMsg = document.getElementById('newsletterError');
+
+                        const originalText = btn.innerText;
+                        btn.disabled = true;
+                        btn.innerText = 'Subscribing...';
+                        successMsg.style.display = 'none';
+                        errorMsg.style.display = 'none';
+
+                        // Get CSRF token
+                        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+                        fetch('/api/leads/newsletter/', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': csrfToken
+                            },
+                            body: JSON.stringify({
+                                email: emailInput.value
+                            })
+                        })
+                            .then(response => {
+                                if (response.ok) return response.json();
+                                throw new Error('Network response was not ok');
+                            })
+                            .then(data => {
+                                newsletterForm.style.display = 'none';
+                                successMsg.innerHTML = '<i class="fas fa-check-circle"></i> ' + data.message;
+                                successMsg.style.display = 'block';
+                            })
+                            .catch(err => {
+                                console.error(err);
+                                errorMsg.style.display = 'block';
+                                btn.disabled = false;
+                                btn.innerText = originalText;
+                            });
+                    });
+                }
+            });
+        </script>
+
+        <!-- Research Methodology Widget -->
+        <div class="sidebar-widget">
+            <h3 class="widget-title">Research Methodology</h3>
+            <div class="methodology-preview">
+                <div class="method-item">
+                    <span class="method-icon">📊</span>
+                    <div class="method-content">
+                        <strong>Primary Research</strong>
+                        <p>Interviews with Key Opinion Leaders (KOLs), Supplier Surveys, and Industry Experts.</p>
+                    </div>
+                </div>
+                <div class="method-item">
+                    <span class="method-icon">📚</span>
+                    <div class="method-content">
+                        <strong>Secondary Research</strong>
+                        <p>Company Annual Reports, SEC Filings, Industry Associations, and Paid Databases.</p>
+                    </div>
+                </div>
+                <div class="method-item">
+                    <span class="method-icon">🛡️</span>
+                    <div class="method-content">
+                        <strong>Data Validation</strong>
+                        <p>Triangulation and market breakdown verification.</p>
+                    </div>
+                </div>
+            </div>
+            <a href="{% url 'request-sample' report.slug %}" class="sidebar-link-btn">View Full Methodology →</a>
+        </div>
+
+        <!-- Request Customization Widget -->
+        <div class="sidebar-widget" style="background: linear-gradient(135deg, #fff 0%, #f0f9ff 100%);">
+            <h3 class="widget-title">Need Specific Data?</h3>
+            <p style="font-size: 1.1rem; color: #475569; margin-bottom: 1rem; line-height: 1.6;">
+                We offer <strong>10% free customization</strong> with every report. tailoring data to your specific
+                regional or segment requirements.
+            </p>
+            <a href="{% url 'ask-for-discount' report.slug %}" class="sidebar-btn btn-blue-analyst"
+                style="margin-bottom: 0;">
+                Request Customization
+            </a>
+        </div>
+
+</div>
+
+<script>
+    // Tab Switching Logic
+    document.addEventListener('DOMContentLoaded', function () {
+        const tabs = document.querySelectorAll('button.tab-btn');
+        const panes = document.querySelectorAll('.tab-pane');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all
+                tabs.forEach(t => t.classList.remove('active'));
+                panes.forEach(p => p.classList.remove('active'));
+
+                // Add active to clicked
+                tab.classList.add('active');
+
+                // Show corresponding pane
+                const targetId = tab.dataset.tab;
+                document.getElementById(targetId).classList.add('active');
+            });
+        });
+    });
+
+    // Buy Link Update
+    function updateBuyLink(radio, slug) {
+        const type = radio.value;
+        const form = document.getElementById('buyForm');
+        form.action = `/reports/checkout/${slug}/${type}/`;
+    }
+</script>
+
+
+
+<!-- Exit Intent Popup (Redesigned) -->
+<div id="exitIntentPopup" class="exit-popup-overlay" style="display: none;">
+    <div class="exit-popup-content">
+        <button class="exit-popup-close">&times;</button>
+        <div class="popup-header-accent"></div>
+
+        <div id="popupFormContainer">
+            <h2 class="exit-popup-title" id="exitPopupTitle">{{ report.title }}</h2>
+            <h3 class="exit-popup-subtitle">Want Free Sample Report ? Get it Now in Minutes.</h3>
+
+            <form id="exitIntentForm" class="exit-popup-form">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="exitName">Name</label>
+                    <input type="text" id="exitName" name="full_name" required placeholder="Full Name">
+                </div>
+                <div class="form-group">
+                    <label for="exitEmail">Email</label>
+                    <input type="email" id="exitEmail" name="email" required placeholder="Work Email">
+                    <small id="emailError"
+                        style="color: red; display: none; font-size: 0.85rem; margin-top: 0.25rem;">Please use a
+                        corporate email address.</small>
+                </div>
+
+                <p class="corporate-email-note">*corporate emails only, please.</p>
+
+                <button type="submit" class="exit-popup-submit">Get Free Sample Now</button>
+                <div id="exitFormMessage" style="display:none; margin-top: 10px; font-weight: bold;"></div>
+            </form>
+        </div>
+
+        <div id="popupSuccess" class="success-state" style="display: none;">
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h3>Thank You!</h3>
+            <p>Your sample request has been received.</p>
+            <p class="success-subtext">Our team will reach out to you shortly with the sample report.</p>
+            <button class="exit-popup-close-btn"
+                onclick="document.getElementById('exitIntentPopup').style.display='none'">Close</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .exit-popup-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        /* Slightly darker overlay */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        backdrop-filter: blur(4px);
+    }
+
+    .exit-popup-content {
+        background: white;
+        padding: 0;
+        /* Removing padding from container to handle border/header better */
+        border-radius: 8px;
+        /* Slightly sharper corners */
+        width: 90%;
+        max-width: 600px;
+        /* Reduced width for focus */
+        position: relative;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        text-align: left;
+        /* Left align content */
+        overflow: hidden;
+        /* For border radius */
+        animation: popupSlideIn 0.3s ease-out forwards;
+    }
+
+    .popup-header-accent {
+        height: 6px;
+        background: linear-gradient(90deg, #1e3a8a 0%, #3b82f6 100%);
+        width: 100%;
+    }
+
+    #popupFormContainer,
+    #popupSuccess {
+        padding: 2.5rem;
+    }
+
+    @keyframes popupSlideIn {
+        from {
+            transform: translateY(-20px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .exit-popup-close {
+        position: absolute;
+        top: 1rem;
+        right: 1.5rem;
+        font-size: 2rem;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #94a3b8;
+        line-height: 1;
+        z-index: 10;
+        transition: color 0.2s;
+    }
+
+    .exit-popup-close:hover {
+        color: #1e293b;
+    }
+
+    .exit-popup-title {
+        color: #1e3a8a;
+        /* Dark Blue */
+        font-size: 1.15rem;
+        line-height: 1.4;
+        margin-bottom: 0.75rem;
+        font-weight: 600;
+        border-bottom: 2px solid #f1f5f9;
+        padding-bottom: 0.75rem;
+    }
+
+    .exit-popup-subtitle {
+        color: #0f172a;
+        /* Dark text for headline */
+        font-size: 1.35rem;
+        /* Large headline */
+        font-weight: 800;
+        margin-bottom: 1.5rem;
+        letter-spacing: -0.02em;
+    }
+
+    .exit-popup-form .form-group {
+        margin-bottom: 1.25rem;
+    }
+
+    .exit-popup-form label {
+        display: block;
+        margin-bottom: 0.4rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #475569;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .exit-popup-form input {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        font-size: 1rem;
+        transition: all 0.2s;
+        background: #f8fafc;
+    }
+
+    .exit-popup-form input:focus {
+        outline: none;
+        border-color: #2563eb;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .corporate-email-note {
+        font-size: 0.85rem;
+        color: #64748b;
+        margin-bottom: 1.5rem;
+        font-style: italic;
+    }
+
+    .exit-popup-submit {
+        background: #2563eb;
+        /* Brand Blue */
+        color: white;
+        padding: 1rem 2rem;
+        border: none;
+        border-radius: 6px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        width: 100%;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+    }
+
+    .exit-popup-submit:hover {
+        background: #1d4ed8;
+    }
+
+    /* Success State Styling */
+    .success-state {
+        text-align: center;
+        padding: 3rem 2rem !important;
+    }
+
+    .success-icon {
+        font-size: 5rem;
+        color: #10b981;
+        margin-bottom: 1.5rem;
+        animation: scaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .success-state h3 {
+        color: #0f172a;
+        font-size: 2rem;
+        font-weight: 800;
+        margin-bottom: 0.75rem;
+    }
+
+    .success-state p {
+        color: #475569;
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .success-subtext {
+        font-size: 1rem;
+        color: #64748b;
+        margin-bottom: 2.5rem !important;
+    }
+
+    .exit-popup-close-btn {
+        background: #f1f5f9;
+        color: #334155;
+        padding: 0.875rem 3rem;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 1rem;
+        transition: all 0.2s;
+    }
+
+    .exit-popup-close-btn:hover {
+        background: #e2e8f0;
+        color: #0f172a;
+    }
+
+    @keyframes scaleIn {
+        from {
+            transform: scale(0);
+            opacity: 0;
+        }
+
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .exit-popup-content {
+            width: 95%;
+            margin: 0 10px;
+        }
+
+        #popupFormContainer {
+            padding: 1.5rem;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const popup = document.getElementById('exitIntentPopup');
+        const closeBtn = document.querySelector('.exit-popup-close');
+        const form = document.getElementById('exitIntentForm');
+        const messageDiv = document.getElementById('exitFormMessage');
+        const successDiv = document.getElementById('popupSuccess');
+        const formContainer = document.getElementById('popupFormContainer');
+        const popupTitle = document.getElementById('exitPopupTitle');
+        const emailInput = document.getElementById('exitEmail');
+        const emailError = document.getElementById('emailError');
+
+        // Truncate Title Logic
+        if (popupTitle) {
+            const originalTitle = popupTitle.innerText;
+            // Split by " Market" (case sensitive usually, but assuming standardized titles)
+            const marketIndex = originalTitle.indexOf(' Market');
+            if (marketIndex !== -1) {
+                // Include " Market" in the result length (7 characters)
+                popupTitle.innerText = originalTitle.substring(0, marketIndex + 7);
+            }
+        }
+
+        // Corporate Email Validation Logic
+        const blockedDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'aol.com', 'icloud.com', 'protonmail.com'];
+
+        function isCorporateEmail(email) {
+            if (!email.includes('@')) return false;
+            const domain = email.split('@')[1].toLowerCase();
+            return !blockedDomains.includes(domain);
+        }
+
+        // Use a simple variable instead of localStorage so it resets on every page load
+        let hasShownPopup = false;
+
+        // Exit Intent Logic
+        document.addEventListener('mouseleave', function (e) {
+            if (e.clientY < 10) {
+                if (!hasShownPopup) {
+                    // Reset form state on new show
+                    formContainer.style.display = 'block';
+                    successDiv.style.display = 'none';
+                    popup.style.display = 'flex';
+                    hasShownPopup = true;
+                }
+            }
+        });
+
+        // Close Logic
+        closeBtn.addEventListener('click', function () {
+            popup.style.display = 'none';
+        });
+
+        // Allow closing success screen
+        const successClose = document.querySelector('.exit-popup-close-btn');
+        if (successClose) {
+            successClose.addEventListener('click', function () {
+                popup.style.display = 'none';
+            });
+        }
+
+        popup.addEventListener('click', function (e) {
+            if (e.target === popup) {
+                popup.style.display = 'none';
+            }
+        });
+
+        // Form Submission
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const email = emailInput.value;
+            if (!isCorporateEmail(email)) {
+                emailError.style.display = 'block';
+                emailInput.style.borderColor = 'red';
+                emailInput.focus();
+                return;
+            } else {
+                emailError.style.display = 'none';
+                emailInput.style.borderColor = '#cbd5e1';
+            }
+
+            const formData = new FormData(form);
+            const data = {
+                full_name: formData.get('full_name'),
+                email: formData.get('email'),
+                report: "{{ report.id }}",
+                lead_type: "SAMPLE",
+                message: "Generated from Exit Intent Popup (Mobile/Exit Intent)"
+            };
+
+            // Disable button
+            const btn = form.querySelector('button[type="submit"]');
+            const originalText = btn.innerText;
+            btn.disabled = true;
+            btn.innerText = 'Sending...';
+
+            fetch('/api/leads/inquiry/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    return response.json().then(err => { throw new Error(JSON.stringify(err)) });
+                })
+                .then(data => {
+                    // Success State
+                    formContainer.style.display = 'none';
+                    successDiv.style.display = 'block';
+
+                    form.reset();
+                    btn.disabled = false;
+                    btn.innerText = originalText;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    messageDiv.style.display = 'block';
+                    messageDiv.style.color = 'red';
+                    messageDiv.innerText = 'Something went wrong. Please check your network.';
+                    btn.disabled = false;
+                    btn.innerText = originalText;
+                });
+        });
+
+        // Clear error on input
+        emailInput.addEventListener('input', function () {
+            emailError.style.display = 'none';
+            this.style.borderColor = '#cbd5e1';
+        });
+    });
+</script>
+{% endblock %}

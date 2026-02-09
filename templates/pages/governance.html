@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ meta_title }}{% endblock %}
+
+{% block content %}
+<style>
+    .page-hero {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        color: white;
+        padding: 4rem 0 3rem;
+        margin-bottom: 3rem;
+    }
+
+    .page-hero h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
+
+    .content-section {
+        max-width: 900px;
+        margin: 0 auto 3rem;
+        padding: 0 1rem;
+    }
+
+    .content-section h2 {
+        color: #1e3a8a;
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin: 2rem 0 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #f97316;
+    }
+
+    .content-section h3 {
+        color: #2563eb;
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin: 1.5rem 0 1rem;
+    }
+
+    .content-section p,
+    .content-section ul {
+        line-height: 1.8;
+        color: #374151;
+        margin-bottom: 1rem;
+    }
+
+    .content-section ul {
+        margin-left: 1.5rem;
+    }
+</style>
+
+<section class="page-hero">
+    <div class="container">
+        <h1>Corporate Governance & Ethics</h1>
+    </div>
+</section>
+
+<div class="container">
+    <article class="content-section">
+        <h2>Corporate Governance Framework</h2>
+        <p>Markets NXT — A Montclaire & Stein Venture operates under a structured corporate governance framework
+            designed to ensure transparency, accountability, independence, and ethical conduct across all research and
+            consulting activities.</p>
+        <p>Our governance principles align with globally recognized corporate and research governance best practices.
+        </p>
+
+        <h2>Governance Structure</h2>
+
+        <h3>Executive Oversight</h3>
+        <p>Strategic direction and operational oversight are provided by the executive leadership team, responsible for
+            corporate strategy, research integrity, and enterprise risk management.</p>
+
+        <h3>Research & Methodology Oversight Committee</h3>
+        <p>A dedicated internal committee oversees research methodologies, data governance, and analytical standards to
+            ensure institutional research integrity and consistency.</p>
+
+        <h3>Compliance & Ethics Oversight</h3>
+        <p>Compliance protocols govern confidentiality, conflict-of-interest management, and ethical conduct across all
+            engagements.</p>
+
+        <h2>Ethical Research Standards</h2>
+        <p>Markets NXT adheres to strict ethical research principles:</p>
+        <ul>
+            <li><strong>Independence of Analysis:</strong> Research outputs are developed independently without
+                influence from commercial considerations.</li>
+            <li><strong>Transparency of Methodology:</strong> Research methodologies and assumptions are documented and
+                internally reviewed.</li>
+            <li><strong>Confidentiality:</strong> Client data and proprietary information are protected under strict
+                confidentiality protocols.</li>
+            <li><strong>Conflict-of-Interest Management:</strong> Analysts and consultants are required to disclose
+                potential conflicts and recuse themselves when necessary.</li>
+            <li><strong>Responsible Data Use:</strong> Data is collected and processed in compliance with applicable
+                privacy and data protection standards.</li>
+        </ul>
+
+        <h2>Client Confidentiality & Data Protection</h2>
+        <p>Markets NXT maintains enterprise-grade safeguards to protect client and corporate data, including:</p>
+        <ul>
+            <li>Access controls and role-based permissions</li>
+            <li>Secure data storage and transmission protocols</li>
+            <li>Internal confidentiality agreements and compliance training</li>
+            <li>Periodic internal audits and data governance reviews</li>
+        </ul>
+
+        <h2>Code of Conduct</h2>
+        <p>All employees, associates, analysts, and consultants are required to adhere to a Code of Conduct that
+            emphasizes:</p>
+        <ul>
+            <li>Professional integrity</li>
+            <li>Respect for intellectual property</li>
+            <li>Ethical communication and representation</li>
+            <li>Compliance with legal and regulatory requirements</li>
+            <li>Zero tolerance for misconduct, misrepresentation, or data misuse</li>
+        </ul>
+
+        <h2>Continuous Governance Improvement</h2>
+        <p>Markets NXT regularly reviews governance policies to reflect evolving regulatory requirements, industry
+            standards, and best practices in consulting and research governance.</p>
+    </article>
+</div>
+{% endblock %}

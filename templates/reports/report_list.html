@@ -1,0 +1,499 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Browse Reports - Market Research Platform{% endblock %}
+
+{% block content %}
+<style>
+    /* Global Page Styles */
+    body {
+        background-color: #f8fafc;
+    }
+
+    .vmr-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 2.5rem;
+        align-items: start;
+    }
+
+    /* Sidebar Styles (Desktop) */
+    .vmr-sidebar {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        position: sticky;
+        top: 2rem;
+    }
+
+    .vmr-sidebar h3 {
+        font-size: 1.1rem;
+        color: #1e293b;
+        border-bottom: 2px solid #e2e8f0;
+        padding-bottom: 0.8rem;
+        margin-bottom: 1rem;
+        font-weight: 700;
+    }
+
+    .vmr-cat-link {
+        display: block;
+        padding: 0.75rem 0.5rem;
+        color: #64748b;
+        text-decoration: none;
+        font-size: 0.95rem;
+        border-bottom: 1px solid #f1f5f9;
+        transition: 0.2s;
+    }
+
+    .vmr-cat-link:hover,
+    .vmr-cat-link.active {
+        color: #2563eb;
+        background-color: #f8fafc;
+        transform: translateX(5px);
+        font-weight: 600;
+    }
+
+    /* Mobile Category Filter (Hidden on Desktop) */
+    .mobile-cat-filter {
+        display: none;
+        /* Hidden by default */
+        overflow-x: auto;
+        gap: 0.5rem;
+        padding-bottom: 1rem;
+        margin-bottom: 1.5rem;
+        -ms-overflow-style: none;
+        /* IE and Edge */
+        scrollbar-width: none;
+        /* Firefox */
+    }
+
+    .mobile-cat-filter::-webkit-scrollbar {
+        display: none;
+    }
+
+    .mobile-cat-pill {
+        white-space: nowrap;
+        background: white;
+        border: 1px solid #e2e8f0;
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        color: #64748b;
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .mobile-cat-pill.active {
+        background: #1e3a8a;
+        color: white;
+        border-color: #1e3a8a;
+    }
+
+    /* Main Content Area */
+    .vmr-header {
+        background-color: #eff6ff;
+        border: 1px solid #bfdbfe;
+        color: #1e3a8a;
+        padding: 1.5rem 2rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+    }
+
+    .vmr-header h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .vmr-header p {
+        margin: 0;
+        color: #1e40af;
+        opacity: 0.9;
+    }
+
+    /* Report Card Horizontal */
+    .vmr-card {
+        display: flex;
+        gap: 1.5rem;
+        background: white;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .vmr-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        border-color: #cbd5e1;
+    }
+
+    .vmr-thumb {
+        width: 160px;
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+        border-radius: 6px;
+        color: white;
+        text-align: center;
+        padding: 1rem;
+        font-size: 0.8rem;
+        box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .vmr-thumb img {
+        width: 100%;
+        height: auto;
+        opacity: 0.9;
+        mix-blend-mode: overlay;
+    }
+
+    .vmr-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .vmr-breadcrumbs {
+        font-size: 0.8rem;
+        color: #2563eb;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .vmr-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1e3a8a;
+        text-decoration: none;
+        margin-bottom: 0.8rem;
+        line-height: 1.4;
+        display: block;
+    }
+
+    .vmr-title:hover {
+        color: #2563eb;
+        text-decoration: underline;
+    }
+
+    .vmr-desc {
+        font-size: 0.95rem;
+        color: #475569;
+        line-height: 1.6;
+        margin-bottom: 1.2rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    /* Action Buttons Row */
+    .vmr-actions {
+        margin-top: auto;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .vmr-btn {
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-decoration: none;
+        transition: 0.2s;
+        text-align: center;
+    }
+
+    .btn-view {
+        background: #1e3a8a;
+        color: white;
+    }
+
+    .btn-view:hover {
+        background: #1e40af;
+    }
+
+    .btn-sample {
+        background: #dc2626;
+        color: white;
+    }
+
+    .btn-sample:hover {
+        background: #b91c1c;
+    }
+
+    .btn-discount {
+        background: #16a34a;
+        color: white;
+    }
+
+    .btn-discount:hover {
+        background: #15803d;
+    }
+
+    .btn-buy {
+        background: #f59e0b;
+        color: black;
+    }
+
+    .btn-buy:hover {
+        background: #d97706;
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+        .vmr-container {
+            grid-template-columns: 1fr;
+            padding: 1rem;
+            /* Strict Containment */
+            width: 100%;
+            max-width: 100vw;
+            overflow-x: hidden;
+            box-sizing: border-box;
+        }
+
+        main {
+            width: 100%;
+            min-width: 0;
+            max-width: 100%;
+        }
+
+        .vmr-sidebar {
+            display: none;
+        }
+
+        /* Show mobile filter on tablet/mobile */
+        .mobile-cat-filter {
+            display: flex;
+            width: 100%;
+            max-width: 100%;
+            flex-wrap: wrap;
+            /* WRAP items */
+            overflow-x: visible;
+            /* No scroll */
+            padding-bottom: 0;
+            gap: 0.5rem;
+        }
+
+        .vmr-header {
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+    }
+
+    @media (max-width: 640px) {
+
+        /* Mobile Overlay Fix */
+        * {
+            box-sizing: border-box;
+        }
+
+        .vmr-card {
+            flex-direction: column;
+            gap: 1rem;
+            width: 100%;
+            max-width: 100vw;
+            /* Strict */
+            padding: 1.2rem;
+            box-sizing: border-box;
+            overflow: hidden;
+            /* Contain children */
+        }
+
+        .vmr-content {
+            width: 100%;
+            min-width: 0;
+            /* CRITICAL for Flexbox text wrap */
+        }
+
+        .vmr-thumb {
+            width: 100%;
+            height: auto;
+            min-height: 100px;
+            flex-direction: row;
+            gap: 1rem;
+        }
+
+        .vmr-actions {
+            flex-direction: column;
+            width: 100%;
+            min-width: 0;
+        }
+
+        .vmr-btn {
+            width: 100%;
+            display: block;
+        }
+
+        /* FULL CONTEXT: No Truncation */
+        .vmr-desc {
+            -webkit-line-clamp: unset !important;
+            line-clamp: unset !important;
+            display: block !important;
+            height: auto !important;
+            overflow: visible !important;
+            margin-bottom: 1rem;
+
+            /* Text Wrapping Safety */
+            white-space: normal;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+
+        /* Ensure Title Wraps */
+        .vmr-title {
+            word-wrap: break-word;
+            word-break: break-word;
+            hyphens: auto;
+        }
+    }
+</style>
+
+<div class="vmr-container">
+    <!-- Sidebar (Desktop) -->
+    <aside class="vmr-sidebar">
+        <h3>Browse by Categories</h3>
+        <nav>
+            <a href="{% url 'report-list' %}" class="vmr-cat-link {% if not current_category %}active{% endif %}">
+                All Categories
+            </a>
+            {% for cat in categories %}
+            <a href="{% url 'report-list' %}?category={{ cat.slug }}"
+                class="vmr-cat-link {% if current_category == cat.slug %}active{% endif %}">
+                {{ cat.name }}
+            </a>
+            {% endfor %}
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main>
+
+        <!-- Mobile Category Filter (Visible < 992px) -->
+        <div class="mobile-cat-filter">
+            <a href="{% url 'report-list' %}" class="mobile-cat-pill {% if not current_category %}active{% endif %}">
+                All
+            </a>
+            {% for cat in categories %}
+            <a href="{% url 'report-list' %}?category={{ cat.slug }}"
+                class="mobile-cat-pill {% if current_category == cat.slug %}active{% endif %}">
+                {{ cat.name }}
+            </a>
+            {% endfor %}
+        </div>
+
+        <!-- Header / Search -->
+        <div class="vmr-header">
+            {% if current_category %}
+            <h2>{{ current_category|title }} Market Reports</h2>
+            <p>Comprehensive industry analysis, market size, and forecast for {{ current_category }}.</p>
+            {% else %}
+            <h2>Global Market Research Reports</h2>
+            <p>Explore our extensive library of {{ total_reports_count }} market intelligence reports.</p>
+            {% endif %}
+
+            <!-- Modern Search embedded in header -->
+            <form method="get" action="" style="margin-top: 1.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <input type="text" name="q" value="{{ search_query }}" placeholder="Search market, industry..."
+                    style="flex: 1; padding: 0.8rem 1rem; border: 1px solid #bfdbfe; border-radius: 4px; outline: none; min-width: 200px;">
+                <button type="submit"
+                    style="background: #2563eb; color: white; border: none; padding: 0 1.5rem; border-radius: 4px; font-weight: 700; cursor: pointer; height: 46px;">
+                    Search
+                </button>
+            </form>
+        </div>
+
+        <!-- Results Info -->
+        <div style="margin-bottom: 1.5rem; color: #64748b; font-size: 0.9rem;">
+            {% if is_paginated %}
+            <p>Showing <strong>{{ page_obj.start_index }} - {{ page_obj.end_index }}</strong> of <strong>
+                    {{ page_obj.paginator.count }}
+                </strong> reports</p>
+            {% else %}
+            <p>Showing all <strong>{{ reports.count }}</strong> reports</p>
+            {% endif %}
+        </div>
+
+        <!-- Reports List -->
+        <div class="vmr-list">
+            {% for report in reports %}
+            <article class="vmr-card">
+                <div class="vmr-thumb">
+                    <div style="font-weight: 700; font-size: 1.2rem; margin-bottom: 0.5rem;">VMR</div>
+                    <div>{{ report.category.name|default:"Report" }}</div>
+                </div>
+
+                <div class="vmr-content">
+                    <div class="vmr-breadcrumbs">
+                        {{ report.category.name }} / {{ report.region }}
+                    </div>
+
+                    <a href="{% url 'report-detail' report.slug %}" class="vmr-title">
+                        {{ report.title }}
+                    </a>
+
+                    <div class="vmr-desc">
+                        {{ report.summary|striptags|truncatewords:150 }}
+                    </div>
+
+                    <div class="vmr-actions">
+                        <a href="{% url 'report-detail' report.slug %}" class="vmr-btn btn-view">View Details</a>
+                        <a href="{% url 'request-sample' report.slug %}" class="vmr-btn btn-sample">Download Sample</a>
+                        <a href="{% url 'ask-for-discount' report.slug %}" class="vmr-btn btn-discount">Ask For
+                            Discount</a>
+                        <a href="{% url 'report-detail' report.slug %}#buyBtn" class="vmr-btn btn-buy">Purchase Full
+                            Report</a>
+                    </div>
+                </div>
+            </article>
+            {% empty %}
+            <div style="text-align: center; padding: 4rem; background: white; border-radius: 8px;">
+                <p style="color: #64748b; font-size: 1.1rem;">No reports found matching your criteria.</p>
+                <a href="{% url 'report-list' %}" style="color: #2563eb; font-weight: 600; text-decoration: none;">View
+                    all reports</a>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <div style="display: flex; justify-content: center; gap: 0.5rem; margin-top: 3rem;">
+            {% if page_obj.has_previous %}
+            <a href="?page=1{% if search_query %}&q={{ search_query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}"
+                class="vmr-btn" style="background: white; border: 1px solid #e2e8f0; color: #64748b;">First</a>
+            <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}"
+                class="vmr-btn" style="background: white; border: 1px solid #e2e8f0; color: #64748b;">Prev</a>
+            {% endif %}
+
+            <span class="vmr-btn" style="background: #1e3a8a; color: white;">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}"
+                class="vmr-btn" style="background: white; border: 1px solid #e2e8f0; color: #64748b;">Next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}"
+                class="vmr-btn" style="background: white; border: 1px solid #e2e8f0; color: #64748b;">Last</a>
+            {% endif %}
+        </div>
+        {% endif %}
+
+    </main>
+</div>
+{% endblock %}

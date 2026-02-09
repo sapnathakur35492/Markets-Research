@@ -1,0 +1,428 @@
+{% extends 'base.html' %}
+{% block title %}Checkout - {{ report.title }}{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@25.2.0/build/css/intlTelInput.css">
+<style>
+    .checkout-section {
+        background: #f1f5f9;
+        min-height: 90vh;
+        padding: 4rem 0;
+    }
+
+    .checkout-container {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .card-dark {
+        background: #0f172a;
+        /* Dark Blue */
+        border-radius: 8px;
+        padding: 2.5rem;
+        color: white;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-header h2 {
+        color: #60a5fa;
+        font-weight: 700;
+        margin-bottom: 2rem;
+    }
+
+    .form-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.2rem;
+        gap: 1.5rem;
+    }
+
+    .form-label {
+        flex: 0 0 140px;
+        font-weight: 500;
+        font-size: 0.95rem;
+        color: #e2e8f0;
+    }
+
+    .form-input-wrapper {
+        flex: 1;
+    }
+
+    .form-control {
+        width: 100% !important;
+        background: white !important;
+        border: none !important;
+        padding: 0.7rem 1rem !important;
+        border-radius: 6px !important;
+        color: #1e293b !important;
+        font-size: 0.95rem !important;
+    }
+
+    .iti {
+        width: 100%;
+    }
+
+    .iti__country-list {
+        color: #1e293b;
+    }
+
+    .iti__search-input {
+        width: 100% !important;
+        padding: 0.8rem 1rem !important;
+        font-size: 1rem !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 6px !important;
+        margin-bottom: 0.5rem !important;
+        outline: none !important;
+        background: #f8fafc !important;
+        color: #1e293b !important;
+    }
+
+    .iti__search-input:focus {
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+        background: #ffffff !important;
+    }
+
+    .summary-card {
+        background: white;
+        border-radius: 8px;
+        padding: 2rem;
+        border: 1px solid #e2e8f0;
+        height: fit-content;
+        position: sticky;
+        top: 2rem;
+    }
+
+    .summary-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .total-price {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #0f172a;
+        text-align: right;
+    }
+
+    /* Fix overlapping flag/text and style the dial code */
+    .iti__selected-dial-code {
+        margin-left: 8px;
+        font-weight: 500;
+        color: #1e293b !important;
+    }
+
+    .form-control#id_phone_checkout {
+        padding-left: 100px !important;
+        /* Ensure enough space for separate dial code */
+    }
+
+    .iti__selected-flag {
+        background-color: #f1f5f9 !important;
+        border-radius: 6px 0 0 6px !important;
+    }
+
+    .btn-complete {
+        background: #06b6d4;
+        color: white;
+        font-weight: 700;
+        padding: 1rem;
+        border-radius: 6px;
+        border: none;
+        width: 100%;
+        margin-top: 2rem;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .btn-complete:hover {
+        background: #0891b2;
+    }
+
+    #id_country_code_wrapper {
+        display: none;
+    }
+
+    @media (max-width: 900px) {
+        .checkout-container {
+            grid-template-columns: 1fr;
+        }
+
+        .summary-card {
+            order: -1;
+            position: static;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="checkout-section">
+    <div class="container">
+        <div class="checkout-container">
+
+            <!-- Details Form -->
+            <div class="card-dark">
+                <div class="form-header">
+                    <h2>Secure Checkout</h2>
+                </div>
+
+                <form method="post" id="checkoutForm">
+                    {% csrf_token %}
+                    {% if form.errors %}
+                    <div class="alert alert-danger" style="color: #f87171; margin-bottom: 2rem;">
+                        <strong>Please correct the errors below.</strong>
+                    </div>
+                    {% endif %}
+
+                    <h4
+                        style="margin-bottom: 1.5rem; color: #94a3b8; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px;">
+                        Customer Info</h4>
+
+                    <div class="form-row">
+                        <label class="form-label">First Name</label>
+                        <div class="form-input-wrapper">{{ form.first_name }}</div>
+                    </div>
+                    <div class="form-row">
+                        <label class="form-label">Last Name</label>
+                        <div class="form-input-wrapper">{{ form.last_name }}</div>
+                    </div>
+                    <div class="form-row">
+                        <label class="form-label">Work Email</label>
+                        <div class="form-input-wrapper">{{ form.email }}</div>
+                    </div>
+                    <div class="form-row">
+                        <label class="form-label">Work Phone</label>
+                        <div class="form-input-wrapper">
+                            {{ form.phone }}
+                            <div id="phone-error"
+                                style="color: #f87171; font-size: 0.85rem; margin-top: 0.5rem; display: none;">
+                                Please enter a valid phone number for the selected country.
+                            </div>
+                        </div>
+                    </div>
+                    <div id="id_country_code_wrapper">{{ form.country_code }}</div>
+                    <div class="form-row">
+                        <label class="form-label">Company Name</label>
+                        <div class="form-input-wrapper">{{ form.company_name }}</div>
+                    </div>
+                    <div class="form-row">
+                        <label class="form-label">Job Title</label>
+                        <div class="form-input-wrapper">{{ form.designation }}</div>
+                    </div>
+
+                    <h4
+                        style="margin: 2rem 0 1.5rem; color: #94a3b8; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px;">
+                        Billing Address</h4>
+
+                    <div class="form-row">
+                        <label class="form-label">Address</label>
+                        <div class="form-input-wrapper">{{ form.address }}</div>
+                    </div>
+                    <div class="form-row">
+                        <label class="form-label">City</label>
+                        <div class="form-input-wrapper">{{ form.city }}</div>
+                    </div>
+                    <div class="form-row">
+                        <label class="form-label">State</label>
+                        <div class="form-input-wrapper">{{ form.state }}</div>
+                    </div>
+                    <div class="form-row">
+                        <label class="form-label">Zip Code</label>
+                        <div class="form-input-wrapper">{{ form.zip_code }}</div>
+                    </div>
+                    <div class="form-row">
+                        <label class="form-label">Country</label>
+                        <div class="form-input-wrapper">{{ form.country }}</div>
+                    </div>
+
+                    <div style="margin-top: 2rem;">
+                        {{ form.captcha }}
+                    </div>
+
+                    <div id="payment-errors"
+                        style="display: none; background: #fee2e2; color: #b91c1c; padding: 1rem; border-radius: 6px; margin-top: 1.5rem;">
+                    </div>
+
+                    <div id="form-actions">
+                        <button type="submit" class="btn-complete" id="checkoutBtn">Proceed to Payment</button>
+                    </div>
+
+                    <div id="paypal-container" style="display: none; margin-top: 2rem;">
+                        <h4 style="margin-bottom: 1.5rem; color: #60a5fa;">Pay Securely with PayPal</h4>
+                        <div id="paypal-button-container"></div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="summary-card">
+                <h3 style="margin-bottom: 1.5rem; color: #0f172a;">Order Summary</h3>
+                <div class="summary-item">
+                    <span style="color: #64748b;">Report</span>
+                    <span style="font-weight: 600; text-align: right; flex: 1; margin-left: 1rem;">{{ report.title
+                        }}</span>
+                </div>
+                <div class="summary-item">
+                    <span style="color: #64748b;">License</span>
+                    <span style="font-weight: 600;">{{ license_label }}</span>
+                </div>
+                <div class="total-price" style="margin-top: 2rem;">
+                    <span style="font-size: 1.1rem; color: #64748b; font-weight: 500;">Total:</span>
+                    ${{ price }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/intl-tel-input@25.2.0/build/js/intlTelInput.min.js"></script>
+<script src="https://www.paypal.com/sdk/js?client-id={{ PAYPAL_CLIENT_ID }}&currency=USD"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const phoneInput = document.querySelector("#id_phone_checkout");
+        const countryCodeInput = document.querySelector("#id_country_code");
+        const phoneError = document.querySelector("#phone-error");
+
+        const iti = window.intlTelInput(phoneInput, {
+            initialCountry: "auto",
+            geoIpLookup: callback => {
+                fetch("https://ipapi.co/json")
+                    .then(res => res.json())
+                    .then(data => callback(data.country_code))
+                    .catch(() => callback("us"));
+            },
+            utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@25.2.0/build/js/utils.js",
+            separateDialCode: true,
+            strictMode: true,
+        });
+
+        let leadId = null;
+        const form = document.querySelector("#checkoutForm");
+
+        form.addEventListener('submit', function (e) {
+            const btn = document.getElementById('checkoutBtn');
+            const errorDiv = document.getElementById('payment-errors');
+
+            // Validate phone number
+            phoneError.style.display = 'none';
+            if (phoneInput.value.trim()) {
+                if (!iti.isValidNumber()) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                    phoneError.style.display = 'block';
+                    phoneInput.focus();
+                    return false;
+                }
+            }
+
+            e.preventDefault(); // Stop default for AJAX
+
+            // Update country code
+            const dialCode = iti.getSelectedCountryData().dialCode;
+            countryCodeInput.value = "+" + dialCode;
+
+            btn.innerHTML = 'Saving Details...';
+            btn.disabled = true;
+            errorDiv.style.display = 'none';
+
+            const formData = new FormData(form);
+            formData.append('ajax', 'true');
+
+            fetch(window.location.href, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        leadId = data.lead_id;
+                        document.getElementById('form-actions').style.display = 'none';
+                        document.getElementById('paypal-container').style.display = 'block';
+                        form.querySelectorAll('input, select, textarea').forEach(input => input.disabled = true);
+                        renderPayPalButtons();
+                    } else {
+                        throw new Error(data.message || 'Error saving details');
+                    }
+                })
+                .catch(error => {
+                    btn.innerHTML = 'Proceed to Payment';
+                    btn.disabled = false;
+                    errorDiv.innerHTML = '<strong>Error:</strong> ' + error.message;
+                    errorDiv.style.display = 'block';
+                });
+        });
+
+        // Helper to get max digits for current country
+        const setMaxLength = () => {
+            const placeholder = phoneInput.getAttribute('placeholder') || '';
+            const maxDigits = placeholder.replace(/\D/g, '').length;
+            if (maxDigits > 0) {
+                phoneInput.setAttribute('maxlength', maxDigits + 5);
+            }
+        };
+
+        // Enforce numeric only and max length
+        phoneInput.addEventListener('input', function (e) {
+            phoneError.style.display = 'none';
+
+            // Remove non-digits
+            let digits = this.value.replace(/\D/g, '');
+
+            // Get current country length
+            const placeholder = phoneInput.getAttribute('placeholder') || '';
+            const maxDigits = placeholder.replace(/\D/g, '').length;
+
+            if (maxDigits > 0 && digits.length > maxDigits) {
+                digits = digits.substring(0, maxDigits);
+            }
+
+            if (this.value !== digits) {
+                this.value = digits;
+            }
+        });
+
+        phoneInput.addEventListener('countrychange', setMaxLength);
+        setTimeout(setMaxLength, 1000);
+
+        function renderPayPalButtons() {
+            paypal.Buttons({
+                createOrder: (data, actions) => actions.order.create({
+                    purchase_units: [{
+                        amount: { value: '{{ price }}' },
+                        description: '{{ report.title }} - {{ license_label }}'
+                    }]
+                }),
+                onApprove: (data, actions) => actions.order.capture().then(details => {
+                    return fetch('{% url "paypal_capture" %}', {
+                        method: 'POST',
+                        headers: {
+                            'content-type': 'application/json',
+                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                        },
+                        body: JSON.stringify({ orderID: data.orderID, leadID: leadId })
+                    }).then(res => {
+                        if (res.ok) window.location.href = "{% url 'report-detail' slug=report.slug %}?payment=success";
+                        else alert('Payment captured but could not notify server. Please contact support.');
+                    });
+                }),
+                onError: (err) => {
+                    console.error('PayPal Error:', err);
+                    alert('An error occurred with PayPal. Please try again.');
+                }
+            }).render('#paypal-button-container');
+        }
+    });
+</script>
+{% endblock %}

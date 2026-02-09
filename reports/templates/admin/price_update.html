@@ -1,0 +1,11 @@
+{% extends 'admin/base_site.html' %}
+{% load i18n admin_urls %}
+
+{% block content %}
+<h2>Update Prices for {{ reports_count }} Selected Reports</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Update Prices" class="default" />
+</form>
+{% endblock %}

@@ -1,0 +1,10 @@
+Django>=5.0
+djangorestframework
+django-cors-headers
+pandas
+openpyxl
+django-filter
+Pillow
+gunicorn
+python-dotenv
+whitenoise

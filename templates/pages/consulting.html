@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ meta_title }}{% endblock %}
+
+{% block content %}
+<style>
+    .page-hero {
+        background: linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%);
+        /* Purple */
+        color: white;
+        padding: 4rem 0 3rem;
+        margin-bottom: 3rem;
+    }
+
+    .page-hero h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    .content-section {
+        max-width: 900px;
+        margin: 0 auto 3rem;
+        padding: 0 1rem;
+    }
+
+    .content-section h2 {
+        color: #1e3a8a;
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin: 2.5rem 0 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 3px solid #f97316;
+    }
+
+    .content-section h3 {
+        color: #2563eb;
+        font-size: 1.4rem;
+        font-weight: 600;
+        margin: 2rem 0 1rem;
+    }
+
+    .content-section p {
+        line-height: 1.8;
+        color: #374151;
+        margin-bottom: 1.2rem;
+    }
+
+    .content-section ul {
+        line-height: 1.8;
+        color: #374151;
+        margin: 1rem 0 1.5rem 1.5rem;
+    }
+
+    .content-section li {
+        margin-bottom: 0.5rem;
+    }
+
+    .service-box {
+        background: #f0f9ff;
+        border-left: 4px solid #2563eb;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+        border-radius: 4px;
+    }
+
+    .service-box h3 {
+        margin-top: 0;
+    }
+
+    /* Mobile Responsive Fixes */
+    @media (max-width: 768px) {
+        .page-hero {
+            padding: 3rem 0 2rem;
+        }
+
+        .page-hero h1 {
+            font-size: 1.75rem;
+            /* Reduced from 2.5rem */
+            line-height: 1.3;
+            padding: 0 1rem;
+            /* Ensure text doesn't touch edges */
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            padding: 0 1rem;
+        }
+    }
+</style>
+
+<section class="page-hero">
+    <div class="container">
+        <h1>Strategic Advisory & Market Intelligence Consulting</h1>
+        <p class="subtitle">Consulting-led market intelligence for strategic decisions</p>
+    </div>
+</section>
+
+<div class="container">
+    <article class="content-section">
+        <p style="font-size: 1.1rem;">Markets NXT provides consulting-led market intelligence services to enterprises,
+            investors, and institutions seeking structured insights for strategic decisions.</p>
+
+        <h2>Our Consulting Services</h2>
+
+        <div class="service-box">
+            <h3>Market Entry & Expansion Strategy</h3>
+            <p>We support organizations evaluating new markets, geographies, and sectors with structured market sizing,
+                competitive analysis, and risk assessment.</p>
+        </div>
+
+        <div class="service-box">
+            <h3>Corporate Strategy & Industry Intelligence</h3>
+            <p>Our consultants deliver industry structure analysis, scenario modeling, and long-term market outlooks to
+                support corporate planning.</p>
+        </div>
+
+        <div class="service-box">
+            <h3>Investment & Commercial Due Diligence</h3>
+            <p>We provide data-driven insights for private equity firms, venture capital funds, corporate M&A teams, and
+                financial institutions.</p>
+        </div>
+
+        <div class="service-box">
+            <h3>Custom Research & Intelligence Projects</h3>
+            <p>Tailored research engagements aligned with enterprise strategic priorities, including proprietary
+                datasets, expert interviews, and consulting frameworks.</p>
+        </div>
+
+        <div class="service-box">
+            <h3>Policy & Regulatory Intelligence</h3>
+            <p>Structured analysis of regulatory environments, policy trends, and geopolitical risk factors impacting
+                industries and investments.</p>
+        </div>
+
+        <h2>Our Consulting Approach</h2>
+
+        <p>Markets NXT combines structured research methodologies, proprietary datasets, and consulting frameworks to
+            deliver insights that inform strategic and financial decisions.</p>
+
+        <p><strong>We operate with institutional rigor, independence, and confidentiality.</strong></p>
+
+        <div
+            style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 1.5rem; margin: 2rem 0; border-radius: 4px;">
+            <p style="margin: 0; font-size: 1.05rem;"><strong>Ready to discuss your strategic intelligence
+                    needs?</strong></p>
+            <p style="margin: 0.5rem 0 0;"><a href="{% url 'pages:contact' %}"
+                    style="color: #2563eb; font-weight: 600;">Contact our consulting team →</a></p>
+        </div>
+    </article>
+</div>
+{% endblock %}

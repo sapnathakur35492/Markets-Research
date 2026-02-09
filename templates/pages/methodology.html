@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ meta_title }}{% endblock %}
+
+{% block content %}
+<style>
+    .page-hero {
+        background: linear-gradient(135deg, #0e7490 0%, #06b6d4 100%);
+        /* Cyan */
+        color: white;
+        padding: 4rem 0 3rem;
+        margin-bottom: 3rem;
+    }
+
+    .page-hero h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
+
+    .content-section {
+        max-width: 900px;
+        margin: 0 auto 3rem;
+        padding: 0 1rem;
+    }
+
+    .content-section h2 {
+        color: #1e3a8a;
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin: 2rem 0 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #f97316;
+    }
+
+    .content-section h3 {
+        color: #2563eb;
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin: 1.5rem 0 1rem;
+    }
+
+    .content-section p,
+    .content-section ul {
+        line-height: 1.8;
+        color: #374151;
+        margin-bottom: 1rem;
+    }
+
+    .content-section ul {
+        margin-left: 1.5rem;
+    }
+
+    .process-step {
+        background: #f9fafb;
+        border-left: 4px solid #2563eb;
+        padding: 1.25rem;
+        margin: 1rem 0;
+        border-radius: 4px;
+    }
+
+    .process-step h4 {
+        color: #1e3a8a;
+        margin: 0 0 0.5rem;
+    }
+
+    .process-step p {
+        margin: 0;
+    }
+</style>
+
+<section class="page-hero">
+    <div class="container">
+        <h1>Methodology & Research Framework</h1>
+    </div>
+</section>
+
+<div class="container">
+    <article class="content-section">
+        <h2>Institutional Research Methodology</h2>
+        <p>Markets NXT applies a structured institutional research framework inspired by global consulting and
+            intelligence best practices.</p>
+
+        <h2>Research Process</h2>
+
+        <div class="process-step">
+            <h4>1. Market Definition & Segmentation</h4>
+            <p>We define industry scope, value chains, and market segments using standardized classification frameworks
+                and domain expertise.</p>
+        </div>
+
+        <div class="process-step">
+            <h4>2. Data Collection & Validation</h4>
+            <p>Data is sourced from a combination of:</p>
+            <ul style="margin-top: 0.5rem;">
+                <li>Primary interviews and surveys</li>
+                <li>Industry experts and stakeholders</li>
+                <li>Public filings and regulatory data</li>
+                <li>Trade publications and technical literature</li>
+                <li>Proprietary datasets and longitudinal research archives</li>
+            </ul>
+        </div>
+
+        <div class="process-step">
+            <h4>3. Quantitative Modeling</h4>
+            <p>We apply market sizing models, growth projections, scenario analysis, and sensitivity testing to develop
+                structured forecasts.</p>
+        </div>
+
+        <div class="process-step">
+            <h4>4. Competitive & Strategic Analysis</h4>
+            <p>Industry structure, competitive positioning, value chain mapping, and strategic implications are assessed
+                using consulting frameworks.</p>
+        </div>
+
+        <div class="process-step">
+            <h4>5. Expert Review & Quality Assurance</h4>
+            <p>All research outputs undergo multi-level internal validation and expert review to ensure analytical
+                integrity.</p>
+        </div>
+
+        <h2>Consulting Integration</h2>
+        <p>Unlike traditional research firms, Markets NXT integrates consulting logic into research outputs, providing:
+        </p>
+        <ul>
+            <li>Strategic implications</li>
+            <li>Investment and expansion considerations</li>
+            <li>Risk and opportunity assessments</li>
+            <li>Scenario-based decision frameworks</li>
+        </ul>
+
+        <h2>Data Governance & Ethics</h2>
+        <p>Markets NXT adheres to strict standards for:</p>
+        <ul>
+            <li>Data accuracy and transparency</li>
+            <li>Source attribution and validation</li>
+            <li>Confidentiality and ethical research practices</li>
+            <li>Conflict-of-interest management</li>
+        </ul>
+    </article>
+</div>
+{% endblock %}

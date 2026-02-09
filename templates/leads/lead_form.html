@@ -1,0 +1,933 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ page_title }} - {{ report.title }}{% endblock %}
+
+{% block extra_head %}
+<!-- Intl Tel Input CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@25.2.0/build/css/intlTelInput.css">
+<!-- FontAwesome for Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+    /* ----------------------------------------------------------------
+       STYLES COPIED FROM report_detail.html FOR CONSISTENCY
+       ---------------------------------------------------------------- */
+    html,
+    body {
+        background: radial-gradient(at 0% 0%, rgba(226, 232, 240, 0.5) 0px, transparent 50%),
+            radial-gradient(at 100% 0%, rgba(203, 213, 225, 0.4) 0px, transparent 50%),
+            radial-gradient(at 100% 100%, rgba(226, 232, 240, 0.5) 0px, transparent 50%),
+            radial-gradient(at 0% 100%, rgba(203, 213, 225, 0.4) 0px, transparent 50%),
+            #f8fafc;
+        overflow-x: hidden;
+        max-width: 100%;
+        font-family: 'Inter', sans-serif;
+    }
+
+    /* Hero Section */
+    .detail-hero {
+        position: relative;
+        background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+        color: white;
+        padding: 5rem 0 4.5rem;
+        border-bottom: 5px solid #f97316;
+        margin-bottom: 0;
+        text-align: left;
+        overflow: hidden;
+    }
+
+    .detail-hero::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -10%;
+        width: 60%;
+        height: 120%;
+        background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, transparent 70%);
+        border-radius: 50%;
+        filter: blur(80px);
+        pointer-events: none;
+    }
+
+    .detail-hero::after {
+        content: '';
+        position: absolute;
+        bottom: -20%;
+        right: 5%;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(249, 115, 22, 0.15) 0%, transparent 70%);
+        border-radius: 50%;
+        filter: blur(60px);
+        pointer-events: none;
+    }
+
+    .detail-hero .container {
+        position: relative;
+        z-index: 2;
+        max-width: 1540px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    .detail-title {
+        font-size: 2.2rem;
+        font-weight: 800;
+        line-height: 1.25;
+        color: white;
+        margin-bottom: 1.5rem;
+        letter-spacing: -0.02em;
+        text-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        max-width: 90%;
+    }
+
+    /* Removed hero-meta class as per request */
+
+    /* Layout Grid */
+    .detail-grid-container {
+        max-width: 1540px;
+        margin: 0 auto;
+        padding: 4rem 2rem;
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        gap: 5rem;
+        align-items: start;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Main Content Area (Form Container) */
+    .detail-main {
+        background: #ffffff;
+        border-radius: 16px;
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        border-top: 5px solid #2563eb;
+        /* Top Color Accent */
+        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.08), 0 10px 20px -15px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        width: 100%;
+        padding: 3.5rem;
+        position: relative;
+    }
+
+    /* Elegant Form Header */
+    .form-header {
+        margin-bottom: 2.5rem;
+        border-bottom: 2px solid #f1f5f9;
+        padding-bottom: 1.5rem;
+    }
+
+    .form-title-main {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: #1e3a8a;
+        letter-spacing: -0.02em;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .form-title-main i {
+        color: #f97316;
+        font-size: 0.9em;
+    }
+
+    /* Icon Accent */
+
+    .form-subtitle {
+        color: #64748b;
+        margin-top: 0.5rem;
+        font-size: 1rem;
+    }
+
+    /* Form Fields Styling */
+    .form-group {
+        margin-bottom: 1.75rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #475569;
+        margin-bottom: 0.25rem;
+        display: block;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+
+    /* Input Group for Icons */
+    .input-group {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 1rem;
+        color: #94a3b8;
+        z-index: 10;
+        font-size: 1rem;
+        pointer-events: none;
+        transition: color 0.3s;
+    }
+
+    /* Stylish Input Fields */
+    .form-control {
+        width: 100% !important;
+        background: #f8fafc !important;
+        border: 1px solid #e2e8f0 !important;
+        padding: 0.9rem 1.1rem 0.9rem 2.8rem !important;
+        /* Left padding for icon */
+        border-radius: 8px !important;
+        color: #1e293b !important;
+        font-size: 1rem !important;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.01);
+    }
+
+    .form-control:hover {
+        background: #fff !important;
+        border-color: #cbd5e1 !important;
+    }
+
+    /* Enhanced Form Styling */
+    .form-control:focus {
+        background: #fff !important;
+        border-color: #2563eb !important;
+        /* Brand Blue */
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1) !important;
+    }
+
+    .form-control:focus+.input-icon,
+    .form-control:focus~.input-icon {
+        color: #1e40af;
+        /* Darker Blue on Focus */
+        opacity: 1;
+    }
+
+    /* Special padding for phone since it has its own flag container */
+    .form-control#id_phone {
+        padding-left: 90px !important;
+    }
+
+    /* Submit Button */
+    .btn-submit-form {
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        color: white;
+        font-weight: 700;
+        padding: 1.1rem 3rem;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 1rem;
+        width: 100%;
+        font-size: 1.1rem;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+        letter-spacing: 0.02em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+    }
+
+    .btn-submit-form:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+        background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+    }
+
+    .btn-submit-form:active {
+        transform: translateY(0);
+    }
+
+    /* Privacy Text */
+    .privacy-text {
+        text-align: center;
+        margin-top: 1.5rem;
+        font-size: 0.85rem;
+        color: #94a3b8;
+    }
+
+    .privacy-text a {
+        color: #64748b;
+        text-decoration: underline;
+    }
+
+    /* ITI overrides */
+    .iti {
+        width: 100%;
+    }
+
+    .iti__country-list {
+        color: #1e293b;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .iti__search-input {
+        width: 100% !important;
+        padding: 0.8rem !important;
+        border: 1px solid #e2e8f0 !important;
+        background: #fff !important;
+    }
+
+    .iti__selected-dial-code {
+        color: #1e293b !important;
+        font-weight: 500;
+    }
+
+    /* Hiding Elements */
+    #id_country_code_wrapper {
+        display: none !important;
+    }
+
+    /* Sidebar Styling */
+    .detail-sidebar {
+        position: sticky;
+        top: 2rem;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    /* Removed meta-box and action-buttons styles/html as per request */
+
+    .sidebar-widget {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e2e8f0;
+    }
+
+    .widget-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .snapshot-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.25rem;
+    }
+
+    .snapshot-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .snapshot-label {
+        font-size: 0.75rem;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 600;
+    }
+
+    .snapshot-value {
+        font-weight: 700;
+        color: #0f172a;
+        font-size: 1rem;
+    }
+
+    /* Why Choose Us Styling */
+    .why-item {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .why-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .why-icon {
+        width: 36px;
+        height: 36px;
+        background: #e0f2fe;
+        color: #0284c7;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 0.9rem;
+    }
+
+    .why-content strong {
+        display: block;
+        color: #0f172a;
+        font-size: 0.95rem;
+        margin-bottom: 0.2rem;
+    }
+
+    .why-content p {
+        color: #64748b;
+        font-size: 0.85rem;
+        margin: 0;
+        line-height: 1.4;
+    }
+
+    /* License Box */
+    .license-box {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+
+    .license-option {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        cursor: pointer;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .license-option:last-of-type {
+        border-bottom: none;
+    }
+
+    .license-label {
+        font-size: 0.95rem;
+        color: #475569;
+        margin-left: 0.5rem;
+        flex: 1;
+    }
+
+    .license-price {
+        font-weight: 700;
+        color: #1e3a8a;
+        font-size: 0.95rem;
+    }
+
+    input[type="radio"] {
+        accent-color: #2563eb;
+        transform: scale(1.1);
+    }
+
+    @keyframes blink-btn {
+        0% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: 0.85;
+            transform: scale(0.98);
+        }
+
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    .btn-buy-now {
+        display: block;
+        width: 100%;
+        padding: 1rem;
+        background: #16a34a;
+        color: white;
+        text-align: center;
+        border-radius: 8px;
+        font-weight: 700;
+        text-decoration: none;
+        margin-top: 1rem;
+        transition: all 0.2s;
+        box-shadow: 0 4px 6px rgba(22, 163, 74, 0.2);
+    }
+
+    .btn-buy-now:hover {
+        background: #15803d;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 12px rgba(22, 163, 74, 0.3);
+        animation: blink-btn 1s infinite ease-in-out;
+    }
+
+    @media (max-width: 900px) {
+        .detail-grid-container {
+            grid-template-columns: 1fr;
+            gap: 3rem;
+            padding: 2rem 1rem;
+        }
+
+        .detail-main {
+            padding: 2rem 1.5rem;
+        }
+
+        .detail-title {
+            font-size: 1.75rem;
+        }
+
+        .form-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .detail-hero {
+            padding: 3rem 0;
+        }
+
+        .detail-title {
+            font-size: 1.35rem !important;
+            line-height: 1.3;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<header class="detail-hero">
+    <div class="container">
+        <!-- Removed Meta Header as requested -->
+        <h1 class="detail-title">{{ report.title }}</h1>
+    </div>
+</header>
+
+<div class="detail-grid-container">
+
+    <!-- MAIN CONTENT: LEAD FORM -->
+    <main class="detail-main">
+        <div class="form-header">
+            <h2 class="form-title-main">
+                <i class="fas fa-edit"></i> {{ page_title }}
+            </h2>
+            <p class="form-subtitle">Please fill out the form below and we captures your inquiry.</p>
+        </div>
+
+        <form method="post" id="leadForm" novalidate>
+            {% csrf_token %}
+
+            <!-- Removed global error message block as per request -->
+
+            <!-- First Name & Last Name Row -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">First Name</label>
+                    <div class="input-group">
+                        <i class="fas fa-user input-icon"></i>
+                        {{ form.first_name }}
+                    </div>
+                    <!-- Inline Error -->
+                    <div id="error_id_first_name" class="field-error"
+                        style="color: #ef4444; font-size: 0.85rem; margin-top: 0.4rem; display: none;">This field is
+                        required.</div>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">Last Name</label>
+                    <div class="input-group">
+                        <i class="fas fa-user input-icon"></i>
+                        {{ form.last_name }}
+                    </div>
+                    <!-- Inline Error -->
+                    <div id="error_id_last_name" class="field-error"
+                        style="color: #ef4444; font-size: 0.85rem; margin-top: 0.4rem; display: none;">This field is
+                        required.</div>
+                </div>
+            </div>
+
+            <!-- Email -->
+            <div class="form-group">
+                <label class="form-label">Work Email</label>
+                <div class="input-group">
+                    <i class="fas fa-envelope input-icon"></i>
+                    {{ form.email }}
+                </div>
+                <!-- Inline Error -->
+                <div id="error_id_email" class="field-error"
+                    style="color: #ef4444; font-size: 0.85rem; margin-top: 0.4rem; display: none;">This field is
+                    required.</div>
+            </div>
+
+            <!-- Country -->
+            <div class="form-group">
+                <label class="form-label">Country</label>
+                <div class="input-group">
+                    <i class="fas fa-globe input-icon"></i>
+                    {{ form.country }}
+                </div>
+                <!-- Inline Error -->
+                <div id="error_id_country" class="field-error"
+                    style="color: #ef4444; font-size: 0.85rem; margin-top: 0.4rem; display: none;">Please select a
+                    country.</div>
+            </div>
+
+            <!-- Phone -->
+            <div class="form-group">
+                <label class="form-label">Work Phone</label>
+                <div class="input-group">
+                    <!-- Phone has own wrapper/icon via library usually, but strict padding set above -->
+                    {{ form.phone }}
+                </div>
+                <!-- Inline Error -->
+                <div id="phone-error" style="color: #ef4444; font-size: 0.85rem; margin-top: 0.4rem; display: none;">
+                    Please enter a valid phone number.
+                </div>
+            </div>
+
+            <!-- Hidden Code Field -->
+            <div id="id_country_code_wrapper">
+                {{ form.country_code }}
+            </div>
+
+            <!-- Company -->
+            <div class="form-group">
+                <label class="form-label">Company Name</label>
+                <div class="input-group">
+                    <i class="fas fa-building input-icon"></i>
+                    {{ form.company_name }}
+                </div>
+                <!-- Inline Error -->
+                <div id="error_id_company_name" class="field-error"
+                    style="color: #ef4444; font-size: 0.85rem; margin-top: 0.4rem; display: none;">This field is
+                    required.</div>
+            </div>
+
+            <!-- Message -->
+            <div class="form-group">
+                <label class="form-label">Message</label>
+                <!-- Textarea needs spacing for icon at top-left -->
+                <div class="input-group" style="align-items: flex-start;">
+                    <i class="fas fa-comment-dots input-icon" style="top: 1rem;"></i>
+                    {{ form.message }}
+                </div>
+                <!-- Inline Error -->
+                <div id="error_id_message" class="field-error"
+                    style="color: #ef4444; font-size: 0.85rem; margin-top: 0.4rem; display: none;">This field is
+                    required.</div>
+            </div>
+
+            <div style="margin-bottom: 2rem; display: none;">
+                {{ form.captcha }}
+            </div>
+
+            <button type="submit" class="btn-submit-form" id="submitBtn">
+                Submit Request <i class="fas fa-arrow-right"></i>
+            </button>
+
+            <p class="privacy-text">
+                By clicking submit, you agree to our <a href="{% url 'pages:privacy' %}">Privacy
+                    Policy</a>
+                and <a href="{% url 'pages:terms' %}">Terms of Service</a>.
+            </p>
+        </form>
+    </main>
+
+    <!-- RIGHT SIDEBAR -->
+    <aside class="detail-sidebar">
+
+        <!-- License / Buy Box (Moved to top as per request) -->
+        <div class="license-box">
+            <h3
+                style="margin-bottom: 1.5rem; color: #1e3a8a; font-size: 1.1rem; border-bottom: 2px solid #f1f5f9; padding-bottom: 0.75rem; font-weight: 700;">
+                Select License Type
+            </h3>
+
+            <form action="/reports/checkout/{{ report.slug }}/single/" id="buyFormSidebar" method="get">
+                <label class="license-option">
+                    <div style="display:flex; align-items:center;">
+                        <input type="radio" name="license" value="single" checked
+                            onchange="updateBuyLinkSidebar(this, '{{ report.slug }}')">
+                        <span class="license-label">Single User License</span>
+                    </div>
+                    <span class="license-price">${{ report.single_user_price }}</span>
+                </label>
+
+                <label class="license-option">
+                    <div style="display:flex; align-items:center;">
+                        <input type="radio" name="license" value="multi"
+                            onchange="updateBuyLinkSidebar(this, '{{ report.slug }}')">
+                        <span class="license-label">Multi User License</span>
+                    </div>
+                    <span class="license-price">${{ report.multi_user_price }}</span>
+                </label>
+
+                <label class="license-option">
+                    <div style="display:flex; align-items:center;">
+                        <input type="radio" name="license" value="enterprise"
+                            onchange="updateBuyLinkSidebar(this, '{{ report.slug }}')">
+                        <span class="license-label">Enterprise License</span>
+                    </div>
+                    <span class="license-price">${{ report.enterprise_price }}</span>
+                </label>
+
+                <label class="license-option">
+                    <div style="display:flex; align-items:center;">
+                        <input type="radio" name="license" value="data"
+                            onchange="updateBuyLinkSidebar(this, '{{ report.slug }}')">
+                        <span class="license-label">Data Pack License</span>
+                    </div>
+                    <span class="license-price">${{ report.data_pack_price }}</span>
+                </label>
+
+                <button type="submit" class="btn-buy-now">
+                    Buy Now
+                </button>
+            </form>
+        </div>
+
+        <div class="sidebar-widget">
+            <h3 class="widget-title">Market Snapshot <i class="fas fa-chart-pie" style="opacity: 0.5;"></i></h3>
+            <div class="snapshot-grid">
+                <div class="snapshot-item">
+                    <span class="snapshot-label">Base Year</span>
+                    <span class="snapshot-value">{{ report.base_year|default:"2024" }}</span>
+                </div>
+                <div class="snapshot-item">
+                    <span class="snapshot-label">Forecast</span>
+                    <span class="snapshot-value">{{ report.forecast_period|default:"2025-2032" }}</span>
+                </div>
+                <div class="snapshot-item">
+                    <span class="snapshot-label">CAGR</span>
+                    <span class="snapshot-value">7.5%</span>
+                </div>
+                <div class="snapshot-item">
+                    <span class="snapshot-label">Region</span>
+                    <span class="snapshot-value">{{ report.region|default:"Global" }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Why Choose Us Widget -->
+        <div class="sidebar-widget">
+            <h3 class="widget-title" style="color: #1e3a8a;">Why Choose Us?</h3>
+            <div class="why-choose-list">
+                <div class="why-item">
+                    <div class="why-icon"><i class="fas fa-check"></i></div>
+                    <div class="why-content">
+                        <strong>Expert Analysts</strong>
+                        <p>Industry veterans with deep domain expertise.</p>
+                    </div>
+                </div>
+                <div class="why-item">
+                    <div class="why-icon"><i class="fas fa-check"></i></div>
+                    <div class="why-content">
+                        <strong>Quality Assurance</strong>
+                        <p>Rigorous data validation & verification.</p>
+                    </div>
+                </div>
+                <div class="why-item">
+                    <div class="why-icon"><i class="fas fa-check"></i></div>
+                    <div class="why-content">
+                        <strong>24/7 Support</strong>
+                        <p>Dedicated assistance for all your queries.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </aside>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/intl-tel-input@25.2.0/build/js/intlTelInput.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const phoneInput = document.querySelector("#id_phone");
+        const countryCodeInput = document.querySelector("#id_country_code");
+        const phoneError = document.querySelector("#phone-error");
+
+        const iti = window.intlTelInput(phoneInput, {
+            initialCountry: "auto",
+            geoIpLookup: callback => {
+                fetch("https://ipapi.co/json")
+                    .then(res => res.json())
+                    .then(data => callback(data.country_code))
+                    .catch(() => callback("us"));
+            },
+            utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@25.2.0/build/js/utils.js",
+            separateDialCode: true,
+            strictMode: true,
+        });
+
+        // Strict 10-digit validation logic for India
+        const validateIndiaPhone = () => {
+            const countryData = iti.getSelectedCountryData();
+            if (countryData.iso2 === 'in') {
+                phoneInput.setAttribute('maxlength', '10');
+                phoneInput.setAttribute('minlength', '10');
+                phoneInput.value = phoneInput.value.replace(/\D/g, '').slice(0, 10);
+            } else {
+                const placeholder = phoneInput.getAttribute('placeholder') || '';
+                const maxDigits = placeholder.replace(/\D/g, '').length;
+                if (maxDigits > 0) {
+                    phoneInput.setAttribute('maxlength', maxDigits + 5);
+                    phoneInput.removeAttribute('minlength');
+                }
+            }
+        };
+
+        phoneInput.addEventListener('input', function (e) {
+            phoneError.style.display = 'none';
+            const countryData = iti.getSelectedCountryData();
+            if (countryData.iso2 === 'in') {
+                let val = this.value.replace(/\D/g, '');
+                if (val.length > 10) val = val.slice(0, 10);
+                this.value = val;
+            } else {
+                let digits = this.value.replace(/\D/g, '');
+                const placeholder = phoneInput.getAttribute('placeholder') || '';
+                const maxDigits = placeholder.replace(/\D/g, '').length;
+                if (maxDigits > 0 && digits.length > maxDigits + 2) {
+                    digits = digits.substring(0, maxDigits + 2);
+                }
+                this.value = digits;
+            }
+        });
+
+        phoneInput.addEventListener('countrychange', function () {
+            phoneInput.value = '';
+            validateIndiaPhone();
+        });
+
+        setTimeout(validateIndiaPhone, 1000);
+
+        // General Form Validation
+        const validateForm = (e) => {
+            let isValid = true;
+            let firstErrorField = null;
+
+            const showError = (fieldId, msg) => {
+                const field = document.querySelector('[name="' + fieldId + '"]') || document.getElementById('id_' + fieldId);
+                const errorDiv = document.getElementById('error_id_' + fieldId) || document.getElementById('phone-error');
+
+                if (field) {
+                    field.style.borderColor = "#ef4444";
+                    if (errorDiv) {
+                        errorDiv.textContent = msg;
+                        errorDiv.style.display = 'block';
+                    }
+                    if (!firstErrorField) firstErrorField = field;
+                }
+            };
+
+            const hideError = (fieldId) => {
+                const field = document.querySelector('[name="' + fieldId + '"]') || document.getElementById('id_' + fieldId);
+                const errorDiv = document.getElementById('error_id_' + fieldId) || document.getElementById('phone-error');
+
+                if (field) {
+                    field.style.borderColor = "#e2e8f0";
+                    if (errorDiv) {
+                        errorDiv.style.display = 'none';
+                    }
+                }
+            };
+
+            // Fields to validate
+            const requiredFields = [
+                { id: 'first_name', msg: 'First Name is required' },
+                { id: 'last_name', msg: 'Last Name is required' },
+                { id: 'email', msg: 'Email is required' },
+                { id: 'country', msg: 'Country is required' },
+                { id: 'company_name', msg: 'Company Name is required' },
+                { id: 'message', msg: 'Message is required' }
+            ];
+
+            requiredFields.forEach(item => {
+                hideError(item.id);
+                const field = document.querySelector('[name="' + item.id + '"]');
+                if (field && !field.value.trim()) {
+                    isValid = false;
+                    showError(item.id, "This field is required.");
+                }
+            });
+
+            // Specific: Email
+            const emailField = document.querySelector('[name="email"]');
+            if (emailField && emailField.value.trim()) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(emailField.value.trim())) {
+                    isValid = false;
+                    showError('email', "Please enter a valid email address.");
+                }
+            }
+
+            // Specific: Phone
+            const phoneVal = phoneInput.value.trim();
+            const countryData = iti.getSelectedCountryData();
+
+            phoneInput.style.borderColor = "#e2e8f0";
+            phoneError.style.display = 'none';
+
+            if (!phoneVal) {
+                isValid = false;
+                phoneInput.style.borderColor = "#ef4444";
+                phoneError.textContent = "This field is required.";
+                phoneError.style.display = 'block';
+                if (!firstErrorField) firstErrorField = phoneInput;
+            } else {
+                if (countryData.iso2 === 'in') {
+                    if (phoneVal.length !== 10) {
+                        isValid = false;
+                        phoneInput.style.borderColor = "#ef4444";
+                        phoneError.textContent = "Phone number must be exactly 10 digits.";
+                        phoneError.style.display = 'block';
+                        if (!firstErrorField) firstErrorField = phoneInput;
+                    }
+                }
+
+                if ((countryData.iso2 !== 'in' || phoneVal.length === 10) && !iti.isValidNumber()) {
+                    isValid = false;
+                    phoneInput.style.borderColor = "#ef4444";
+                    phoneError.textContent = "Please enter a valid phone number.";
+                    phoneError.style.display = 'block';
+                    if (!firstErrorField) firstErrorField = phoneInput;
+                }
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                if (firstErrorField) firstErrorField.focus();
+                return false;
+            }
+            return true;
+        };
+
+        const form = document.querySelector("#leadForm");
+        form.addEventListener('submit', function (e) {
+            if (!validateForm(e)) {
+                return false;
+            }
+            // Valid
+            if (iti) {
+                const dialCode = iti.getSelectedCountryData().dialCode;
+                countryCodeInput.value = "+" + dialCode;
+            }
+            const btn = document.getElementById('submitBtn');
+            btn.innerHTML = 'Processing... <i class="fas fa-spinner fa-spin"></i>';
+            btn.disabled = true;
+            btn.style.opacity = '0.7';
+        });
+    });
+
+    function updateBuyLinkSidebar(radio, slug) {
+        const type = radio.value;
+        const form = document.getElementById('buyFormSidebar');
+        form.action = `/reports/checkout/${slug}/${type}/`;
+    }
+</script>
+{% endblock %}

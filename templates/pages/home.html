@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Markets NXT - Institutional Market Intelligence & Strategic Advisory{% endblock %}
+
+{% block content %}
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        color: white;
+        padding: 5rem 0;
+        text-align: center;
+    }
+
+    .hero-section h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 1.5rem;
+        line-height: 1.2;
+    }
+
+    .hero-section .subtitle {
+        font-size: 1.3rem;
+        margin-bottom: 2rem;
+        opacity: 0.9;
+    }
+
+    .hero-cta {
+        display: inline-flex;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .btn-hero {
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 6px;
+        text-decoration: none;
+        transition: 0.2s;
+    }
+
+    .btn-hero-primary {
+        background: white;
+        color: #1e3a8a;
+    }
+
+    .btn-hero-primary:hover {
+        background: #f3f4f6;
+    }
+
+    .btn-hero-secondary {
+        background: transparent;
+        color: white;
+        border: 2px solid white;
+    }
+
+    .btn-hero-secondary:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .features-section {
+        padding: 4rem 0;
+        background: #f9fafb;
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-top: 3rem;
+    }
+
+    .feature-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .feature-card h3 {
+        color: #1e3a8a;
+        font-size: 1.4rem;
+        margin-bottom: 1rem;
+    }
+
+    .feature-card p {
+        color: #6b7280;
+        line-height: 1.6;
+    }
+
+    .cta-section {
+        background: #1e3a8a;
+        color: white;
+        padding: 4rem 0;
+        text-align: center;
+    }
+
+    .cta-section h2 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .cta-section p {
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+        opacity: 0.9;
+    }
+</style>
+
+<section class="hero-section">
+    <div class="container">
+        <h1>Institutional Market Intelligence<br>& Strategic Advisory</h1>
+        <p class="subtitle">A Montclaire & Stein Venture</p>
+        <p style="max-width: 800px; margin: 0 auto; font-size: 1.1rem; opacity: 0.85;">
+            Rigorous, independent market research and consulting insights that enable enterprises, investors, and
+            institutions to make informed strategic decisions in a complex global economy.
+        </p>
+        <div class="hero-cta">
+            <a href="{% url 'report-list' %}" class="btn-hero btn-hero-primary">Browse Reports</a>
+            <a href="{% url 'pages:consulting' %}" class="btn-hero btn-hero-secondary">Consulting Services</a>
+        </div>
+    </div>
+</section>
+
+<section class="features-section">
+    <div class="container">
+        <h2 style="text-align: center; font-size: 2.5rem; color: #1e3a8a; margin-bottom: 1rem;">Why Markets NXT</h2>
+        <p style="text-align: center; color: #6b7280; font-size: 1.1rem; max-width: 700px; margin: 0 auto;">
+            Institutional research frameworks, not generic reports
+        </p>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <h3>🎯 Institutional Rigor</h3>
+                <p>Structured research methodologies inspired by consulting frameworks, designed for board-level
+                    decision-making and strategic planning.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>📊 Data Discipline</h3>
+                <p>Multi-source validation, conservative forecasting, and expert-driven interpretation backed by over a
+                    century of institutional knowledge.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>🔍 Independent Analysis</h3>
+                <p>Objective insights free from commercial bias, ensuring ethical research practices and analytical
+                    integrity.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>🌐 Global Perspective</h3>
+                <p>Network of industry advisors and domain experts across North America, Europe, and Asia-Pacific.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>💼 Consulting Integration</h3>
+                <p>Strategic implications, investment considerations, and scenario-based decision frameworks integrated
+                    into every report.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>🔒 Enterprise Security</h3>
+                <p>ISO 9001 & ISO 27001 certified with strict confidentiality standards and data protection practices.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="cta-section">
+    <div class="container">
+        <h2>Ready to Access Institutional Intelligence?</h2>
+        <p>Explore our market reports or discuss custom research engagements</p>
+        <div style="display: inline-flex; gap: 1rem;">
+            <a href="{% url 'pages:contact' %}" class="btn-hero btn-hero-primary">Contact Us</a>
+            <a href="{% url 'pages:about' %}" class="btn-hero btn-hero-secondary">Learn More</a>
+        </div>
+    </div>
+</section>
+{% endblock %}
