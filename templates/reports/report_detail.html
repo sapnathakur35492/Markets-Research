@@ -16,7 +16,7 @@
             radial-gradient(at 100% 100%, rgba(226, 232, 240, 0.5) 0px, transparent 50%),
             radial-gradient(at 0% 100%, rgba(203, 213, 225, 0.4) 0px, transparent 50%),
             #f8fafc;
-        overflow-x: hidden;
+        /* overflow-x: hidden; <--- REMOVED to fix sticky behavior */
         max-width: 100%;
     }
 
@@ -765,8 +765,8 @@
     .detail-sidebar {
         position: sticky;
         top: 2rem;
-        align-self: stretch;
-        /* Stretch to match grid row height */
+        align-self: start;
+        /* CHANGED from stretch to start to allow sticky movement */
     }
 
     /* Responsive */
@@ -866,7 +866,8 @@
             <button class="tab-btn active" data-tab="description">Description</button>
             <button class="tab-btn" data-tab="segmentation">Segmentation</button>
             <button class="tab-btn" data-tab="toc">Table of Contents</button>
-            <button class="tab-btn" data-tab="methodology">Methodology</button>
+            <a href="{% url 'report-methodology' report.slug %}" class="tab-btn"
+                style="text-decoration: none;">Methodology</a>
             <a href="{% url 'request-sample' report.slug %}" class="tab-btn" style="text-decoration: none;">Download PDF
                 Sample</a>
         </div>
@@ -1019,16 +1020,7 @@
                 {% endif %}
             </div>
 
-            <!-- Methodology -->
-            <div id="methodology" class="tab-pane">
-                <h2>Research Methodology</h2>
-                {% if report.methodology %}
-                {{ report.methodology|safe }}
-                {% else %}
-                <p>Our research methodology involves extensive primary and secondary research, including expert
-                    interviews and data validation.</p>
-                {% endif %}
-            </div>
+
 
         </div>
     </main>
@@ -1201,7 +1193,8 @@
         <!-- Support Widget -->
         <div class="sidebar-widget support-widget">
             <h3 class="widget-title">Need Assistance?</h3>
-            <p class="support-text">Our experts are here to help you find the right market insights for your business.
+            <p class="support-text">Our experts are here to help you find the right market insights for your
+                business.
             </p>
             <a href="{% url 'speak-to-analyst' report.slug %}" class="support-btn">Speak to an Analyst</a>
         </div>

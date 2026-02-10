@@ -1,0 +1,419 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load report_filters %}
+
+{% block title %}Research Methodology - {{ report.title }} - Market Research Platform{% endblock %}
+
+{% block content %}
+<style>
+    /* Global Background matching detail page */
+    html,
+    body {
+        background: radial-gradient(at 0% 0%, rgba(226, 232, 240, 0.5) 0px, transparent 50%),
+            radial-gradient(at 100% 0%, rgba(203, 213, 225, 0.4) 0px, transparent 50%),
+            radial-gradient(at 100% 100%, rgba(226, 232, 240, 0.5) 0px, transparent 50%),
+            radial-gradient(at 0% 100%, rgba(203, 213, 225, 0.4) 0px, transparent 50%),
+            #f8fafc;
+        max-width: 100%;
+    }
+
+    /* Hero Section - Simplified for Methodology */
+    .methodology-hero {
+        position: relative;
+        background: radial-gradient(circle at 10% 20%, #1e3a8a 0%, #1e40af 90%);
+        color: white;
+        padding: 3rem 0;
+        border-bottom: 5px solid #f97316;
+        margin-bottom: 0;
+        overflow: hidden;
+    }
+
+    .methodology-hero::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -10%;
+        width: 60%;
+        height: 120%;
+        background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+        border-radius: 50%;
+        filter: blur(80px);
+        pointer-events: none;
+    }
+
+    .container {
+        max-width: 1540px;
+        margin: 0 auto;
+        padding: 0 2rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .report-title-link {
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        font-size: 0.9rem;
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+
+    .report-title-link:hover {
+        color: white;
+        text-decoration: underline;
+    }
+
+    .page-title {
+        font-size: 2.2rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        color: white;
+    }
+
+    /* Layout Grid */
+    .methodology-grid {
+        max-width: 1540px;
+        margin: 0 auto;
+        padding: 4rem 2rem;
+        display: grid;
+        grid-template-columns: 1fr 380px;
+        gap: 6rem;
+        align-items: start;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Main Content */
+    .methodology-content {
+        background: white;
+        padding: 3rem;
+        border-radius: 20px;
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+        color: #334155;
+        line-height: 1.8;
+        font-size: 1.05rem;
+    }
+
+    .methodology-content h2 {
+        color: #1e3a8a;
+        font-size: 1.75rem;
+        margin-top: 2.5rem;
+        margin-bottom: 1.25rem;
+        font-weight: 800;
+        border-bottom: 2px solid #e2e8f0;
+        padding-bottom: 0.75rem;
+    }
+
+    .methodology-content h2:first-child {
+        margin-top: 0;
+    }
+
+    .methodology-content h3 {
+        color: #0f172a;
+        font-size: 1.35rem;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        font-weight: 700;
+    }
+
+    .methodology-content p {
+        margin-bottom: 1.25rem;
+        text-align: justify;
+    }
+
+    .methodology-content ul {
+        margin-bottom: 1.5rem;
+        padding-left: 1.5rem;
+    }
+
+    .methodology-content li {
+        margin-bottom: 0.75rem;
+        position: relative;
+        list-style: none;
+    }
+
+    .methodology-content li::before {
+        content: "→";
+        color: #3b82f6;
+        font-weight: bold;
+        display: inline-block;
+        width: 1.5em;
+        margin-left: -1.5em;
+    }
+
+    /* Sidebar - keeping consistent with Report Detail */
+    .methodology-sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        position: sticky;
+        top: 2rem;
+        align-self: start;
+    }
+
+    .sidebar-widget {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+
+    .widget-title {
+        color: #1e3a8a;
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid #f1f5f9;
+    }
+
+    .sidebar-btn {
+        display: block;
+        width: 100%;
+        padding: 1rem;
+        border-radius: 12px;
+        text-align: center;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 1.05rem;
+        transition: all 0.3s;
+        margin-bottom: 1rem;
+        color: white;
+    }
+
+    .sidebar-btn:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.1);
+    }
+
+    /* Button Colors */
+    .btn-red-sample {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+    }
+
+    .btn-yellow-discount {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+    }
+
+    .btn-blue-analyst {
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+    }
+
+    .btn-green-buy {
+        background: linear-gradient(135deg, #16a34a, #15803d);
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #64748b;
+        text-decoration: none;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        transition: color 0.2s;
+    }
+
+    .back-link:hover {
+        color: #1e3a8a;
+    }
+
+    @media (max-width: 992px) {
+        .methodology-grid {
+            grid-template-columns: 1fr;
+            gap: 3rem;
+        }
+
+        .methodology-sidebar {
+            order: 2;
+            position: static;
+        }
+    }
+</style>
+
+<!-- Hero Section -->
+<div class="methodology-hero">
+    <div class="container">
+        <a href="{% url 'report-detail' report.slug %}" class="report-title-link">
+            <i class="fas fa-arrow-left"></i> Back to Report: {{ report.title }}
+        </a>
+        <h1 class="page-title">Research Methodology</h1>
+    </div>
+</div>
+
+<div class="methodology-grid">
+    <!-- Main Content with Provided Methodology Text -->
+    <div class="methodology-content">
+        <h2>Research Framework and Methodological Approach — MarketsNXT</h2>
+
+        <h3>Overview of Our Research Process</h3>
+        <p>MarketsNXT follows a structured, multi-stage research framework designed to ensure accuracy, reliability, and
+            strategic relevance of every published study. Our methodology integrates globally accepted research
+            standards with industry best practices in data collection, modeling, verification, and insight generation.
+            Each project is executed through an iterative validation cycle, where new findings are continuously
+            cross-checked and refined. We also align research objectives and analytical methods with client requirements
+            at the outset to ensure outcome relevance and usability.</p>
+
+        <h3>Data Acquisition Strategy</h3>
+        <p>Robust data collection is the foundation of our analytical process. MarketsNXT employs a layered sourcing
+            model that combines proprietary intelligence, commercial databases, expert consultations, and authoritative
+            public sources.</p>
+        <p>Our data gathering activities include:</p>
+        <ul>
+            <li>Accessing licensed commercial databases for company performance metrics, industry reports, technical
+                journals, and sector publications</li>
+            <li>Utilizing MarketsNXT’s internal knowledge repositories developed through ongoing market tracking and
+                archived studies</li>
+            <li>Conducting primary interviews with industry participants, subject matter experts, distributors, and
+                decision-makers through structured questionnaires and direct discussions</li>
+            <li>Reviewing secondary information sources including regulatory publications, multilateral agency reports,
+                institutional papers, and recognized industry bodies</li>
+            <li>Studying investor presentations, corporate disclosures, analyst briefings, and financial commentary for
+                third-party perspectives and market signals</li>
+        </ul>
+
+        <h3>Analytical Modeling and Insight Development</h3>
+        <p>After collection, datasets are processed and interpreted using multiple analytical techniques to identify
+            baseline market values, demand patterns, growth drivers, constraints, and opportunity clusters. MarketsNXT
+            selects analytical models based on the nature of the market and the forecasting objective.</p>
+        <p>Our analytical toolkit includes demand modeling, trend mapping, penetration analysis, and scenario
+            forecasting supported by statistical and heuristic techniques.</p>
+
+        <h3>Market Estimation Techniques</h3>
+        <p>MarketsNXT applies multiple estimation pathways to strengthen forecast accuracy.</p>
+
+        <h4>Demand-Driven Build-Up Method</h4>
+        <p>This method aggregates country-level and segment-level demand figures to construct total market size. It
+            relies on unit consumption, pricing trends, and segment adoption rates.</p>
+
+        <h4>Market Decomposition Method</h4>
+        <p>This approach starts with broader industry values and proportionally distributes them across sub-segments
+            based on penetration ratios, usage intensity, and segment weightages.</p>
+
+        <h4>Hybrid Estimation Method</h4>
+        <p>A blended structure combining build-up and decomposition techniques to balance supply indicators with
+            consumption signals.</p>
+
+        <h3>Supply Chain Anchored Forecasting</h3>
+        <p>MarketsNXT integrates value chain intelligence into its forecasting structure to ensure commercial realism
+            and operational alignment.</p>
+
+        <h4>Supply-Side Evaluation</h4>
+        <p>Revenue and capacity estimates are developed through company financial reviews, product portfolio mapping,
+            benchmarking of competitive positioning, and commercialization tracking. We also evaluate pipeline
+            developments, distribution reach, and strategic initiatives.</p>
+
+        <h4>Demand-Side Evaluation</h4>
+        <p>Demand projections are developed by mapping end-use industries, adjacent markets, adoption rates, and segment
+            penetration levels. Subject matter expert inputs are incorporated to refine demand trajectories and usage
+            assumptions.</p>
+
+        <h4>Market Share Allocation Models</h4>
+        <p>Structured scoring and weighted factor models are used to estimate participant shares and segment
+            distribution patterns.</p>
+
+        <h3>Forecast Construction Approaches</h3>
+        <ul>
+            <li><strong>Segment Demand Aggregation:</strong> Individual product and application demand across
+                geographies is modeled and consolidated to derive total opportunity size.</li>
+            <li><strong>Penetration and Adoption Modeling:</strong> Used particularly for emerging products and
+                technologies where adoption curves and substitution patterns influence growth.</li>
+            <li><strong>Statistical and Multivariable Forecasting:</strong> Regression and variable-sensitivity models
+                are used where sufficient historical and cross-factor data is available.</li>
+            <li><strong>Consumption Flow Modeling:</strong> Commodity flow and utilization mapping are applied to
+                validate volume movements across the ecosystem.</li>
+        </ul>
+
+        <h3>Market Sizing Finalization and Quality Control</h3>
+        <p>Before publication, MarketsNXT subjects all estimates and forecasts to a structured internal review and
+            expert validation workflow.</p>
+        <ul>
+            <li><strong>Estimate Consolidation:</strong> All modeled outputs are reconciled and aligned across segments
+                and regions.</li>
+            <li><strong>Data Harmonization:</strong> Figures are normalized to ensure consistency across sources,
+                timeframes, and currency references.</li>
+            <li><strong>Expert Verification:</strong> Independent industry specialists and senior analysts review
+                assumptions, outputs, and interpretations.</li>
+            <li><strong>Multi-Level Validation:</strong> Reports proceed to release only after passing layered quality
+                and accuracy checks.</li>
+        </ul>
+
+        <h3>Client-Centric Research Delivery</h3>
+        <p>MarketsNXT positions research delivery as a collaborative engagement rather than a static information
+            transfer. Analysts work with clients to clarify objectives, interpret findings, and connect insights to
+            strategic decisions. Each engagement includes a designated contact lead to support communication and
+            continuity throughout the project lifecycle.</p>
+
+        <h3>Market Environment Inputs Considered</h3>
+        <p>Our market models incorporate a broad set of contextual variables to ensure realistic projections, including:
+        </p>
+        <ul>
+            <li>Macro and microeconomic indicators</li>
+            <li>Regulatory and policy landscape</li>
+            <li>Industry-specific compliance structures</li>
+            <li>Technology evolution factors</li>
+            <li>Capital investment activity</li>
+            <li>Infrastructure and capacity expansion trends</li>
+            <li>Channel economics and margin structures</li>
+        </ul>
+
+        <h3>Custom Requirement Integration</h3>
+        <p>MarketsNXT adapts research frameworks to address specific client priorities. Studies can be tailored to
+            support initiatives such as market entry planning, product launch evaluation, partnership screening,
+            investment feasibility assessment, geographic expansion, technology benchmarking, and customer intelligence
+            programs.</p>
+
+        <h3>Strategy and Insight Translation</h3>
+        <p>The final stage converts validated findings into decision-ready intelligence. MarketsNXT develops actionable
+            roadmaps, opportunity matrices, and strategic recommendations aligned with client goals and market
+            realities.</p>
+    </div>
+
+    <!-- Sidebar (Simplified from Detail Page) -->
+    <div class="methodology-sidebar">
+        <!-- Report Info Widget -->
+        <div class="sidebar-widget">
+            <h3 class="widget-title">About This Report</h3>
+            <p style="font-size: 0.9rem; color: #475569; margin-bottom: 1rem;">
+                This methodology applies to the report: <strong>{{ report.title }}</strong>
+            </p>
+            <div style="font-size: 0.85rem; color: #64748b; margin-bottom: 1rem;">
+                <i class="far fa-calendar-alt"></i> {{ report.publish_date|date:"F Y" }} |
+                <i class="far fa-file-alt"></i> {{ report.pages_count }} Pages
+            </div>
+            <a href="{% url 'report-detail' report.slug %}" class="sidebar-btn btn-green-buy">
+                View Report Details
+            </a>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="sidebar-widget">
+            <h3 class="widget-title">Interested?</h3>
+            <a href="{% url 'request-sample' report.slug %}" class="sidebar-btn btn-red-sample">
+                Download PDF Sample
+            </a>
+            <a href="{% url 'ask-for-discount' report.slug %}" class="sidebar-btn btn-yellow-discount">
+                Ask For Discount
+            </a>
+            <a href="{% url 'speak-to-analyst' report.slug %}" class="sidebar-btn btn-blue-analyst">
+                Speak to Analyst
+            </a>
+        </div>
+
+        <!-- Need Specific Data Widget -->
+        <div class="sidebar-widget" style="background: linear-gradient(135deg, #fff 0%, #f0f9ff 100%);">
+            <h3 class="widget-title">Need Specific Data?</h3>
+            <p style="font-size: 0.95rem; color: #475569; margin-bottom: 1rem; line-height: 1.5;">
+                We offer <strong>10% free customization</strong> with every report.
+            </p>
+            <a href="{% url 'speak-to-analyst' report.slug %}" class="sidebar-btn btn-blue-analyst"
+                style="margin-bottom: 0;">
+                Request Customization
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

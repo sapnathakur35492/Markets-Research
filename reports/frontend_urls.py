@@ -1,10 +1,11 @@
 from django.urls import path
-from .views import ReportListView, ReportDetailView
+from .views import ReportListView, ReportDetailView, ReportMethodologyView
 from leads.views import LeadCaptureView, CheckoutView
 
 urlpatterns = [
     path('', ReportListView.as_view(), name='report-list'),
     path('<slug:slug>/', ReportDetailView.as_view(), name='report-detail'),
+    path('<slug:slug>/methodology/', ReportMethodologyView.as_view(), name='report-methodology'),
     
     # Lead Forms
     path('request-sample/<slug:slug>/', LeadCaptureView.as_view(), name='request-sample'),

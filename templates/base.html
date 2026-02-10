@@ -200,9 +200,10 @@
         html,
         body {
             width: 100%;
-            max-width: 100vw;
-            overflow-x: hidden;
+            max-width: 100%;
+            /* overflow-x: hidden;  <-- REMOVED to fix sticky sidebar */
             position: relative;
+            margin: 0;
         }
 
         .container {

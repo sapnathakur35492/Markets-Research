@@ -75,6 +75,26 @@ class ReportDetailView(DetailView):
         
         return context
 
+class ReportMethodologyView(DetailView):
+    model = Report
+    template_name = "reports/methodology.html"
+    context_object_name = "report"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['lead_form'] = LeadForm()
+        # Add related reports from the same category, excluding current report
+        context['related_reports'] = Report.objects.filter(
+            category=self.object.category
+        ).exclude(id=self.object.id).order_by('-publish_date')[:6]
+        
+        # Add categories for sidebar navigation
+        context['all_categories'] = Category.objects.annotate(
+            report_count=Count('reports')
+        ).filter(report_count__gt=0).order_by('name')
+        
+        return context
+
 class CategoryListAPIView(generics.ListAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer

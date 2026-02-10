@@ -17,21 +17,35 @@
         display: grid;
         grid-template-columns: 280px 1fr;
         gap: 2.5rem;
-        align-items: start;
+        align-items: stretch;
+        /* CHANGED from start to stretch to ensure full height track */
+        overflow: visible;
+        /* Ensure no overflow clipping */
     }
 
     /* Sidebar Styles (Desktop) */
     .vmr-sidebar {
+        height: 100%;
+        position: relative;
+        /* No sticky here */
+    }
+
+    .vmr-sticky-content {
         background: white;
         padding: 1.5rem;
         border-radius: 8px;
         border: 1px solid #e2e8f0;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         position: sticky;
-        top: 2rem;
+        top: 110px;
+        /* Adjusted to clear sticky header */
+        align-self: start;
+        max-height: calc(100vh - 120px);
+        overflow-y: auto;
+        z-index: 10;
     }
 
-    .vmr-sidebar h3 {
+    .vmr-sticky-content h3 {
         font-size: 1.1rem;
         color: #1e293b;
         border-bottom: 2px solid #e2e8f0;
@@ -368,18 +382,20 @@
 <div class="vmr-container">
     <!-- Sidebar (Desktop) -->
     <aside class="vmr-sidebar">
-        <h3>Browse by Categories</h3>
-        <nav>
-            <a href="{% url 'report-list' %}" class="vmr-cat-link {% if not current_category %}active{% endif %}">
-                All Categories
-            </a>
-            {% for cat in categories %}
-            <a href="{% url 'report-list' %}?category={{ cat.slug }}"
-                class="vmr-cat-link {% if current_category == cat.slug %}active{% endif %}">
-                {{ cat.name }}
-            </a>
-            {% endfor %}
-        </nav>
+        <div class="vmr-sticky-content">
+            <h3>Browse by Categories</h3>
+            <nav>
+                <a href="{% url 'report-list' %}" class="vmr-cat-link {% if not current_category %}active{% endif %}">
+                    All Categories
+                </a>
+                {% for cat in categories %}
+                <a href="{% url 'report-list' %}?category={{ cat.slug }}"
+                    class="vmr-cat-link {% if current_category == cat.slug %}active{% endif %}">
+                    {{ cat.name }}
+                </a>
+                {% endfor %}
+            </nav>
+        </div>
     </aside>
 
     <!-- Main Content -->
