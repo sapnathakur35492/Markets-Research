@@ -7,9 +7,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>{% block title %}Market Research Platform{% endblock %}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=5">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=7">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'django_ckeditor_5/dist/styles.css' %}">
+    <link rel="icon" type="image/jpg" href="{% static 'images/favicon.jpg' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/css/intlTelInput.css">
+    <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>
     <style>
+        .iti {
+            width: 100%;
+        }
+
         /* Mobile Menu Styles */
         .mobile-menu-toggle {
             display: none;
@@ -85,16 +96,168 @@
         }
 
         /* Stylish Header */
+        /* Top Navigation Bar */
+        .top-bar {
+            background: #0f172a;
+            /* Dark Blue from reference */
+            color: #ffffff;
+            padding: 8px 0;
+            font-size: 0.85rem;
+            letter-spacing: 0.02em;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .top-bar .container {
+            display: flex;
+            justify-content: space-between;
+            /* Space between Email and Links */
+            align-items: center;
+        }
+
+        .top-contact-info a {
+            color: #ffffff;
+            /* Brighter white for better visibility */
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            transition: color 0.3s ease;
+            font-size: 1.05rem;
+            /* Increased font size as requested */
+            font-weight: 500;
+        }
+
+        .top-contact-info a:hover {
+            color: #e2e8f0;
+        }
+
+        .top-links {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .top-links a {
+            color: #e2e8f0;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+            position: relative;
+        }
+
+        .top-links a:hover {
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+        /* Pipe separator */
+        .top-links a:not(:last-child)::after {
+            content: "|";
+            position: absolute;
+            right: -10px;
+            color: #475569;
+            font-weight: 400;
+        }
+
+        @media (max-width: 768px) {
+            .top-bar .container {
+                display: flex;
+                justify-content: center;
+                /* Center on mobile if wrapping or stacking */
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .top-contact-info a {
+                color: #94a3b8;
+                text-decoration: none;
+                display: flex;
+                align-items: center;
+                transition: color 0.3s ease;
+            }
+
+            .top-contact-info a:hover {
+                color: #ffffff;
+            }
+
+            .top-links {
+                gap: 12px;
+                font-size: 0.8rem;
+                flex-wrap: wrap;
+                /* Allow wrapping on very small screens */
+                justify-content: center;
+            }
+
+            .top-links a:not(:last-child)::after {
+                right: -8px;
+            }
+        }
+
         header {
             background: #ffffff;
-            /* Pure white to match logo background */
-            padding: 0.8rem 0;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            /* Pure white */
+            padding: 1rem 0;
+            /* Increased padding */
+            border-bottom: 1px solid #e2e8f0;
             position: sticky;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
+        }
+
+        .header-search {
+            display: flex;
+            align-items: center;
+            background: #ffffff;
+            border-radius: 8px;
+            /* Slightly more rounded */
+            padding: 2px;
+            border: 2px solid #e2e8f0;
+            overflow: hidden;
+            width: 320px;
+            /* Slimmer for better fit next to nav */
+            max-width: 100%;
+            margin-left: 20px;
+            /* Space from nav */
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .header-search:focus-within {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .header-search input {
+            border: none;
+            background: transparent;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            width: 100%;
+            outline: none;
+            color: #334155;
+        }
+
+        .header-search button {
+            background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            margin-left: 4px;
+        }
+
+        .header-search button:hover {
+            transform: scale(1.05);
+            filter: brightness(1.1);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
         }
 
         .nav-wrapper {
@@ -105,7 +268,7 @@
 
         .nav-links {
             display: flex;
-            gap: 2.5rem;
+            gap: 1.5rem;
             align-items: center;
         }
 
@@ -201,7 +364,8 @@
         body {
             width: 100%;
             max-width: 100%;
-            /* overflow-x: hidden;  <-- REMOVED to fix sticky sidebar */
+            overflow-x: hidden;
+            /* Restored to prevent mobile overflow */
             position: relative;
             margin: 0;
         }
@@ -226,6 +390,29 @@
 </head>
 
 <body>
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="container">
+            <div class="top-contact-info">
+                <a href="mailto:sales@marketsnxt.com">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round"
+                        style="margin-right: 5px; vertical-align: middle;">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                    sales@marketsnxt.com
+                </a>
+            </div>
+            <div class="top-links">
+                <a href="{% url 'report-list' %}">Report Store</a>
+                <a href="{% url 'pages:consulting' %}">Consulting</a>
+                <a href="{% url 'pages:methodology' %}">Methodology</a>
+                <a href="{% url 'pages:faqs' %}">FAQs</a>
+            </div>
+        </div>
+    </div>
+
     <header>
         <div class="container nav-wrapper">
             <!-- Mobile Back Button -->
@@ -238,9 +425,11 @@
 
             <a href="{% url 'home' %}" class="logo">
                 <img src="{% static 'images/logo_new.jpg' %}" alt="Markets NXT"
-                    style="height: 180px; width: auto; display: block;">
+                    style="width: 300px; height: auto; display: block;">
             </a>
 
+            <!-- Removed margin-left: auto from nav to keep it left/center on desktop. 
+                 On mobile, justify-content: space-between will handle toggle position. -->
             <nav>
                 <button class="mobile-menu-toggle" id="menuToggle">
                     <span></span>
@@ -248,16 +437,77 @@
                     <span></span>
                 </button>
                 <ul class="nav-links" id="navLinks">
-                    <li><a href="{% url 'home' %}">Home</a></li>
+                    <li><a href="{% url 'home' %}">Home</a></li> <!-- "Industries we cover" equivalent -->
                     <li><a href="{% url 'report-list' %}">Reports</a></li>
                     <li><a href="{% url 'blog-list' %}">Blog</a></li>
-                    <li><a href="{% url 'pages:consulting' %}">Consulting</a></li>
-                    <li><a href="{% url 'pages:contact' %}">Contact</a></li>
+                    <li><a href="{% url 'pages:about' %}">Who we are</a></li>
+                    <li><a href="{% url 'pages:contact' %}">Contact us</a></li>
                 </ul>
             </nav>
 
-            <a href="{% url 'report-list' %}" class="btn btn-primary nav-cta"
-                style="padding: 0.5rem 1.5rem; font-size: 0.9rem;">Browse Reports</a>
+            <!-- Header Search Bar -->
+            <form action="{% url 'report-list' %}" method="GET" class="header-search">
+                <input type="text" name="q" placeholder="Search">
+                <button type="submit">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                </button>
+            </form>
+            <style>
+                .header-search button {
+                    flex-shrink: 0;
+                    /* Prevent button from shrinking on desktop */
+                }
+
+                @media (max-width: 991px) {
+                    .nav-wrapper {
+                        flex-wrap: wrap;
+                        /* Allow wrapping */
+                        gap: 10px;
+                        padding-bottom: 10px;
+                    }
+
+                    .header-search {
+                        order: 4;
+                        /* Move to bottom */
+                        width: 100%;
+                        /* Full width on mobile */
+                        margin-top: 5px;
+                        display: flex !important;
+                        /* Force show */
+                    }
+
+                    /* Ensure logo doesn't get squashed */
+                    /* Ensure logo doesn't get squashed */
+                    .logo img {
+                        max-width: 200px;
+                        /* Reduce logo size slightly on mobile if needed, or keep 300px but ensure overflow handled */
+                        height: auto;
+                    }
+                }
+
+                @media (min-width: 992px) {
+                    nav {
+                        margin-left: auto;
+                        /* Pushes nav and search to the right */
+                    }
+
+                    .nav-links {
+                        margin-left: 0;
+                    }
+                }
+
+                @media (max-width: 400px) {
+                    .logo img {
+                        width: 100% !important;
+                        /* Full width logo on very small screens */
+                        max-width: 220px;
+                    }
+                }
+            </style>
         </div>
     </header>
 
@@ -315,7 +565,7 @@
         style="background-image: url('{% static 'images/footer.jpg' %}'); background-size: cover; background-position: center; position: relative; padding: 2.25rem 0 1.5rem; overflow: hidden;">
         <!-- Dark overlay with gradient for better text contrast -->
         <div
-            style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, rgba(15, 23, 42, 0.94), rgba(30, 41, 59, 0.92)); z-index: 0;">
+            style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, rgba(84, 79, 117, 0.98), rgba(15, 23, 42, 0.96)); z-index: 0;">
         </div>
 
         <!-- Subtle pattern overlay for texture -->
@@ -409,21 +659,22 @@
                     </ul>
                 </div>
                 <div>
-                    <h4 style="color: white; margin: 0rem 0 0.4rem; font-size: 0.75rem; font-weight: 600;">Legal &
-                        Governance</h4>
+                    <h3
+                        style="color: #fff; margin-bottom: 0.875rem; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+                        Legal & Governance</h3>
                     <ul style="list-style: none; padding: 0; margin: 0;">
-                        <li style="margin-bottom: 0.3rem;"><a href="{% url 'pages:privacy' %}"
-                                style="color: rgba(255,255,255,0.65); text-decoration: none; font-size: 0.8rem; transition: color 0.2s;"
+                        <li style="margin-bottom: 0.4rem;"><a href="{% url 'pages:privacy' %}"
+                                style="color: rgba(255,255,255,0.75); text-decoration: none; font-size: 0.875rem; transition: color 0.2s;"
                                 onmouseover="this.style.color='#3b82f6'"
-                                onmouseout="this.style.color='rgba(255,255,255,0.65)'">Privacy Policy</a></li>
-                        <li style="margin-bottom: 0.3rem;"><a href="{% url 'pages:terms' %}"
-                                style="color: rgba(255,255,255,0.65); text-decoration: none; font-size: 0.8rem; transition: color 0.2s;"
+                                onmouseout="this.style.color='rgba(255,255,255,0.75)'">Privacy Policy</a></li>
+                        <li style="margin-bottom: 0.4rem;"><a href="{% url 'pages:terms' %}"
+                                style="color: rgba(255,255,255,0.75); text-decoration: none; font-size: 0.875rem; transition: color 0.2s;"
                                 onmouseover="this.style.color='#3b82f6'"
-                                onmouseout="this.style.color='rgba(255,255,255,0.65)'">Terms & Conditions</a></li>
-                        <li style="margin-bottom: 0.3rem;"><a href="{% url 'pages:disclaimer' %}"
-                                style="color: rgba(255,255,255,0.65); text-decoration: none; font-size: 0.8rem; transition: color 0.2s;"
+                                onmouseout="this.style.color='rgba(255,255,255,0.75)'">Terms & Conditions</a></li>
+                        <li style="margin-bottom: 0.4rem;"><a href="{% url 'pages:disclaimer' %}"
+                                style="color: rgba(255,255,255,0.75); text-decoration: none; font-size: 0.875rem; transition: color 0.2s;"
                                 onmouseover="this.style.color='#3b82f6'"
-                                onmouseout="this.style.color='rgba(255,255,255,0.65)'">Legal Disclaimer</a></li>
+                                onmouseout="this.style.color='rgba(255,255,255,0.75)'">Legal Disclaimer</a></li>
                     </ul>
                 </div>
 
@@ -443,12 +694,20 @@
                                     style="font-size: 1.1rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">📧</span>
                                 sales@marketsnxt.com
                             </p>
-                            <p
-                                style="color: rgba(255,255,255,0.95); font-size: 0.8rem; margin: 0; display: flex; align-items: center; gap: 0.5rem; font-weight: 500;">
-                                <span
-                                    style="font-size: 1.1rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">📞</span>
-                                +1-970-633-3460
-                            </p>
+                            <div
+                                style="margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 0.5rem;">
+                                <p style="color: rgba(255,255,255,0.9); font-size: 0.75rem; margin-bottom: 0.5rem;">
+                                    <strong>HQ:</strong><br>
+                                    Markets NXT — A Montclaire & Stein Venture<br>
+                                    5511 Capital Center Drive, Suite 220<br>
+                                    Raleigh, North Carolina 27606
+                                </p>
+                                <p style="color: rgba(255,255,255,0.9); font-size: 0.75rem; margin: 0;">
+                                    <strong>Office:</strong><br>
+                                    Markets NXT — A Montclaire & Stein Venture<br>
+                                    Magarpatta City, Pune - 411028
+                                </p>
+                            </div>
                         </div>
                     </div>
 
@@ -541,6 +800,51 @@
             if (window.location.pathname === '/' || window.location.pathname === '') {
                 if (backBtn) backBtn.style.display = 'none';
             }
+        });
+    </script>
+    <!-- Intl Tel Input Logic -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const phoneInputs = [
+                { inputId: "#id_phone", codeId: "#id_country_code" },
+                { inputId: "#id_phone_checkout", codeId: "#id_country_code" }
+            ];
+
+            phoneInputs.forEach(item => {
+                const input = document.querySelector(item.inputId);
+                const codeInput = document.querySelector(item.codeId);
+
+                if (input) {
+                    const iti = window.intlTelInput(input, {
+                        utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
+                        initialCountry: "auto",
+                        geoIpLookup: function (callback) {
+                            fetch("https://ipapi.co/json")
+                                .then(res => res.json())
+                                .then(data => callback(data.country_code))
+                                .catch(() => callback("us"));
+                        },
+                        preferredCountries: ['us', 'gb', 'in', 'de', 'jp'],
+                        separateDialCode: true,
+                    });
+
+                    // Update hidden code field on change
+                    input.addEventListener("countrychange", function () {
+                        const countryData = iti.getSelectedCountryData();
+                        if (codeInput) {
+                            codeInput.value = "+" + countryData.dialCode;
+                        }
+                    });
+
+                    // Initialize hidden field
+                    if (codeInput) {
+                        const countryData = iti.getSelectedCountryData();
+                        if (countryData.dialCode) {
+                            codeInput.value = "+" + countryData.dialCode;
+                        }
+                    }
+                }
+            });
         });
     </script>
 </body>

@@ -4,86 +4,112 @@
 {% block title %}{{ meta_title }}{% endblock %}
 
 {% block content %}
-<style>
-    .page-hero {
-        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-        color: white;
-        padding: 4rem 0 3rem;
-        margin-bottom: 3rem;
-    }
-
-    .page-hero h1 {
-        font-size: 2.5rem;
-        font-weight: 700;
-    }
-
-    .content-section {
-        max-width: 900px;
-        margin: 0 auto 3rem;
-        padding: 0 1rem;
-    }
-
-    .content-section h2 {
-        color: #1e3a8a;
-        font-size: 1.6rem;
-        font-weight: 700;
-        margin: 2rem 0 1rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid #f97316;
-    }
-
-    .content-section p {
-        line-height: 1.8;
-        color: #374151;
-        margin-bottom: 1rem;
-    }
-
-    .warning-box {
-        background: #fef3c7;
-        border-left: 4px solid #f59e0b;
-        padding: 1.5rem;
-        margin: 2rem 0;
-        border-radius: 4px;
-    }
-</style>
-
-<section class="page-hero">
+<section class="legal-page-wrapper">
     <div class="container">
-        <h1>Legal Disclaimer</h1>
-    </div>
-</section>
-
-<div class="container">
-    <article class="content-section">
-        <p>The information provided by Markets NXT ("the Company") is intended for informational and analytical purposes
-            only. While reasonable efforts are made to ensure accuracy and reliability, Markets NXT makes no warranties
-            or representations regarding the completeness, accuracy, or timeliness of the information.</p>
-
-        <h2>No Professional Advice</h2>
-        <p>Content published by Markets NXT does not constitute legal, financial, investment, tax, or professional
-            advice. Users should seek independent professional counsel before making decisions based on the information
-            provided.</p>
-
-        <h2>Forward-Looking Statements</h2>
-        <p>Certain content may include forward-looking statements and projections based on assumptions and
-            methodologies. Actual outcomes may differ materially due to market conditions, regulatory changes, and other
-            factors.</p>
-
-        <h2>Limitation of Liability</h2>
-        <div class="warning-box">
-            <p style="margin: 0;"><strong>Markets NXT shall not be liable for any direct or indirect damages arising
-                    from the use of its content, reports, or website materials.</strong></p>
+        <div class="legal-breadcrumbs">
+            <a href="{% url 'home' %}">Home</a> &raquo; Legal Disclaimer
         </div>
 
-        <h2>Intellectual Property</h2>
-        <p>All content, reports, methodologies, and materials are proprietary to Markets NXT and protected by applicable
-            intellectual property laws. Unauthorized reproduction or distribution is prohibited.</p>
+        <div class="legal-content-box">
+            <h1>Legal Disclaimer</h1>
+            <p><strong>Markets NXT — A Montclaire & Stein Venture</strong></p>
+            <p>The information, analysis, and materials provided by Markets NXT — A Montclaire & Stein Venture (“Markets
+                NXT,” “the Company,” “we,” or “our”) through its website, research reports, advisory deliverables,
+                presentations, databases, and other communications (collectively, the “Content”) are provided for
+                general informational and analytical purposes only. By accessing or using our Content, you acknowledge
+                and agree to the terms of this Legal Disclaimer.</p>
 
-        <h2>Third-Party Information</h2>
-        <p>Markets NXT may reference third-party data and sources believed to be reliable. The Company does not
-            guarantee the accuracy of third-party information and is not responsible for errors or omissions.</p>
+            <h2 style="margin-top: 0;">1. Informational & Analytical Purpose Only</h2>
+            <p>All Markets NXT Content is intended to provide structured market intelligence, industry analysis, and
+                strategic perspective based on available data, research methodologies, and professional judgment at the
+                time of publication.</p>
+            <p>Content is not intended to be, and should not be interpreted as: Investment advice, Legal advice,
+                Accounting advice, Tax advice, Regulatory advice, Technical certification guidance, Professional
+                engineering or medical advice.</p>
+            <p>Users are expected to apply independent judgment and seek qualified professional counsel before making
+                business, financial, legal, or investment decisions.</p>
 
-        <p style="margin-top: 2rem; font-size: 0.9rem; color: #6b7280;">Last updated: January 2026</p>
-    </article>
-</div>
+            <h2>2. No Advisory Relationship Created by Content Access</h2>
+            <p>Accessing Markets NXT Content, purchasing research reports, attending briefings, or communicating with
+                our analysts does not by itself create a formal consulting, advisory, fiduciary, or client relationship.
+            </p>
+            <p>A formal advisory relationship exists only where a written consulting or engagement agreement has been
+                executed between Markets NXT and the client organization. Absent such an agreement, users should not
+                rely on Content as personalized advisory guidance.</p>
+
+            <h2>3. Methodology-Based Estimates & Forecasts</h2>
+            <p>Many Markets NXT research publications include: Market size estimates, Growth projections, Forecast
+                models, Scenario analyses, Trend outlooks.</p>
+            <p>These are developed using structured methodologies, stated assumptions, historical patterns, and
+                available data sources. However, all forward-looking analysis inherently involves uncertainty. Actual
+                outcomes may differ materially due to factors including but not limited to: Macroeconomic shifts, Policy
+                and regulatory changes, Competitive actions, Technology disruption, Supply chain variability, Capital
+                market behavior, Geopolitical developments. Forecasts and projections are not guarantees of future
+                performance.</p>
+
+            <h2>4. Data Sources & Reliability Limitations</h2>
+            <p>Markets NXT research draws from a combination of primary and secondary sources, which may include: Public
+                data, Industry publications, Company disclosures, Expert interviews, Trade sources, Government
+                statistics, Proprietary analytical models.</p>
+            <p>While we apply structured validation and cross-verification processes, we do not independently audit
+                every external data source used. Accordingly:</p>
+            <ul>
+                <li>We do not guarantee absolute accuracy of all source data</li>
+                <li>Source data may change after publication</li>
+                <li>Some inputs may contain reporting delays or revisions</li>
+                <li>Third-party errors may propagate despite validation efforts</li>
+            </ul>
+            <p>Content should therefore be viewed as analytical interpretation, not certified fact.</p>
+
+            <h2>5. No Warranties or Representations</h2>
+            <p>Markets NXT makes no express or implied warranties regarding Content, including but not limited to:
+                Accuracy, Completeness, Timeliness, Fitness for a particular purpose, Commercial usefulness, Outcome
+                reliability. All Content is provided on an “as is” and “as available” basis.</p>
+
+            <h2>6. Decision Responsibility</h2>
+            <p>All business, investment, operational, policy, and strategic decisions made using Markets NXT Content are
+                the sole responsibility of the user or client. Markets NXT is not responsible for decisions taken or not
+                taken based on Content, actions by users relying on analysis, business outcomes resulting from Content
+                use, investment gains or losses, or strategic initiative results.</p>
+            <p>Use of our Content is at the user’s own risk.</p>
+
+            <h2>7. Limitation of Liability</h2>
+            <p>To the fullest extent permitted by applicable law, Markets NXT shall not be liable for any: Direct
+                losses, Indirect losses, Consequential damages, Incidental damages, Lost profits, Lost opportunities,
+                Business interruption, Reputational harm. Arising from or related to the use of or reliance on our
+                Content.</p>
+
+            <h2>8. Third-Party References & Mentions</h2>
+            <p>Markets NXT Content may reference third-party companies, products, technologies, standards, or
+                organizations. Such references: Do not constitute endorsement, Do not imply partnership, Do not indicate
+                certification, Do not establish affiliation. All trademarks and brand names remain the property of their
+                respective owners.</p>
+
+            <h2>9. Industry & Regulatory Interpretation Disclaimer</h2>
+            <p>Where research discusses regulatory frameworks, standards, or certification regimes (such as ISO,
+                industry standards, or compliance frameworks), such discussion is provided for analytical context only.
+                Markets NXT does not provide: Regulatory certification, Compliance audits, Legal regulatory opinions.
+            </p>
+
+            <h2>10. Technology & Market Change Risk</h2>
+            <p>Markets evolve rapidly. Technology adoption, regulatory shifts, and competitive dynamics can alter market
+                structures faster than publication cycles. Research reflects conditions at time of analysis, and
+                conditions may change after publication.</p>
+
+            <h2>11. No Guarantee of Commercial Outcomes</h2>
+            <p>Markets NXT does not guarantee that use of its research or advisory frameworks will result in: Revenue
+                growth, Market success, Investment returns, Cost savings, Competitive advantage. Strategic success
+                depends on execution, market timing, and external factors beyond analytical scope.</p>
+
+            <h2>12. Confidentiality Boundaries</h2>
+            <p>While Markets NXT maintains strict internal confidentiality controls, users are responsible for
+                safeguarding any research materials they receive. Unauthorized sharing may create risk outside our
+                control.</p>
+
+            <h2>13. Website Availability Disclaimer</h2>
+            <p>We do not guarantee uninterrupted availability of our website or digital delivery systems. Maintenance,
+                technical issues, or external disruptions may affect access temporarily.</p>
+        </div>
+    </div>
+</section>
 {% endblock %}

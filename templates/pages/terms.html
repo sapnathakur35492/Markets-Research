@@ -4,70 +4,51 @@
 {% block title %}{{ meta_title }}{% endblock %}
 
 {% block content %}
-<style>
-    .page-hero {
-        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-        color: white;
-        padding: 4rem 0 3rem;
-        margin-bottom: 3rem;
-    }
-
-    .page-hero h1 {
-        font-size: 2.5rem;
-        font-weight: 700;
-    }
-
-    .content-section {
-        max-width: 900px;
-        margin: 0 auto 3rem;
-        padding: 0 1rem;
-    }
-
-    .content-section h2 {
-        color: #1e3a8a;
-        font-size: 1.6rem;
-        font-weight: 700;
-        margin: 2rem 0 1rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid #f97316;
-    }
-
-    .content-section p {
-        line-height: 1.8;
-        color: #374151;
-        margin-bottom: 1rem;
-    }
-</style>
-
-<section class="page-hero">
+<section class="legal-page-wrapper">
     <div class="container">
-        <h1>Terms and Conditions</h1>
+        <div class="legal-breadcrumbs">
+            <a href="{% url 'home' %}">Home</a> &raquo; Terms & Conditions
+        </div>
+
+        <div class="legal-content-box">
+            <h1>Terms & Conditions</h1>
+
+            <h2>Terms of Use</h2>
+            <p><strong>Markets NXT — A Montclaire & Stein Venture</strong></p>
+            <p>These Terms & Conditions (“Terms”) govern access to and use of the Markets NXT website, research
+                publications, data products, and consulting services (collectively, the “Services”).</p>
+
+            <h2>1. Definitions</h2>
+            <p>“Company,” “Markets NXT,” “we,” or “us” refers to Markets NXT — A Montclaire & Stein Venture.</p>
+
+            <h2>2. Permitted Use of Website</h2>
+            <p>You agree not to:</p>
+            <ul>
+                <li>Use the website for any illegal purpose or in violation of these Terms.</li>
+                <li>Attempt to gain unauthorized access to our systems, servers, or data.</li>
+            </ul>
+
+            <h2>3. Intellectual Property Rights</h2>
+            <p>All Content on this website is the property of Markets NXT or its licensors and is protected by
+                intellectual property laws.</p>
+
+            <h2>4. Research Products & Licensing</h2>
+            <p>We offer the following license types:</p>
+            <ul>
+                <li><strong>Single User License:</strong> Access for one designated individual only.</li>
+                <li><strong>Multi-User / Team License:</strong> Access for a specified number of users.</li>
+                <li><strong>Enterprise / Global License:</strong> Access for all employees globally.</li>
+            </ul>
+
+            <h2>5. Orders, Payments & Delivery</h2>
+            <p>Prices are subject to change without notice. Delivery is typically via email within 24-48 hours.</p>
+
+            <h2>6. Refund Policy</h2>
+            <p>Due to the digital nature of our research products, <strong>all sales are final</strong>.</p>
+
+            <p style="margin-top: 3rem; font-size: 0.9rem; color: #64748b; font-style: italic;">Last updated: February
+                2026</p>
+        </div>
     </div>
 </section>
-
-<div class="container">
-    <article class="content-section">
-        <p>By accessing this website, you agree to comply with the following terms.</p>
-
-        <h2>Use of Content</h2>
-        <p>All reports, content, and materials are proprietary to Markets NXT and protected by intellectual property
-            laws. Unauthorized reproduction or distribution is prohibited.</p>
-
-        <h2>No Investment Advice</h2>
-        <p>Content provided is for informational purposes only and does not constitute investment, legal, or financial
-            advice.</p>
-
-        <h2>Limitation of Liability</h2>
-        <p>Markets NXT is not liable for decisions made based on information provided on this website or in reports.</p>
-
-        <h2>Client Engagements</h2>
-        <p>Consulting and research engagements are governed by separate contractual agreements.</p>
-
-        <h2>Governing Law</h2>
-        <p>These terms are governed by applicable laws in the jurisdiction of Markets NXT's principal place of business.
-        </p>
-
-        <p style="margin-top: 2rem; font-size: 0.9rem; color: #6b7280;">Last updated: January 2026</p>
-    </article>
-</div>
 {% endblock %}

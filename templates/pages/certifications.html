@@ -4,84 +4,108 @@
 {% block title %}{{ meta_title }}{% endblock %}
 
 {% block content %}
-<style>
-    .page-hero {
-        background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%);
-        /* Teal */
-        color: white;
-        padding: 4rem 0 3rem;
-        margin-bottom: 3rem;
-    }
-
-    .page-hero h1 {
-        font-size: 2.5rem;
-        font-weight: 700;
-    }
-
-    .content-section {
-        max-width: 900px;
-        margin: 0 auto 3rem;
-        padding: 0 1rem;
-    }
-
-    .content-section h2 {
-        color: #1e3a8a;
-        font-size: 1.6rem;
-        font-weight: 700;
-        margin: 2rem 0 1rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid #f97316;
-    }
-
-    .content-section p,
-    .content-section ul {
-        line-height: 1.8;
-        color: #374151;
-        margin-bottom: 1rem;
-    }
-
-    .content-section ul {
-        margin-left: 1.5rem;
-    }
-
-    .cert-badge {
-        background: #f0f9ff;
-        border-left: 4px solid #2563eb;
-        padding: 1rem 1.5rem;
-        margin: 1rem 0;
-        border-radius: 4px;
-        font-weight: 600;
-        color: #1e3a8a;
-    }
-</style>
-
-<section class="page-hero">
+<section class="legal-page-wrapper">
     <div class="container">
-        <h1>Certifications & Standards</h1>
+        <div class="legal-breadcrumbs">
+            <a href="{% url 'home' %}">Home</a> &raquo; Certifications & Standards
+        </div>
+
+        <div class="legal-content-box">
+            <h1>Certifications & Standards</h1>
+            <p>Markets NXT operates under a structured quality, information security, and governance framework designed
+                to align with internationally recognized standards for research, consulting, and data handling
+                organizations. Our certification and compliance philosophy reflects our institutional commitment to
+                quality assurance, information protection, process discipline, and auditability.</p>
+            <p>As a market intelligence and consulting organization serving enterprises, investors, and institutions, we
+                recognize that analytical credibility must be supported by operational credibility. Accordingly, our
+                internal systems, workflows, and controls are designed in alignment with globally accepted certification
+                frameworks — particularly ISO 9001 (Quality Management Systems) and ISO 27001 (Information Security
+                Management Systems) — under principles recognized by the International Accreditation Forum (IAF)
+                ecosystem.</p>
+
+            <h2 style="margin-top: 0;">Quality Management Alignment — ISO 9001 Framework</h2>
+            <p>Markets NXT’s research and consulting operations are structured in alignment with the principles of ISO
+                9001 Quality Management Systems, which emphasize process consistency, continuous improvement, documented
+                controls, and customer-focused delivery.</p>
+
+            <h3>ISO 9001 Principles Applied at Markets NXT</h3>
+            <ul>
+                <li><strong>Process Standardization:</strong> Research and consulting workflows are documented through
+                    structured process maps, methodology templates, and engagement protocols.</li>
+                <li><strong>Multi-Level Review Controls:</strong> Major research outputs pass through layered internal
+                    reviews, including scope validation, methodological checks, data verification, and conclusion
+                    consistency review.</li>
+                <li><strong>Client Requirement Alignment:</strong> Engagement scoping procedures ensure that client
+                    objectives, deliverables, and analytical approaches are defined and validated before research
+                    execution begins.</li>
+                <li><strong>Corrective & Preventive Controls:</strong> Internal review findings are documented and used
+                    to refine research templates, modeling assumptions, and quality checkpoints.</li>
+                <li><strong>Performance Monitoring:</strong> Quality indicators — including revision rates, methodology
+                    deviations, and review flags — are monitored to improve output reliability.</li>
+                <li><strong>Documentation Discipline:</strong> Research assumptions, segmentation logic, and modeling
+                    structures are documented for traceability and audit readiness.</li>
+            </ul>
+
+            <h2>Information Security & Data Protection — ISO 27001 Framework</h2>
+            <p>Information security is central to Markets NXT’s operating model. As a provider of market intelligence
+                and consulting services, we handle sensitive client inquiries, proprietary datasets, strategic plans,
+                and confidential communications. Our information governance framework is structured in alignment with
+                ISO 27001 Information Security Management System (ISMS) principles.</p>
+
+            <h3>ISO 27001 Principles Applied at Markets NXT</h3>
+            <ul>
+                <li><strong>Risk-Based Information Security:</strong> Information assets are classified by sensitivity
+                    level, and security controls are applied proportionally.</li>
+                <li><strong>Access Control Frameworks:</strong> Role-based access controls limit exposure of sensitive
+                    client and research data to authorized personnel only.</li>
+                <li><strong>Data Handling Protocols:</strong> Internal protocols govern how research data, client
+                    materials, and proprietary models are stored, accessed, transmitted, and archived.</li>
+                <li><strong>Confidentiality Safeguards:</strong> Employees, analysts, and external contributors operate
+                    under confidentiality agreements and data protection obligations.</li>
+                <li><strong>Secure Research Workflows:</strong> Research production systems follow structured data
+                    handling practices, including version control and restricted editing rights.</li>
+                <li><strong>Incident Response Preparedness:</strong> Incident reporting and response procedures are
+                    defined to ensure timely containment and remediation of any data security event.</li>
+                <li><strong>Vendor & Partner Controls:</strong> Third-party service providers are evaluated for security
+                    posture and are subject to contractual data protection obligations.</li>
+            </ul>
+
+            <h2>International Accreditation Framework — IAF Recognition Context</h2>
+            <p>Markets NXT’s certification alignment philosophy recognizes the role of the International Accreditation
+                Forum (IAF) in the global certification ecosystem.</p>
+            <p>The IAF is the international association of accreditation bodies that ensures certification bodies
+                operate under consistent global standards. Certifications issued under IAF-recognized accreditation
+                frameworks provide international credibility and cross-border recognition.</p>
+
+            <h2>Research Quality Assurance Controls</h2>
+            <p>Beyond formal certification frameworks, Markets NXT maintains internal research quality controls designed
+                specifically for market intelligence and consulting outputs. Research Quality Measures Include:</p>
+            <ul>
+                <li>Multi-source data triangulation</li>
+                <li>Source reliability scoring</li>
+                <li>Forecast sensitivity testing</li>
+                <li>Assumption documentation registers</li>
+                <li>Peer review checkpoints</li>
+                <li>Methodology audit trails</li>
+                <li>Version-controlled modeling files</li>
+                <li>Structured estimation frameworks</li>
+            </ul>
+
+            <h2>Confidentiality & Client Data Assurance</h2>
+            <p>Certification-aligned practices are reinforced by client confidentiality controls:</p>
+            <ul>
+                <li>Engagement-level data segregation</li>
+                <li>Need-to-know analyst access</li>
+                <li>Confidential document labeling protocols</li>
+                <li>Controlled distribution lists</li>
+                <li>Secure archival procedures</li>
+            </ul>
+
+            <h2>Continuous Certification Readiness & Improvement</h2>
+            <p>Markets NXT maintains a continuous improvement philosophy toward certification and compliance readiness.
+                Internal audits, methodology reviews, and workflow refinements are conducted periodically to strengthen
+                alignment with ISO and international governance standards.</p>
+        </div>
     </div>
 </section>
-
-<div class="container">
-    <article class="content-section">
-        <p>Markets NXT adheres to internationally recognized quality and information security standards.</p>
-
-        <h2>ISO Certifications</h2>
-        <div class="cert-badge">✓ ISO 9001: Quality Management Systems</div>
-        <div class="cert-badge">✓ ISO 27001: Information Security Management Systems</div>
-
-        <h2>Research & Consulting Standards</h2>
-        <ul>
-            <li>Internal research methodology frameworks aligned with global consulting best practices</li>
-            <li>Data validation and multi-source verification protocols</li>
-            <li>Confidentiality and non-disclosure frameworks for client engagements</li>
-        </ul>
-
-        <h2>Corporate Governance</h2>
-        <ul>
-            <li>Ethical research standards</li>
-            <li>Conflict-of-interest policies</li>
-            <li>Independent research principles</li>
-        </ul>
-    </article>
-</div>
 {% endblock %}

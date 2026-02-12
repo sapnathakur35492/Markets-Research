@@ -111,3 +111,33 @@ def downgrade_headers(value):
     # Replace closing tags
     value = re.sub(r'</h[1-6]>', '</p>', value)
     return mark_safe(value)
+
+
+@register.filter(name='get_category_icon')
+def get_category_icon(category_name):
+    """
+    Return an emoji icon based on the category name.
+    """
+    if not category_name:
+        return '📊'
+    
+    name = category_name.lower()
+    
+    if "health" in name or "pharma" in name or "bio" in name:
+        return '🩺'
+    elif "tech" in name or "software" in name or "cyber" in name:
+        return '💻'
+    elif "chem" in name or "material" in name:
+        return '⚗️'
+    elif "energy" in name or "power" in name:
+        return '⚡'
+    elif "auto" in name or "vehicle" in name:
+        return '🚗'
+    elif "food" in name or "beverage" in name:
+        return '🍔'
+    elif "aero" in name or "defence" in name or "security" in name:
+        return '✈️'
+    elif "consumer" in name or "retail" in name:
+        return '🛍️'
+    else:
+        return '📊'

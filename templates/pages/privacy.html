@@ -1,91 +1,196 @@
+```
 {% extends 'base.html' %}
 {% load static %}
 
 {% block title %}{{ meta_title }}{% endblock %}
 
 {% block content %}
-<style>
-    .page-hero {
-        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-        color: white;
-        padding: 4rem 0 3rem;
-        margin-bottom: 3rem;
-    }
-
-    .page-hero h1 {
-        font-size: 2.5rem;
-        font-weight: 700;
-    }
-
-    .content-section {
-        max-width: 900px;
-        margin: 0 auto 3rem;
-        padding: 0 1rem;
-    }
-
-    .content-section h2 {
-        color: #1e3a8a;
-        font-size: 1.6rem;
-        font-weight: 700;
-        margin: 2rem 0 1rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid #f97316;
-    }
-
-    .content-section p,
-    .content-section ul {
-        line-height: 1.8;
-        color: #374151;
-        margin-bottom: 1rem;
-    }
-
-    .content-section ul {
-        margin-left: 1.5rem;
-    }
-</style>
-
-<section class="page-hero">
+<section class="legal-page-wrapper">
     <div class="container">
-        <h1>Privacy Policy</h1>
+        <div class="legal-breadcrumbs">
+            <a href="{% url 'home' %}">Home</a> &raquo; Privacy Policy
+        </div>
+
+        <div class="legal-content-box">
+            <h1>Privacy Policy</h1>
+
+            <p>Markets NXT (“Markets NXT,” “we,” “our,” or “us”) is committed to protecting the privacy and
+                confidentiality of personal and business information entrusted to us. As a provider of market
+                intelligence, research, and consulting services, we recognize that responsible data handling is
+                essential to our institutional credibility and client trust.</p>
+            <p>This Privacy Policy explains how we collect, use, store, protect, and disclose information when you visit
+                our website, interact with our services, or communicate with us. This policy applies to website
+                visitors, clients, subscribers, partners, and other stakeholders who engage with Markets NXT.</p>
+            <p>By accessing our website or using our services, you acknowledge the practices described in this Privacy
+                Policy.</p>
+
+            <h2>1. Scope of This Policy</h2>
+            <p>This Privacy Policy applies to:</p>
+            <ul>
+                <li>Visitors to Markets NXT websites and digital platforms</li>
+                <li>Individuals submitting inquiries or requests</li>
+                <li>Clients and prospective clients</li>
+                <li>Report purchasers and subscribers</li>
+                <li>Event participants and webinar registrants</li>
+                <li>Business partners and collaborators</li>
+            </ul>
+            <p>This policy covers personal and business contact information and related usage data but does not apply to
+                third-party websites that may be linked from our platform.</p>
+
+            <h2>2. Information We Collect</h2>
+            <p>We collect information in a limited and purpose-driven manner. Categories of information may include:</p>
+
+            <h3>2.1 Information You Provide Directly</h3>
+            <p>You may voluntarily provide information when you:</p>
+            <ul>
+                <li>Fill out contact forms</li>
+                <li>Request reports or proposals</li>
+                <li>Subscribe to newsletters or research updates</li>
+                <li>Register for briefings or events</li>
+                <li>Communicate with us by email or phone</li>
+            </ul>
+            <p>This information may include: Name, Business email address, Organization name, Job title or function,
+                Country or region, Phone number, Inquiry details and message content.</p>
+
+            <h3>2.2 Business & Transaction Information</h3>
+            <p>When you purchase reports or engage services, we may collect:</p>
+            <ul>
+                <li>Billing contact details</li>
+                <li>Company information</li>
+                <li>Transaction records</li>
+                <li>Engagement correspondence</li>
+                <li>Service delivery preferences</li>
+            </ul>
+            <p>Payment processing is typically handled through secure third-party payment providers. Markets NXT does
+                not store full payment card details.</p>
+
+            <h2>3. How We Use Information</h2>
+            <p>We use collected information for legitimate business and operational purposes, including:</p>
+
+            <h3>3.1 Service Delivery</h3>
+            <ul>
+                <li>Responding to inquiries and requests</li>
+                <li>Delivering purchased reports and services</li>
+                <li>Managing consulting and research engagements</li>
+                <li>Providing client support</li>
+            </ul>
+
+            <h3>3.2 Communication</h3>
+            <ul>
+                <li>Sending requested research updates</li>
+                <li>Providing service-related communications</li>
+                <li>Sharing relevant insights or event invitations (where appropriate)</li>
+            </ul>
+
+            <h3>3.3 Operational Improvement</h3>
+            <ul>
+                <li>Improving website performance and usability</li>
+                <li>Enhancing research and service quality</li>
+                <li>Developing new offerings</li>
+            </ul>
+
+            <h3>3.4 Compliance & Protection</h3>
+            <ul>
+                <li>Meeting legal and regulatory requirements</li>
+                <li>Enforcing contractual rights</li>
+                <li>Protecting against misuse or unauthorized activity</li>
+            </ul>
+            <p>We do not use personal data for unrelated purposes without appropriate notice or consent.</p>
+
+            <h2>4. Legal Basis for Processing</h2>
+            <p>Where applicable under data protection laws, Markets NXT processes information under one or more of the
+                following bases:</p>
+            <ul>
+                <li>Legitimate business interest</li>
+                <li>Contractual necessity</li>
+                <li>User consent</li>
+                <li>Legal obligation</li>
+                <li>Protection of legitimate rights and interests</li>
+            </ul>
+
+            <h2>5. Cookies & Tracking Technologies</h2>
+            <p>Markets NXT may use cookies and similar technologies to enhance website functionality and understand
+                usage behavior. Cookies may be used to:</p>
+            <ul>
+                <li>Maintain session functionality</li>
+                <li>Remember user preferences</li>
+                <li>Analyze traffic patterns</li>
+                <li>Improve site performance</li>
+            </ul>
+            <p>Users may control cookie settings through their browser preferences. Disabling cookies may affect certain
+                website features.</p>
+
+            <h2>6. Information Sharing & Disclosure</h2>
+            <p>Markets NXT does not sell personal information to third parties. We may share information only under
+                limited and controlled circumstances:</p>
+
+            <h3>6.1 Service Providers</h3>
+            <p>With trusted third-party vendors who support: Website hosting, Email delivery, Analytics services,
+                Payment processing, CRM systems. These providers are contractually obligated to maintain confidentiality
+                and security.</p>
+
+            <h3>6.2 Legal & Regulatory Requirements</h3>
+            <p>We may disclose information if required to: Comply with law or regulation, Respond to lawful requests,
+                Protect legal rights, Prevent fraud or misuse.</p>
+
+            <h3>6.3 Business Transfers</h3>
+            <p>In the event of a merger, restructuring, or asset transfer, information may be transferred subject to
+                confidentiality protections.</p>
+
+            <h2>7. Data Security Measures</h2>
+            <p>Markets NXT maintains reasonable administrative, technical, and organizational safeguards to protect
+                information from unauthorized access, disclosure, alteration, or destruction.</p>
+            <p>Security measures include:</p>
+            <ul>
+                <li>Access controls and role restrictions</li>
+                <li>Secure data storage systems</li>
+                <li>Confidentiality agreements</li>
+                <li>Controlled document access</li>
+                <li>Internal data handling protocols</li>
+            </ul>
+            <p>While no system can guarantee absolute security, we apply structured safeguards consistent with
+                institutional standards.</p>
+
+            <h2>8. Data Retention</h2>
+            <p>We retain personal and business information only as long as necessary for: Service delivery, Contract
+                fulfillment, Legal compliance, Legitimate business purposes.</p>
+            <p>Retention periods vary depending on the type of information and engagement context. Data no longer
+                required is securely deleted or anonymized where practical.</p>
+
+            <h2>9. International Data Transfers</h2>
+            <p>Markets NXT operates through a global analyst and client network. Information may be processed in
+                multiple jurisdictions. Where cross-border data transfer occurs, we apply appropriate safeguards and
+                contractual protections.</p>
+
+            <h2>10. Your Rights</h2>
+            <p>Subject to applicable law, individuals may have the right to:</p>
+            <ul>
+                <li>Request access to their data</li>
+                <li>Request correction of inaccurate data</li>
+                <li>Request deletion where appropriate</li>
+                <li>Object to certain processing</li>
+                <li>Withdraw consent where applicable</li>
+            </ul>
+            <p>Requests may be submitted using the contact details below. We may verify identity before processing
+                requests.</p>
+
+            <h2>11. Third-Party Links</h2>
+            <p>Our website may contain links to third-party websites. Markets NXT is not responsible for the privacy
+                practices or content of external sites. Users should review third-party privacy policies independently.
+            </p>
+
+            <h2>12. Children’s Privacy</h2>
+            <p>Markets NXT services are intended for business and professional audiences. We do not knowingly collect
+                personal data from children.</p>
+
+            <h2>13. Policy Updates</h2>
+            <p>We may update this Privacy Policy periodically to reflect operational, legal, or regulatory changes.
+                Updated versions will be posted with a revised effective date. Continued use of our website after
+                updates indicates acceptance of the revised policy.</p>
+
+            <p style="margin-top: 3rem; font-size: 0.9rem; color: #64748b; font-style: italic;">Last updated: February
+                2026</p>
+        </div>
     </div>
 </section>
-
-<div class="container">
-    <article class="content-section">
-        <p>Markets NXT ("we," "our," or "us") respects your privacy and is committed to protecting personal and
-            corporate information.</p>
-
-        <h2>Information We Collect</h2>
-        <ul>
-            <li>Contact details provided via forms or email</li>
-            <li>Business and corporate inquiry information</li>
-            <li>Website usage data through cookies and analytics tools</li>
-        </ul>
-
-        <h2>Use of Information</h2>
-        <p>We use collected information to:</p>
-        <ul>
-            <li>Respond to inquiries</li>
-            <li>Deliver research and consulting services</li>
-            <li>Improve website and service offerings</li>
-            <li>Comply with legal and regulatory requirements</li>
-        </ul>
-
-        <h2>Data Security</h2>
-        <p>We implement reasonable administrative and technical safeguards to protect information against unauthorized
-            access or disclosure.</p>
-
-        <h2>Third-Party Sharing</h2>
-        <p>We do not sell personal data. Information may be shared with trusted service providers solely for operational
-            purposes.</p>
-
-        <h2>Cookies</h2>
-        <p>Our website may use cookies to enhance user experience and analyze website traffic.</p>
-
-        <h2>Policy Updates</h2>
-        <p>This policy may be updated periodically. Continued use of our website constitutes acceptance of changes.</p>
-
-        <p style="margin-top: 2rem; font-size: 0.9rem; color: #6b7280;">Last updated: January 2026</p>
-    </article>
-</div>
 {% endblock %}

@@ -259,6 +259,18 @@
                     <div id="paypal-container" style="display: none; margin-top: 2rem;">
                         <h4 style="margin-bottom: 1.5rem; color: #60a5fa;">Pay Securely with PayPal</h4>
                         <div id="paypal-button-container"></div>
+
+                        {% if debug %}
+                        <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px dashed #475569;">
+                            <h5 style="color: #fbbf24; margin-bottom: 1rem;">Developer Mode</h5>
+                            <button type="button" id="devBypassBtn" class="btn-complete"
+                                style="background: #334155; color: #94a3b8; font-size: 0.9rem;">
+                                Test Payment (Dev Bypass)
+                            </button>
+                            <p style="color: #64748b; font-size: 0.8rem; margin-top: 0.5rem;">Simulates a successful
+                                transaction without PayPal.</p>
+                        </div>
+                        {% endif %}
                     </div>
                 </form>
             </div>
@@ -285,7 +297,6 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@25.2.0/build/js/intlTelInput.min.js"></script>
-<script src="https://www.paypal.com/sdk/js?client-id={{ PAYPAL_CLIENT_ID }}&currency=USD"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const phoneInput = document.querySelector("#id_phone_checkout");
@@ -397,31 +408,70 @@
         setTimeout(setMaxLength, 1000);
 
         function renderPayPalButtons() {
-            paypal.Buttons({
-                createOrder: (data, actions) => actions.order.create({
-                    purchase_units: [{
-                        amount: { value: '{{ price }}' },
-                        description: '{{ report.title }} - {{ license_label }}'
-                    }]
-                }),
-                onApprove: (data, actions) => actions.order.capture().then(details => {
-                    return fetch('{% url "paypal_capture" %}', {
+            // Server-Side Flow: Call backend to create order and get redirect URL
+            const btnContainer = document.getElementById('paypal-button-container');
+            btnContainer.innerHTML = '<button id="payNowBtn" class="btn-complete" style="background: #fbbf24; color: #1e3a8a;">Pay with PayPal</button>';
+
+            document.getElementById('payNowBtn').addEventListener('click', function () {
+                this.innerHTML = 'Redirecting to PayPal...';
+                this.disabled = true;
+
+                fetch('{% url "create-paypal-order" %}', {
+                    method: 'POST',
+                    headers: {
+                        'content-type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: JSON.stringify({ lead_id: leadId })
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.approve_url) {
+                            window.location.href = data.approve_url;
+                        } else {
+                            throw new Error(data.error || 'Failed to initiate PayPal payment');
+                        }
+                    })
+                    .catch(err => {
+                        console.error('PayPal Error:', err);
+                        alert('Error: ' + err.message);
+                        this.innerHTML = 'Pay with PayPal';
+                        this.disabled = false;
+                    });
+            });
+
+            // Dev Bypass Handler
+            const devBtn = document.getElementById('devBypassBtn');
+            if (devBtn) {
+                devBtn.addEventListener('click', function () {
+                    this.innerHTML = 'Simulating Payment...';
+                    this.disabled = true;
+
+                    fetch('{% url "dev-bypass" %}', {
                         method: 'POST',
                         headers: {
                             'content-type': 'application/json',
                             'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
                         },
-                        body: JSON.stringify({ orderID: data.orderID, leadID: leadId })
-                    }).then(res => {
-                        if (res.ok) window.location.href = "{% url 'report-detail' slug=report.slug %}?payment=success";
-                        else alert('Payment captured but could not notify server. Please contact support.');
-                    });
-                }),
-                onError: (err) => {
-                    console.error('PayPal Error:', err);
-                    alert('An error occurred with PayPal. Please try again.');
-                }
-            }).render('#paypal-button-container');
+                        body: JSON.stringify({ lead_id: leadId })
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.redirect_url) {
+                                window.location.href = data.redirect_url;
+                            } else {
+                                alert('Dev Bypass Error: ' + (data.error || 'Unknown error'));
+                                this.innerHTML = 'Test Payment (Dev Bypass)';
+                                this.disabled = false;
+                            }
+                        })
+                        .catch(err => {
+                            alert('Dev Connection Error: ' + err.message);
+                            this.innerHTML = 'Test Payment (Dev Bypass)';
+                            this.disabled = false;
+                        });
+                });
+            }
         }
     });
 </script>

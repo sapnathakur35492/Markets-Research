@@ -4,160 +4,81 @@
 {% block title %}{{ meta_title }}{% endblock %}
 
 {% block content %}
-<style>
-    .page-hero {
-        background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
-        /* Navy/Slate */
-        color: white;
-        padding: 4rem 0 3rem;
-        margin-bottom: 3rem;
-    }
-
-    .page-hero h1 {
-        font-size: 2.5rem;
-        font-weight: 700;
-        margin-bottom: 1rem;
-    }
-
-    .page-hero .subtitle {
-        font-size: 1.2rem;
-        opacity: 0.9;
-    }
-
-    .content-section {
-        max-width: 900px;
-        margin: 0 auto 3rem;
-        padding: 0 1rem;
-    }
-
-    .content-section h2 {
-        color: #1e3a8a;
-        font-size: 1.8rem;
-        font-weight: 700;
-        margin: 2.5rem 0 1.5rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 3px solid #f97316;
-    }
-
-    .content-section h3 {
-        color: #2563eb;
-        font-size: 1.4rem;
-        font-weight: 600;
-        margin: 2rem 0 1rem;
-    }
-
-    .content-section p {
-        line-height: 1.8;
-        color: #374151;
-        margin-bottom: 1.2rem;
-        text-align: justify;
-    }
-
-    .legacy-box {
-        background: #f0f9ff;
-        border-left: 4px solid #2563eb;
-        padding: 1.5rem;
-        margin: 2rem 0;
-        border-radius: 4px;
-    }
-
-    .philosophy-box {
-        background: #fef3c7;
-        border-left: 4px solid #f59e0b;
-        padding: 1.5rem;
-        margin: 2rem 0;
-        border-radius: 4px;
-    }
-
-    .about-profile-image {
-        float: right;
-        width: 300px;
-        margin-left: 2rem;
-        margin-bottom: 1rem;
-        border-radius: 8px;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        border: 4px solid white;
-    }
-
-    @media (max-width: 768px) {
-        .about-profile-image {
-            float: none;
-            display: block;
-            margin: 0 auto 1.5rem;
-            width: 100%;
-        }
-    }
-</style>
-
-<section class="page-hero">
+<section class="legal-page-wrapper">
     <div class="container">
-        <h1>About Us</h1>
-        <p class="subtitle">Markets NXT — A Montclaire & Stein Venture</p>
+        <div class="legal-breadcrumbs">
+            <a href="{% url 'home' %}">Home</a> &raquo; About Us
+        </div>
+
+        <div class="legal-content-box">
+            <h1>About Us</h1>
+            <p><strong>Markets NXT — A Montclaire & Stein Venture</strong></p>
+
+            <h2 style="margin-top: 0;">A Legacy Rooted in Early 20th Century Enterprise</h2>
+
+            <img src="{% static 'images/Profile.jpg' %}" alt="Profile Image"
+                style="float: right; width: 300px; margin-left: 2rem; margin-bottom: 2rem; border-radius: 8px; border: 4px solid #f1f5f9;">
+
+            <p>In the early decades of the 1900s, at a time when modern business advisory was still in its infancy, two
+                entrepreneurial thinkers—<strong>Edgar Montclaire</strong>, a French-trained economist, and
+                <strong>Johann Stein</strong>, a German-American industrial strategist—formed a partnership that would
+                later become a cornerstone of institutional consulting.
+            </p>
+
+            <p>Montclaire and Stein began their journey advising small and family-owned enterprises across Europe and
+                the northeastern United States, helping them navigate industrial expansion, financial structuring, and
+                early globalization. Their philosophy was simple yet transformative: <em>rigorous analysis, independent
+                    thinking, and practical guidance grounded in data</em>.</p>
+
+            <p>As industries evolved and multinational corporations emerged, Montclaire & Stein expanded their advisory
+                services to corporate enterprises, financial institutions, and government-linked organizations, building
+                a reputation for structured thinking, economic intelligence, and strategic counsel. Over the decades,
+                the firm cultivated a culture of intellectual rigor, ethical advisory, and institutional
+                discipline—principles that continue to define its legacy.</p>
+
+            <h2>A Century of Data as Institutional Capital</h2>
+
+            <div
+                style="background: #f8fafc; border-left: 4px solid #1e3a8a; padding: 2rem; margin: 2rem 0; border-radius: 4px;">
+                <p style="margin-bottom: 0;"><strong>Over more than a century</strong>, Montclaire & Stein accumulated a
+                    vast corpus of structured economic data, industry intelligence, and enterprise case knowledge. What
+                    began as advisory notes and enterprise records evolved into a proprietary intellectual asset—an
+                    institutional knowledge base that informs strategic decisions across sectors.</p>
+            </div>
+
+            <p>The firm's legacy was shaped by analysts, industry veterans, economists, engineers, policy specialists,
+                and corporate strategists who contributed structured insights across industrial cycles, technological
+                shifts, and economic transformations. Their collective expertise has informed corporate expansions,
+                market entry strategies, policy frameworks, and investment decisions across multiple generations of
+                enterprises.</p>
+
+            <p>This heritage of disciplined research and advisory excellence forms the intellectual foundation upon
+                which <strong>Markets NXT</strong> is built.</p>
+
+            <h2>How Markets NXT Is Different</h2>
+
+            <h3>Institutional Research Frameworks, Not Generic Reports</h3>
+            <p>Unlike conventional market research providers that rely on surface-level secondary data aggregation,
+                Markets NXT applies <strong>institutional research frameworks</strong> inspired by consulting
+                methodologies. Each report is structured to support board-level decision-making, investment analysis,
+                and strategic planning, rather than marketing content consumption.</p>
+
+            <h3>Legacy-Driven Data Discipline and Independent Analysis</h3>
+            <p>Our analytical culture is shaped by the Montclaire & Stein legacy of data discipline, independent
+                verification, and conservative forecasting assumptions. We avoid over-optimistic projections and rely on
+                structured assumptions, multi-source validation, and expert-driven interpretation.</p>
+
+            <h2>Our Philosophy</h2>
+
+            <div
+                style="background: #eff6ff; border-left: 4px solid #2563eb; padding: 2rem; margin: 2rem 0; border-radius: 4px;">
+                <p style="font-size: 1.1rem; margin: 0; color: #1e3a8a;"><strong>Markets NXT operates on the principle
+                        that data is only valuable when transformed into strategic intelligence.</strong></p>
+            </div>
+
+            <p>We serve enterprises and institutions that require rigor, independence, and actionable clarity in an
+                increasingly complex global economy.</p>
+        </div>
     </div>
 </section>
-
-<div class="container">
-    <article class="content-section">
-        <h2>A Legacy Rooted in Early 20th Century Enterprise</h2>
-
-        <img src="{% static 'images/Profile.jpg' %}" alt="Profile Image" class="about-profile-image">
-
-        <p>In the early decades of the 1900s, at a time when modern business advisory was still in its infancy, two
-            entrepreneurial thinkers—<strong>Edgar Montclaire</strong>, a French-trained economist, and <strong>Johann
-                Stein</strong>, a German-American industrial strategist—formed a partnership that would later become a
-            cornerstone of institutional consulting.</p>
-
-        <p>Montclaire and Stein began their journey advising small and family-owned enterprises across Europe and the
-            northeastern United States, helping them navigate industrial expansion, financial structuring, and early
-            globalization. Their philosophy was simple yet transformative: <em>rigorous analysis, independent thinking,
-                and practical guidance grounded in data</em>.</p>
-
-        <p>As industries evolved and multinational corporations emerged, Montclaire & Stein expanded their advisory
-            services to corporate enterprises, financial institutions, and government-linked organizations, building a
-            reputation for structured thinking, economic intelligence, and strategic counsel. Over the decades, the firm
-            cultivated a culture of intellectual rigor, ethical advisory, and institutional discipline—principles that
-            continue to define its legacy.</p>
-
-        <h2>A Century of Data as Institutional Capital</h2>
-
-        <div class="legacy-box">
-            <p><strong>Over more than a century</strong>, Montclaire & Stein accumulated a vast corpus of structured
-                economic data, industry intelligence, and enterprise case knowledge. What began as advisory notes and
-                enterprise records evolved into a proprietary intellectual asset—an institutional knowledge base that
-                informs strategic decisions across sectors.</p>
-        </div>
-
-        <p>The firm's legacy was shaped by analysts, industry veterans, economists, engineers, policy specialists, and
-            corporate strategists who contributed structured insights across industrial cycles, technological shifts,
-            and economic transformations. Their collective expertise has informed corporate expansions, market entry
-            strategies, policy frameworks, and investment decisions across multiple generations of enterprises.</p>
-
-        <p>This heritage of disciplined research and advisory excellence forms the intellectual foundation upon which
-            <strong>Markets NXT</strong> is built.
-        </p>
-
-        <h2>How Markets NXT Is Different</h2>
-
-        <h3>Institutional Research Frameworks, Not Generic Reports</h3>
-        <p>Unlike conventional market research providers that rely on surface-level secondary data aggregation, Markets
-            NXT applies <strong>institutional research frameworks</strong> inspired by consulting methodologies. Each
-            report is structured to support board-level decision-making, investment analysis, and strategic planning,
-            rather than marketing content consumption.</p>
-
-        <h3>Legacy-Driven Data Discipline and Independent Analysis</h3>
-        <p>Our analytical culture is shaped by the Montclaire & Stein legacy of data discipline, independent
-            verification, and conservative forecasting assumptions. We avoid over-optimistic projections and rely on
-            structured assumptions, multi-source validation, and expert-driven interpretation.</p>
-
-        <h2>Our Philosophy</h2>
-
-        <div class="philosophy-box">
-            <p style="font-size: 1.1rem; margin: 0;"><strong>Markets NXT operates on the principle that data is only
-                    valuable when transformed into strategic intelligence.</strong></p>
-        </div>
-
-        <p>We serve enterprises and institutions that require rigor, independence, and actionable clarity in an
-            increasingly complex global economy.</p>
-    </article>
-</div>
 {% endblock %}

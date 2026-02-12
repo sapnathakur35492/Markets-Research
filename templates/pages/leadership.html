@@ -4,91 +4,93 @@
 {% block title %}{{ meta_title }}{% endblock %}
 
 {% block content %}
-<style>
-    .page-hero {
-        background: linear-gradient(135deg, #334155 0%, #475569 100%);
-        /* Slate */
-        color: white;
-        padding: 4rem 0 3rem;
-        margin-bottom: 3rem;
-    }
-
-    .page-hero h1 {
-        font-size: 2.5rem;
-        font-weight: 700;
-    }
-
-    .content-section {
-        max-width: 900px;
-        margin: 0 auto 3rem;
-        padding: 0 1rem;
-    }
-
-    .content-section h2 {
-        color: #1e3a8a;
-        font-size: 1.6rem;
-        font-weight: 700;
-        margin: 2rem 0 1rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid #f97316;
-    }
-
-    .content-section h3 {
-        color: #2563eb;
-        font-size: 1.3rem;
-        font-weight: 600;
-        margin: 1.5rem 0 1rem;
-    }
-
-    .content-section p,
-    .content-section ul {
-        line-height: 1.8;
-        color: #374151;
-        margin-bottom: 1rem;
-    }
-
-    .content-section ul {
-        margin-left: 1.5rem;
-    }
-</style>
-
-<section class="page-hero">
+<section class="legal-page-wrapper">
     <div class="container">
-        <h1>Leadership & Analysts</h1>
+        <div class="legal-breadcrumbs">
+            <a href="{% url 'home' %}">Home</a> &raquo; Leadership & Analysts
+        </div>
+
+        <div class="legal-content-box">
+            <h1>Leadership & Analysts</h1>
+            <p><strong>Markets NXT — A Montclaire & Stein Venture</strong></p>
+
+            <h2 style="margin-top: 0;">Leadership Team</h2>
+            <p>Markets NXT is guided by a multidisciplinary leadership group composed of senior professionals from
+                strategy consulting, market intelligence, industry research, financial analysis, and enterprise advisory
+                backgrounds. The leadership team operates under a governance-driven model that emphasizes analytical
+                rigor, methodological discipline, and client-impact orientation.</p>
+            <p>Leadership at Markets NXT is defined not only by executive oversight, but by stewardship of research
+                quality, advisory integrity, and institutional standards. Each member of the leadership group
+                contributes domain depth and methodological oversight to ensure that research and consulting outputs
+                meet enterprise decision requirements.</p>
+
+            <h3>Office of the Managing Director — Strategy & Institutional Development</h3>
+            <p>The Managing Director’s office is responsible for long-range institutional direction, research
+                philosophy, and strategic partnerships. This function oversees the alignment between Markets NXT’s
+                intelligence platforms and its consulting frameworks, ensuring that published research and advisory
+                engagements remain methodologically consistent and decision-relevant.</p>
+
+            <h3>Director — Research & Intelligence</h3>
+            <p>The Director of Research & Intelligence leads the firm’s global research programs, sector coverage
+                architecture, and analytical methodology standards. This function is responsible for research design
+                frameworks, data validation protocols, and forecast modeling approaches used across published and custom
+                research outputs.</p>
+            <p>The Director of Research & Intelligence maintains internal standards for:</p>
+            <ul>
+                <li>Market sizing methodologies</li>
+                <li>Forecast modeling frameworks</li>
+                <li>Source validation processes</li>
+                <li>Multi-source triangulation protocols</li>
+                <li>Analytical review layers</li>
+                <li>Documentation of assumptions</li>
+            </ul>
+
+            <h3>Director — Consulting & Advisory Services</h3>
+            <p>The Director of Consulting & Advisory Services leads client-facing strategic engagements, custom research
+                programs, and advisory assignments. This function bridges structured research with applied strategic
+                decision support.</p>
+            <ul>
+                <li>Custom research program design</li>
+                <li>Market entry and expansion advisory</li>
+                <li>Investment and commercial due diligence support</li>
+                <li>Competitive intelligence engagements</li>
+                <li>Strategy validation studies</li>
+                <li>Scenario and risk analysis projects</li>
+            </ul>
+
+            <h3>Head — Data Governance & Methodology</h3>
+            <p>The Head of Data Governance & Methodology oversees data integrity standards, source evaluation protocols,
+                and methodological consistency across research programs. This leadership function is central to
+                maintaining institutional research credibility.</p>
+
+            <h3>Sector Research Leads</h3>
+            <p>Markets NXT appoints Sector Research Leads across major industry domains including technology,
+                healthcare, industrials, energy, financial services, and advanced materials. These leaders supervise
+                domain analyst teams and maintain sector-specific framework libraries.</p>
+
+            <h3>Advisory & Expert Network</h3>
+            <p>In addition to internal leadership, Markets NXT maintains a structured external expert network composed
+                of industry specialists, academic contributors, technical consultants, and former operators. This
+                network supports domain validation and contextual interpretation.</p>
+
+            <h2>Leadership Operating Principles</h2>
+            <p>Across all leadership functions, Markets NXT follows institutional operating principles:</p>
+            <ul>
+                <li><strong>Method before conclusion</strong> — analytical process integrity is prioritized over speed.
+                </li>
+                <li><strong>Evidence before assertion</strong> — claims must be supported by validated data.</li>
+                <li><strong>Independence before influence</strong> — analysis is insulated from commercial pressure.
+                </li>
+                <li><strong>Confidentiality before convenience</strong> — client data protection is non-negotiable.</li>
+                <li><strong>Consistency before scale</strong> — methodological consistency is prioritized over rapid
+                    expansion.</li>
+            </ul>
+
+            <h2>Institutional Culture</h2>
+            <p>Leadership at Markets NXT promotes a culture of analytical discipline, professional skepticism, and
+                continuous improvement. Internal debate, peer review, and methodological challenge are encouraged as
+                mechanisms to improve research quality.</p>
+        </div>
     </div>
 </section>
-
-<div class="container">
-    <article class="content-section">
-        <h2>Leadership Team</h2>
-
-        <h3>Managing Partner & Executive Leadership</h3>
-        <p>Markets NXT is led by senior professionals with backgrounds in strategy consulting, corporate research,
-            finance, technology, and policy advisory. The leadership team brings experience across enterprise strategy,
-            industry intelligence, investment research, and corporate advisory engagements.</p>
-
-        <h3>Research & Intelligence Leadership</h3>
-        <p>The research leadership oversees methodology design, analyst frameworks, and data governance, ensuring all
-            outputs meet institutional research standards.</p>
-
-        <h2>Analysts & Research Associates</h2>
-        <p>Markets NXT employs a multidisciplinary team of industry analysts, economists, engineers, financial
-            researchers, and sector specialists with experience across:</p>
-        <ul>
-            <li>Technology and digital industries</li>
-            <li>Manufacturing and industrial sectors</li>
-            <li>Energy and utilities</li>
-            <li>Healthcare and life sciences</li>
-            <li>Financial services and capital markets</li>
-            <li>Consumer and retail markets</li>
-            <li>Policy, regulatory, and geopolitical analysis</li>
-        </ul>
-        <p>Our analysts combine quantitative modeling, primary research, expert interviews, and secondary data
-            validation to deliver enterprise-grade insights.</p>
-
-        <h2>Global Advisory Network</h2>
-        <p>Markets NXT maintains a network of industry advisors, academic collaborators, and domain experts across North
-            America, Europe, and Asia-Pacific, enabling localized intelligence and global perspective.</p>
-    </article>
-</div>
 {% endblock %}

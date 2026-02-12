@@ -249,31 +249,203 @@
     <div class="methodology-content">
         <h2>Research Framework and Methodological Approach — MarketsNXT</h2>
 
+        <!-- Main Process Flow -->
+        <div class="process-flow-container">
+            <div class="process-step">
+                <div class="step-circle">
+                    <i class="fas fa-database"></i>
+                </div>
+                <h4>Information<br>Procurement</h4>
+            </div>
+            <div class="step-arrow"><i class="fas fa-chevron-right"></i></div>
+            <div class="process-step">
+                <div class="step-circle">
+                    <i class="fas fa-chart-pie"></i>
+                </div>
+                <h4>Information<br>Analysis</h4>
+            </div>
+            <div class="step-arrow"><i class="fas fa-chevron-right"></i></div>
+            <div class="process-step">
+                <div class="step-circle">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h4>Market Formulation<br>& Validation</h4>
+            </div>
+        </div>
+
+        <style>
+            .process-flow-container {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 1rem;
+                margin: 3rem 0;
+                padding: 2rem;
+                background: #f8fafc;
+                border-radius: 16px;
+                border: 1px dashed #cbd5e1;
+            }
+
+            .process-step {
+                text-align: center;
+                position: relative;
+                width: 160px;
+            }
+
+            .step-circle {
+                width: 80px;
+                height: 80px;
+                background: linear-gradient(135deg, #4B2D6D 0%, #3a1f58 100%);
+                /* Deep Purple */
+                color: white;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 2rem;
+                margin: 0 auto 1rem;
+                box-shadow: 0 8px 15px rgba(75, 45, 109, 0.2);
+                border: 4px solid #fff;
+                outline: 2px solid #00C1D4;
+                /* Teal Accent */
+            }
+
+            .process-step h4 {
+                color: #1e293b;
+                font-weight: 700;
+                line-height: 1.3;
+                font-size: 1rem;
+            }
+
+            .step-arrow {
+                color: #00C1D4;
+                font-size: 2rem;
+                opacity: 0.5;
+            }
+
+            @media (max-width: 640px) {
+                .process-flow-container {
+                    flex-direction: column;
+                    gap: 2rem;
+                }
+
+                .step-arrow {
+                    transform: rotate(90deg);
+                }
+
+                .step-circle {
+                    width: 60px;
+                    height: 60px;
+                    font-size: 1.5rem;
+                }
+            }
+        </style>
+
         <h3>Overview of Our Research Process</h3>
         <p>MarketsNXT follows a structured, multi-stage research framework designed to ensure accuracy, reliability, and
             strategic relevance of every published study. Our methodology integrates globally accepted research
             standards with industry best practices in data collection, modeling, verification, and insight generation.
-            Each project is executed through an iterative validation cycle, where new findings are continuously
-            cross-checked and refined. We also align research objectives and analytical methods with client requirements
-            at the outset to ensure outcome relevance and usability.</p>
+        </p>
 
-        <h3>Data Acquisition Strategy</h3>
+        <!-- Data Acquisition Grid -->
+        <h3 style="margin-top: 3rem;">1. Data Acquisition Strategy</h3>
         <p>Robust data collection is the foundation of our analytical process. MarketsNXT employs a layered sourcing
-            model that combines proprietary intelligence, commercial databases, expert consultations, and authoritative
-            public sources.</p>
-        <p>Our data gathering activities include:</p>
-        <ul>
-            <li>Accessing licensed commercial databases for company performance metrics, industry reports, technical
-                journals, and sector publications</li>
-            <li>Utilizing MarketsNXT’s internal knowledge repositories developed through ongoing market tracking and
-                archived studies</li>
-            <li>Conducting primary interviews with industry participants, subject matter experts, distributors, and
-                decision-makers through structured questionnaires and direct discussions</li>
-            <li>Reviewing secondary information sources including regulatory publications, multilateral agency reports,
-                institutional papers, and recognized industry bodies</li>
-            <li>Studying investor presentations, corporate disclosures, analyst briefings, and financial commentary for
-                third-party perspectives and market signals</li>
-        </ul>
+            model.</p>
+
+        <div class="procurement-grid">
+            <div class="proc-card secondary">
+                <div class="proc-header">
+                    <i class="fas fa-book-open"></i> Secondary Research
+                </div>
+                <ul class="proc-list">
+                    <li>Company annual reports & SEC filings</li>
+                    <li>Industry association publications</li>
+                    <li>Technical journals & white papers</li>
+                    <li>Government databases (World Bank, OECD)</li>
+                    <li>Paid commercial databases</li>
+                </ul>
+            </div>
+            <div class="proc-card primary">
+                <div class="proc-header">
+                    <i class="fas fa-comments"></i> Primary Research
+                </div>
+                <ul class="proc-list">
+                    <li>KOL Interviews (CEOs, Marketing Heads)</li>
+                    <li>Surveys with industry participants</li>
+                    <li>Distributor & supplier discussions</li>
+                    <li>End-user feedback loops</li>
+                    <li>Questionnaires for gap analysis</li>
+                </ul>
+            </div>
+        </div>
+
+        <style>
+            .procurement-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 2rem;
+                margin: 2rem 0;
+            }
+
+            .proc-card {
+                border-radius: 12px;
+                overflow: hidden;
+                border: 1px solid #e2e8f0;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+            }
+
+            .proc-header {
+                padding: 1rem 1.5rem;
+                font-weight: 700;
+                font-size: 1.1rem;
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+            }
+
+            .proc-card.secondary .proc-header {
+                background: #E8F8FA;
+                /* Light Teal */
+                color: #0e7490;
+            }
+
+            .proc-card.primary .proc-header {
+                background: #F3E8FF;
+                /* Light Purple */
+                color: #6b21a8;
+            }
+
+            .proc-list {
+                padding: 1.5rem;
+                margin: 0;
+            }
+
+            .proc-list li {
+                list-style: none;
+                margin-bottom: 0.75rem;
+                position: relative;
+                padding-left: 1.5rem;
+                font-size: 0.95rem;
+            }
+
+            .proc-list li::before {
+                color: #00C1D4;
+                /* Teal arrow */
+                font-weight: bold;
+                content: "➤";
+                position: absolute;
+                left: 0;
+                font-size: 0.8rem;
+                top: 2px;
+            }
+
+            @media (max-width: 768px) {
+                .procurement-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+        </style>
+
 
         <h3>Analytical Modeling and Insight Development</h3>
         <p>After collection, datasets are processed and interpreted using multiple analytical techniques to identify
@@ -282,35 +454,178 @@
         <p>Our analytical toolkit includes demand modeling, trend mapping, penetration analysis, and scenario
             forecasting supported by statistical and heuristic techniques.</p>
 
-        <h3>Market Estimation Techniques</h3>
+        <!-- Pyramids Section -->
+        <h3 style="margin-top: 3rem;">2. Market Estimation Techniques</h3>
         <p>MarketsNXT applies multiple estimation pathways to strengthen forecast accuracy.</p>
 
-        <h4>Demand-Driven Build-Up Method</h4>
-        <p>This method aggregates country-level and segment-level demand figures to construct total market size. It
-            relies on unit consumption, pricing trends, and segment adoption rates.</p>
+        <div class="approaches-container">
+            <!-- Bottom Up Approach -->
+            <div class="approach-box">
+                <h4>Bottom-up Approach</h4>
+                <div class="pyramid-container bottom-up">
+                    <div class="pyramid-level l1"><span>Country Level Market Size</span></div>
+                    <div class="pyramid-level l2"><span>Regional Market Size</span></div>
+                    <div class="pyramid-level l3"><span>Global Market Size</span></div>
+                </div>
+                <p class="approach-desc">Aggregating granular demand data from country level to derive global figures.
+                </p>
+            </div>
 
-        <h4>Market Decomposition Method</h4>
-        <p>This approach starts with broader industry values and proportionally distributes them across sub-segments
-            based on penetration ratios, usage intensity, and segment weightages.</p>
+            <!-- Top Down Approach -->
+            <div class="approach-box">
+                <h4>Top-down Approach</h4>
+                <div class="pyramid-container top-down">
+                    <div class="pyramid-level l1"><span>Parent Market Size</span></div>
+                    <div class="pyramid-level l2"><span>Target Market Share</span></div>
+                    <div class="pyramid-level l3"><span>Segmented Market Size</span></div>
+                </div>
+                <p class="approach-desc">Breaking down the parent industry market to identify the target serviceable
+                    market.</p>
+            </div>
+        </div>
 
-        <h4>Hybrid Estimation Method</h4>
-        <p>A blended structure combining build-up and decomposition techniques to balance supply indicators with
-            consumption signals.</p>
+        <style>
+            .approaches-container {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 4rem;
+                /* Increased gap */
+                margin: 2rem 0;
+            }
+
+            .approach-box {
+                text-align: center;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .approach-box h4 {
+                color: #4B2D6D;
+                margin-bottom: 2rem;
+                font-size: 1.25rem;
+                font-weight: 800;
+            }
+
+            .pyramid-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                width: 100%;
+                max-width: 350px;
+                /* Constrain max width */
+                margin-bottom: 2rem;
+                filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.1));
+                /* Moving shadow to container to respect clip-path */
+            }
+
+            .pyramid-level {
+                width: 100%;
+                background: #00C1D4;
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 700;
+                font-size: 0.9rem;
+                padding: 1rem 0.5rem;
+                /* Increased padding */
+                text-align: center;
+                line-height: 1.2;
+                position: relative;
+                z-index: 1;
+            }
+
+            /* Bottom Up Styling (Standard Pyramid) */
+            /* l1 = Base (Bottom), l2 = Middle, l3 = Tip (Top) */
+            .bottom-up {
+                flex-direction: column-reverse;
+            }
+
+            .bottom-up .l1 {
+                width: 100%;
+                background: #4B2D6D;
+                padding-bottom: 0.5rem;
+                /* Almost rectangular base */
+                clip-path: polygon(0 0, 100% 0, 95% 100%, 5% 100%);
+            }
+
+            .bottom-up .l2 {
+                width: 90%;
+                /* Wider middle */
+                background: #00C1D4;
+                clip-path: polygon(5% 0, 95% 0, 90% 100%, 10% 100%);
+            }
+
+            .bottom-up .l3 {
+                width: 80%;
+                /* Much wider top */
+                background: #60a5fa;
+                /* Very blunt tip */
+                clip-path: polygon(10% 0, 90% 0, 85% 100%, 15% 100%);
+                padding-top: 1.2rem;
+                margin-bottom: -1px;
+                font-size: 0.85rem;
+                /* Smaller font for tip */
+            }
+
+            /* Top Down Styling (Inverted Pyramid) */
+            /* l1 = Base (Top), l2 = Middle, l3 = Tip (Bottom) */
+            .top-down .l1 {
+                width: 100%;
+                background: #4B2D6D;
+                padding-top: 1.2rem;
+                clip-path: polygon(0 0, 100% 0, 95% 100%, 5% 100%);
+            }
+
+            .top-down .l2 {
+                width: 90%;
+                background: #00C1D4;
+                clip-path: polygon(5% 0, 95% 0, 90% 100%, 10% 100%);
+            }
+
+            .top-down .l3 {
+                width: 80%;
+                /* Much wider bottom tip */
+                background: #60a5fa;
+                clip-path: polygon(10% 0, 90% 0, 85% 100%, 15% 100%);
+                padding-bottom: 1.2rem;
+                font-size: 0.85rem;
+            }
+
+            .approach-desc {
+                font-size: 0.95rem;
+                color: #64748b;
+                line-height: 1.6;
+                max-width: 90%;
+            }
+
+            /* Text tweaks for small shapes */
+            .pyramid-level span {
+                display: block;
+                max-width: 95%;
+                /* Allow text to use almost full width */
+            }
+
+            @media (max-width: 768px) {
+                .approaches-container {
+                    grid-template-columns: 1fr;
+                    gap: 3rem;
+                }
+            }
+        </style>
 
         <h3>Supply Chain Anchored Forecasting</h3>
         <p>MarketsNXT integrates value chain intelligence into its forecasting structure to ensure commercial realism
             and operational alignment.</p>
-
         <h4>Supply-Side Evaluation</h4>
         <p>Revenue and capacity estimates are developed through company financial reviews, product portfolio mapping,
             benchmarking of competitive positioning, and commercialization tracking. We also evaluate pipeline
             developments, distribution reach, and strategic initiatives.</p>
-
         <h4>Demand-Side Evaluation</h4>
         <p>Demand projections are developed by mapping end-use industries, adjacent markets, adoption rates, and segment
             penetration levels. Subject matter expert inputs are incorporated to refine demand trajectories and usage
             assumptions.</p>
-
         <h4>Market Share Allocation Models</h4>
         <p>Structured scoring and weighted factor models are used to estimate participant shares and segment
             distribution patterns.</p>
@@ -340,6 +655,96 @@
             <li><strong>Multi-Level Validation:</strong> Reports proceed to release only after passing layered quality
                 and accuracy checks.</li>
         </ul>
+
+        <h3>3. Market Engineering & Validation</h3>
+        <p>Market engineering involves the triangulation of data from multiple sources to minimize errors.</p>
+
+        <div class="validation-box">
+            <div class="v-step">
+                <span class="v-num">01</span>
+                <strong>Data Mining</strong>
+                <p>Extensive gathering of raw data.</p>
+            </div>
+            <div class="v-line"></div>
+            <div class="v-step">
+                <span class="v-num">02</span>
+                <strong>Analysis</strong>
+                <p>Statistical regression & trend analysis.</p>
+            </div>
+            <div class="v-line"></div>
+            <div class="v-step">
+                <span class="v-num">03</span>
+                <strong>Validation</strong>
+                <p>Cross-verification with experts.</p>
+            </div>
+            <div class="v-line"></div>
+            <div class="v-step">
+                <span class="v-num">04</span>
+                <strong>Final Output</strong>
+                <p>Publication of market study.</p>
+            </div>
+        </div>
+
+        <style>
+            .validation-box {
+                display: flex;
+                align-items: flex-start;
+                justify-content: space-between;
+                background: #f1f5f9;
+                padding: 2rem;
+                border-radius: 16px;
+                margin: 2rem 0;
+            }
+
+            .v-step {
+                flex: 1;
+                text-align: center;
+                padding: 0 0.5rem;
+            }
+
+            .v-num {
+                display: inline-block;
+                background: #4B2D6D;
+                color: white;
+                font-weight: 700;
+                padding: 0.25rem 0.75rem;
+                border-radius: 8px;
+                margin-bottom: 0.75rem;
+                font-size: 0.9rem;
+            }
+
+            .v-step strong {
+                display: block;
+                color: #1e293b;
+                margin-bottom: 0.5rem;
+            }
+
+            .v-step p {
+                font-size: 0.85rem;
+                color: #64748b;
+                margin: 0;
+            }
+
+            .v-line {
+                width: 1px;
+                height: 80px;
+                background: #cbd5e1;
+                margin-top: 1rem;
+            }
+
+            @media (max-width: 640px) {
+                .validation-box {
+                    flex-direction: column;
+                    gap: 1.5rem;
+                }
+
+                .v-line {
+                    width: 100%;
+                    height: 1px;
+                    margin: 0;
+                }
+            }
+        </style>
 
         <h3>Client-Centric Research Delivery</h3>
         <p>MarketsNXT positions research delivery as a collaborative engagement rather than a static information

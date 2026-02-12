@@ -11,6 +11,9 @@ from django.conf import settings
 import os
 import csv
 from django.http import HttpResponse
+from django_ckeditor_5.widgets import CKEditor5Widget
+from django.db import models
+
 
 class ExcelImportForm(forms.Form):
     excel_file = forms.FileField()
@@ -29,6 +32,9 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Report)
 class ReportAdmin(admin.ModelAdmin):
+    formfield_overrides = {
+        models.TextField: {'widget': CKEditor5Widget(config_name='extends')},
+    }
     list_display = ('title', 'category', 'publish_date', 'region', 'single_user_price')
     list_filter = ('category', 'region', 'format_type')
     search_fields = ('title', 'slug', 'summary')

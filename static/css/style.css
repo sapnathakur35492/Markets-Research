@@ -475,3 +475,84 @@ footer {
     padding: 0.5rem;
     border: 1px solid var(--border);
 }
+
+/* Legal Pages - Box on Blue Design */
+.legal-page-wrapper {
+    background-color: #000428 !important;
+    /* Deep institutional blue */
+    padding: 4rem 0;
+    min-height: calc(100vh - 400px);
+}
+
+.legal-breadcrumbs {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+    font-family: 'Inter', sans-serif;
+}
+
+.legal-breadcrumbs a {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.legal-breadcrumbs a:hover {
+    color: white;
+    text-decoration: underline;
+}
+
+.legal-content-box {
+    background: white;
+    padding: 3rem 4rem;
+    border-radius: 0;
+    /* Sharp corners for institutional feel */
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    font-family: 'Poppins', sans-serif;
+    color: #1e293b;
+}
+
+.legal-content-box h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    color: #000428;
+    border-bottom: 2px solid #f1f5f9;
+    padding-bottom: 1rem;
+}
+
+.legal-content-box h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    color: #1e3a8a;
+}
+
+.legal-content-box p,
+.legal-content-box li {
+    font-size: 1rem;
+    line-height: 1.7;
+    margin-bottom: 1.2rem;
+    color: #334155;
+}
+
+.legal-content-box ul {
+    margin-bottom: 1.5rem;
+    padding-left: 1.5rem;
+}
+
+.legal-content-box strong {
+    font-weight: 600;
+    color: #0f172a;
+}
+
+@media (max-width: 768px) {
+    .legal-content-box {
+        padding: 2rem;
+    }
+
+    .legal-content-box h1 {
+        font-size: 1.75rem;
+    }
+}
