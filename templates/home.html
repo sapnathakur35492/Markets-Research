@@ -176,19 +176,22 @@
 
         .hero-content {
             text-align: center;
+            padding: 2rem 0;
         }
 
         .hero-content h1 {
-            font-size: 2.2rem;
+            font-size: 2rem;
             /* Significantly reduced from 3.5rem to prevent cutting */
             word-wrap: break-word;
+            line-height: 1.2;
             /* Ensure wrapping */
         }
 
         .hero-content p.description {
-            font-size: 1rem;
+            font-size: 0.95rem;
             margin: 0 auto 2rem auto;
             /* Center */
+            line-height: 1.5;
         }
 
         .search-inline {
@@ -197,7 +200,7 @@
         }
 
         .hero-wrapper {
-            padding: 40px 0;
+            padding: 30px 0;
             /* Reduce padding */
             min-height: auto;
         }
@@ -205,7 +208,7 @@
         /* Ensure button width is contained */
         .view-details-btn {
             width: 100%;
-            max-width: 280px;
+            max-width: 250px;
             box-sizing: border-box;
         }
     }
@@ -648,16 +651,16 @@
         animation: bounceLeftRight 15s ease-in-out infinite;
     }
 
-    /* Bounce/Ping-pong animation - left to right and back */
+    /* Bounce/Ping-pong animation - left to right and back - reduced distance for mobile */
     @keyframes bounceLeftRight {
 
         0%,
         100% {
-            transform: translateX(-200px);
+            transform: translateX(-50px);
         }
 
         50% {
-            transform: translateX(200px);
+            transform: translateX(50px);
         }
     }
 
@@ -1016,7 +1019,7 @@
 
 <!-- Start Your Growth Journey CTA -->
 <section
-    style="background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%); padding: 5rem 0; text-align: center; color: white;">
+    style="background: linear-gradient(135deg, #002d72 0%, #0f1b2e 100%); padding: 5rem 0; text-align: center; color: white;">
     <div class="container">
         <h2 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 1rem;">Start Your Growth Journey</h2>
         <p style="font-size: 1.1rem; opacity: 0.9; max-width: 700px; margin: 0 auto 2.5rem; line-height: 1.6;">

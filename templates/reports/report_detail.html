@@ -28,17 +28,16 @@
 
 {% block content %}
 <style>
-    /* Global Background */
-    html,
-    /* Global Background */
+    /* Global Background Fix for Sticky */
     html,
     body {
         background: radial-gradient(at 0% 0%, rgba(226, 232, 240, 0.5) 0px, transparent 50%),
             radial-gradient(at 100% 0%, rgba(203, 213, 225, 0.4) 0px, transparent 50%),
             radial-gradient(at 100% 100%, rgba(226, 232, 240, 0.5) 0px, transparent 50%),
             radial-gradient(at 0% 100%, rgba(203, 213, 225, 0.4) 0px, transparent 50%),
-            #f8fafc;
-        /* overflow-x: hidden; <--- REMOVED to fix sticky behavior */
+            #f8fafc !important;
+        overflow-x: clip !important;
+        /* Prevents breaking sticky while still containing horizontal overflow */
         max-width: 100%;
     }
 
@@ -298,7 +297,10 @@
         flex-direction: column;
         gap: 1.5rem;
         position: sticky;
-        top: 2rem;
+        top: 100px;
+        /* Offset from sticky header */
+        align-self: start;
+        /* Critical for sticky to work in flex/grid */
     }
 
     /* Metadata Box */

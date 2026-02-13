@@ -98,11 +98,15 @@
         /* Stylish Header */
         /* Top Navigation Bar */
         .top-bar {
-            background: #0f172a;
-            /* Dark Blue from reference */
+            background: #01206f;
+            /* Updated to match reference */
             color: #ffffff;
-            padding: 8px 0;
-            font-size: 0.85rem;
+            height: 36px;
+            /* Updated from 40px */
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            /* Exact font-size from reference */
             letter-spacing: 0.02em;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
@@ -110,8 +114,8 @@
         .top-bar .container {
             display: flex;
             justify-content: space-between;
-            /* Space between Email and Links */
             align-items: center;
+            width: 100%;
         }
 
         .top-contact-info a {
@@ -159,69 +163,92 @@
         }
 
         @media (max-width: 768px) {
+            .top-bar {
+                height: auto;
+                padding: 8px 0;
+            }
+
             .top-bar .container {
-                display: flex;
+                flex-direction: column;
                 justify-content: center;
-                /* Center on mobile if wrapping or stacking */
-                align-items: center;
-                flex-wrap: wrap;
-                gap: 10px;
+                gap: 5px;
+                text-align: center;
             }
 
             .top-contact-info a {
-                color: #94a3b8;
-                text-decoration: none;
-                display: flex;
-                align-items: center;
-                transition: color 0.3s ease;
-            }
-
-            .top-contact-info a:hover {
-                color: #ffffff;
-            }
-
-            .top-links {
-                gap: 12px;
-                font-size: 0.8rem;
-                flex-wrap: wrap;
-                /* Allow wrapping on very small screens */
+                font-size: 0.95rem;
                 justify-content: center;
             }
 
-            .top-links a:not(:last-child)::after {
-                right: -8px;
+            .top-links {
+                display: none;
+                /* Hide utility links on mobile for extreme clarity */
             }
         }
 
         header {
             background: #ffffff;
-            /* Pure white */
-            padding: 1rem 0;
-            /* Increased padding */
+            height: 160px;
+            /* Updated from 86px */
+            display: flex;
+            align-items: center;
             border-bottom: 1px solid #e2e8f0;
             position: sticky;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
         }
 
         .header-search {
             display: flex;
             align-items: center;
-            background: #ffffff;
-            border-radius: 8px;
-            /* Slightly more rounded */
-            padding: 2px;
-            border: 2px solid #e2e8f0;
+            background: #f1f5f9;
+            /* Slightly darker than white for better contrast */
+            border-radius: 4px;
+            padding: 0;
+            /* Removed padding */
+            border: 1px solid #e2e8f0;
             overflow: hidden;
-            width: 320px;
-            /* Slimmer for better fit next to nav */
-            max-width: 100%;
-            margin-left: 20px;
-            /* Space from nav */
+            width: 335px;
+            /* Matched to the horizontal span of top-bar links */
+            height: 34px;
+            margin-left: 30px;
+            /* Spacing between navigation links and search bar */
+            margin-right: -1px;
+            /* Offset for border to align perfectly with links above */
             transition: all 0.3s ease;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        @media (max-width: 991px) {
+            header {
+                height: auto;
+                min-height: 110px;
+                padding: 15px 0;
+            }
+
+            .header-search {
+                width: 100%;
+                margin: 15px 0 5px;
+                order: 4;
+                height: 42px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+                /* Modern shadow */
+                border-radius: 8px;
+                /* More rounded for attractive look */
+            }
+
+            .nav-wrapper {
+                flex-wrap: wrap;
+                justify-content: space-between;
+                align-items: center;
+                gap: 5px;
+            }
+
+            .logo img {
+                height: 110px !important;
+                margin: 0;
+                display: block;
+            }
         }
 
         .header-search:focus-within {
@@ -233,25 +260,26 @@
         .header-search input {
             border: none;
             background: transparent;
-            padding: 8px 12px;
-            font-size: 0.9rem;
-            width: 100%;
+            padding: 0 12px;
+            font-size: 14px;
+            flex: 1;
+            /* Take remaining space */
+            height: 100%;
             outline: none;
-            color: #334155;
+            color: #1e293b;
         }
 
         .header-search button {
-            background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+            background: #2563eb;
             border: none;
             color: white;
-            padding: 8px 16px;
+            padding: 0 16px;
+            height: 100%;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 6px;
             transition: all 0.2s ease;
-            margin-left: 4px;
         }
 
         .header-search button:hover {
@@ -273,9 +301,11 @@
         }
 
         .nav-links a {
-            color: #1e293b;
+            color: #222222;
+            /* Updated to match reference */
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 16px;
+            /* Slightly increased as requested */
             position: relative;
             padding: 0.5rem 0;
             transition: color 0.3s ease;
@@ -425,12 +455,11 @@
 
             <a href="{% url 'home' %}" class="logo">
                 <img src="{% static 'images/logo_new.jpg' %}" alt="Markets NXT"
-                    style="width: 300px; height: auto; display: block;">
+                    style="height: 150px; width: auto; display: block;">
             </a>
 
-            <!-- Removed margin-left: auto from nav to keep it left/center on desktop. 
-                 On mobile, justify-content: space-between will handle toggle position. -->
-            <nav>
+            <!-- Repositioned nav to the right side next to search bar -->
+            <nav style="margin-left: auto;">
                 <button class="mobile-menu-toggle" id="menuToggle">
                     <span></span>
                     <span></span>
@@ -565,7 +594,7 @@
         style="background-image: url('{% static 'images/footer.jpg' %}'); background-size: cover; background-position: center; position: relative; padding: 2.25rem 0 1.5rem; overflow: hidden;">
         <!-- Dark overlay with gradient for better text contrast -->
         <div
-            style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, rgba(84, 79, 117, 0.98), rgba(15, 23, 42, 0.96)); z-index: 0;">
+            style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, rgba(1, 60, 252, 0.945), rgba(15, 23, 42, 0.96)); z-index: 0;">
         </div>
 
         <!-- Subtle pattern overlay for texture -->
@@ -586,10 +615,8 @@
                 <!-- Certifications with glassmorphism -->
                 <div style="min-width: 150px;">
                     <h3
-                        style="color: #fff; margin-bottom: 0.875rem; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
-                        <span
-                            style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Certifications</span>
-                    </h3>
+                        style="color: #fff; margin-bottom: 0.875rem; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+                        Certifications</h3>
                     <!-- Glassmorphic card with gradient border -->
                     <div
                         style="position: relative; padding: 2px; border-radius: 10px; background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899); box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 20px rgba(59, 130, 246, 0.3);">
