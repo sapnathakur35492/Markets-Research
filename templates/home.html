@@ -646,12 +646,11 @@
         justify-content: center;
         align-items: center;
         gap: 8rem;
-        /* col-12 gap */
         width: 100%;
         animation: bounceLeftRight 15s ease-in-out infinite;
     }
 
-    /* Bounce/Ping-pong animation - left to right and back - reduced distance for mobile */
+    /* Bounce/Ping-pong animation - left to right and back */
     @keyframes bounceLeftRight {
 
         0%,
@@ -720,22 +719,46 @@
 
     @media (max-width: 768px) {
         .slider-section {
-            padding: 3rem 0;
+            padding: 2.5rem 0;
+            overflow-x: hidden;
         }
 
-        .slider-section img {
-            padding: 1.5rem;
+        .certifications-container {
+            gap: 0.5rem !important;
+            flex-wrap: nowrap;
+            overflow-x: visible;
+            animation: bounceLeftRightMobile 5s ease-in-out infinite !important;
+            /* Even faster */
+            padding: 0;
+            max-width: 100%;
+            justify-content: center;
         }
 
-        @keyframes slideInFromLeft {
-            0% {
-                opacity: 0;
-                transform: translateX(-50px);
+        .cert-logo {
+            height: 35px !important;
+            /* Even smaller */
+            padding: 0.3rem 0.5rem !important;
+            flex-shrink: 0;
+            max-width: 80px;
+        }
+
+        .cert-logo-nobox {
+            height: 60px !important;
+            /* Much smaller */
+            flex-shrink: 0;
+            max-width: 70px;
+        }
+
+        @keyframes bounceLeftRightMobile {
+
+            0%,
+            100% {
+                transform: translateX(-8px);
+                /* Smaller movement */
             }
 
-            100% {
-                opacity: 1;
-                transform: translateX(0);
+            50% {
+                transform: translateX(8px);
             }
         }
     }

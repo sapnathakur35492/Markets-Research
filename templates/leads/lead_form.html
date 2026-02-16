@@ -4,7 +4,7 @@
 
 {% block extra_head %}
 <!-- Intl Tel Input CSS -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@25.2.0/build/css/intlTelInput.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@23.0.11/build/css/intlTelInput.css">
 <!-- FontAwesome for Icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -34,6 +34,7 @@
         margin-bottom: 0;
         text-align: left;
         overflow: hidden;
+        z-index: 1;
     }
 
     .detail-hero::before {
@@ -71,7 +72,7 @@
     }
 
     .detail-title {
-        font-size: 2.2rem;
+        font-size: 1.5rem;
         font-weight: 800;
         line-height: 1.25;
         color: white;
@@ -118,19 +119,25 @@
     }
 
     .form-title-main {
-        font-size: 1.75rem;
-        font-weight: 800;
+        font-size: 1.25rem;
+        font-weight: 700;
         color: #1e3a8a;
-        letter-spacing: -0.02em;
-        margin: 0;
+        letter-spacing: -0.01em;
+        margin: 0 0 0.75rem 0;
+        padding-top: 3px;
         display: flex;
         align-items: center;
-        gap: 0.75rem;
+        gap: 0.5rem;
+        line-height: 1.3;
+        overflow: visible;
     }
 
     .form-title-main i {
         color: #f97316;
-        font-size: 0.9em;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+        display: inline-block;
+        line-height: 1;
     }
 
     /* Icon Accent */
@@ -483,6 +490,16 @@
             align-items: flex-start;
             gap: 0.5rem;
         }
+
+        .form-title-main {
+            font-size: 1.1rem;
+            gap: 0.4rem;
+            padding-top: 2px;
+        }
+
+        .form-title-main i {
+            font-size: 0.95rem;
+        }
     }
 
     @media (max-width: 600px) {
@@ -491,7 +508,7 @@
         }
 
         .detail-title {
-            font-size: 1.35rem !important;
+            font-size: 1.23rem !important;
             line-height: 1.3;
         }
     }
@@ -743,7 +760,7 @@
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/intl-tel-input@25.2.0/build/js/intlTelInput.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/intl-tel-input@23.0.11/build/js/intlTelInput.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const phoneInput = document.querySelector("#id_phone");
@@ -758,9 +775,9 @@
                     .then(data => callback(data.country_code))
                     .catch(() => callback("us"));
             },
-            utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@25.2.0/build/js/utils.js",
+            utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@23.0.11/build/js/utils.js",
             separateDialCode: true,
-            strictMode: true,
+            autoPlaceholder: "aggressive",
         });
 
         // Strict 10-digit validation logic for India
@@ -780,12 +797,28 @@
             }
         };
 
+        // Strict India Phone Validation - Multiple Event Handlers
+        const enforceIndiaLimit = function () {
+            const countryData = iti.getSelectedCountryData();
+            if (countryData && countryData.iso2 === 'in') {
+                let val = phoneInput.value.replace(/\D/g, '');
+                if (val.length > 10) {
+                    val = val.slice(0, 10);
+                }
+                phoneInput.value = val;
+            }
+        };
+
+        // Input event - fires on any value change
         phoneInput.addEventListener('input', function (e) {
             phoneError.style.display = 'none';
             const countryData = iti.getSelectedCountryData();
-            if (countryData.iso2 === 'in') {
+
+            if (countryData && countryData.iso2 === 'in') {
                 let val = this.value.replace(/\D/g, '');
-                if (val.length > 10) val = val.slice(0, 10);
+                if (val.length > 10) {
+                    val = val.slice(0, 10);
+                }
                 this.value = val;
             } else {
                 let digits = this.value.replace(/\D/g, '');
@@ -795,6 +828,43 @@
                     digits = digits.substring(0, maxDigits + 2);
                 }
                 this.value = digits;
+            }
+        });
+
+        // Keydown event - prevent typing beyond 10 digits
+        phoneInput.addEventListener('keydown', function (e) {
+            const countryData = iti.getSelectedCountryData();
+            if (countryData && countryData.iso2 === 'in') {
+                const currentLength = this.value.replace(/\D/g, '').length;
+                // Allow: backspace, delete, tab, escape, enter
+                if ([8, 9, 27, 13, 46].indexOf(e.keyCode) !== -1 ||
+                    // Allow: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
+                    (e.keyCode === 65 && e.ctrlKey === true) ||
+                    (e.keyCode === 67 && e.ctrlKey === true) ||
+                    (e.keyCode === 86 && e.ctrlKey === true) ||
+                    (e.keyCode === 88 && e.ctrlKey === true) ||
+                    // Allow: home, end, left, right
+                    (e.keyCode >= 35 && e.keyCode <= 39)) {
+                    return;
+                }
+                // Block if already 10 digits
+                if (currentLength >= 10) {
+                    e.preventDefault();
+                }
+            }
+        });
+
+        // Paste event - trim to 10 digits
+        phoneInput.addEventListener('paste', function (e) {
+            const countryData = iti.getSelectedCountryData();
+            if (countryData && countryData.iso2 === 'in') {
+                setTimeout(() => {
+                    let val = phoneInput.value.replace(/\D/g, '');
+                    if (val.length > 10) {
+                        val = val.slice(0, 10);
+                    }
+                    phoneInput.value = val;
+                }, 10);
             }
         });
 
