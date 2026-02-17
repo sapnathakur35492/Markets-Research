@@ -2,8 +2,11 @@
 {% load static %}
 {% load report_filters %}
 
-{% block title %}{{ report.title }} - Market Research Platform
+{% block title %}{{ report.title }} - Market Research Platform{% endblock %}
+
+{% block content %}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoad&render=explicit" async defer></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         // Check for payment success parameter
@@ -24,9 +27,6 @@
         }
     });
 </script>
-{% endblock %}
-
-{% block content %}
 <style>
     /* Global Background Fix for Sticky */
     html,
@@ -123,10 +123,10 @@
         margin: 0 auto;
         padding: 4rem 2rem;
         display: grid;
-        grid-template-columns: 1fr 400px;
-        /* Wider sidebar, flexible description */
-        gap: 6rem;
-        /* Large gap pushes pricing far right */
+        grid-template-columns: 1fr 340px;
+        /* Sidebar reduced to 340px */
+        gap: 3rem;
+        /* Reduced gap to bring sidebar closer */
         align-items: start;
         width: 100%;
         box-sizing: border-box;
@@ -134,14 +134,17 @@
 
     /* Main Content Area */
     .detail-main {
-        background: rgba(255, 255, 255, 0.95);
-        border-radius: 20px;
-        border: 1px solid rgba(226, 232, 240, 0.8);
-        box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.05),
-            0 10px 15px -10px rgba(0, 0, 0, 0.05);
+        background: #ffffff;
+        border-radius: 16px;
+        /* Thicker and darker outline */
+        border: 4px solid #0e4ae0;
+        /* Deep brand blue */
+        /* Enhanced shadow for depth */
+        box-shadow: 0 20px 40px -5px rgba(1, 32, 111, 0.2),
+            0 10px 20px -5px rgba(0, 0, 0, 0.04);
         overflow: hidden;
         width: 100%;
-        backdrop-filter: blur(10px);
+        position: relative;
     }
 
     /* Tabs */
@@ -159,7 +162,8 @@
     }
 
     .tab-btn {
-        padding: 1.25rem 2rem;
+        padding: 1rem 1.5rem;
+        /* Reduced from 1.25rem 2rem for better fit */
         font-weight: 600;
         color: #64748b;
         background: transparent;
@@ -349,7 +353,7 @@
     /* Sidebar Buttons */
     .sidebar-btn {
         display: block;
-        width: 85%;
+        width: 60%;
         /* Reduced width */
         margin: 0 auto 0.75rem auto;
         /* Center button and keep bottom margin */
@@ -381,11 +385,55 @@
     .btn-green-buy {
         background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
         color: white;
+        animation: flash-pulse 2s infinite;
+        /* added animation */
     }
 
     .btn-red-sample {
         background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
         color: white;
+        animation: shake-attract 4s ease-in-out infinite;
+        /* added animation */
+    }
+
+    /* Animation Keyframes */
+    @keyframes flash-pulse {
+
+        0%,
+        100% {
+            box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7);
+            transform: scale(1);
+            filter: brightness(1);
+        }
+
+        50% {
+            box-shadow: 0 0 0 15px rgba(22, 163, 74, 0);
+            transform: scale(1.03);
+            filter: brightness(1.2);
+        }
+    }
+
+    @keyframes shake-attract {
+
+        0%,
+        100% {
+            transform: translateX(0);
+        }
+
+        5%,
+        15%,
+        25% {
+            transform: translateX(-5px);
+        }
+
+        10%,
+        20% {
+            transform: translateX(5px);
+        }
+
+        30% {
+            transform: translateX(0);
+        }
     }
 
     .btn-yellow-discount {
@@ -833,7 +881,7 @@
         }
 
         .sidebar-btn {
-            width: 100%;
+            width: 75%;
             max-width: 100%;
             white-space: normal;
             /* Allow text wrapping */
@@ -1710,6 +1758,7 @@
             <form class="newsletter-form" id="newsletterForm">
                 {% csrf_token %}
                 <input type="email" id="newsletterEmail" placeholder="Enter your email" required>
+                <div id="newsletter-recaptcha"></div>
                 <button type="submit" class="newsletter-btn">Subscribe Now</button>
             </form>
             <div id="newsletterSuccess"
@@ -1722,50 +1771,145 @@
         </div>
 
         <script>
+            var newsletterWidgetId;
+            var exitIntentWidgetId;
+
+            function onRecaptchaLoad() {
+                try {
+                    newsletterWidgetId = grecaptcha.render('newsletter-recaptcha', {
+                        'sitekey': '{{ recaptcha_public_key }}',
+                        'size': 'invisible',
+                        'callback': onNewsletterSubmit
+                    });
+                } catch (e) { console.error('Newsletter Recaptcha Error:', e); }
+
+                try {
+                    const exitDiv = document.getElementById('exit-recaptcha');
+                    if (exitDiv) {
+                        exitIntentWidgetId = grecaptcha.render('exit-recaptcha', {
+                            'sitekey': '{{ recaptcha_public_key }}',
+                            'size': 'invisible',
+                            'callback': onExitIntentSubmit
+                        });
+                    }
+                } catch (e) { console.error('Exit Intent Recaptcha Error:', e); }
+            };
+
+            function onNewsletterSubmit(token) {
+                const newsletterForm = document.getElementById('newsletterForm');
+                const emailInput = document.getElementById('newsletterEmail');
+                const btn = newsletterForm.querySelector('button');
+                const successMsg = document.getElementById('newsletterSuccess');
+                const errorMsg = document.getElementById('newsletterError');
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                const originalText = 'Subscribe Now';
+
+                fetch('/api/leads/newsletter/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({
+                        email: emailInput.value,
+                        captcha: token
+                    })
+                })
+                    .then(response => {
+                        if (response.ok) return response.json();
+                        return response.json().then(err => { throw new Error(JSON.stringify(err)) });
+                    })
+                    .then(data => {
+                        newsletterForm.style.display = 'none';
+                        successMsg.innerHTML = '<i class="fas fa-check-circle"></i> ' + data.message;
+                        successMsg.style.display = 'block';
+                        grecaptcha.reset(newsletterWidgetId);
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        let msg = "Something went wrong.";
+                        try {
+                            const errObj = JSON.parse(err.message);
+                            if (errObj.captcha) msg = "Captcha Error: " + errObj.captcha[0];
+                            else if (errObj.message) msg = errObj.message;
+                        } catch (e) { }
+
+                        errorMsg.innerText = "Error: " + msg;
+                        errorMsg.style.display = 'block';
+                        btn.disabled = false;
+                        btn.innerText = originalText;
+                        grecaptcha.reset(newsletterWidgetId);
+                    });
+            }
+
+            function onExitIntentSubmit(token) {
+                const form = document.getElementById('exitIntentForm');
+                const formData = new FormData(form);
+                const btn = form.querySelector('button[type="submit"]');
+                const originalText = 'Get Free Sample Now';
+                const formContainer = document.getElementById('popupFormContainer');
+                const successDiv = document.getElementById('popupSuccess');
+                const messageDiv = document.getElementById('exitFormMessage');
+
+                const data = {
+                    full_name: formData.get('full_name'),
+                    email: formData.get('email'),
+                    report: "{{ report.id }}",
+                    lead_type: "SAMPLE",
+                    message: "Generated from Exit Intent Popup (Mobile/Exit Intent)",
+                    captcha: token
+                };
+
+                fetch('/api/leads/inquiry/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                    },
+                    body: JSON.stringify(data)
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            return response.json();
+                        }
+                        return response.json().then(err => { throw new Error(JSON.stringify(err)) });
+                    })
+                    .then(data => {
+                        formContainer.style.display = 'none';
+                        successDiv.style.display = 'block';
+                        form.reset();
+                        btn.disabled = false;
+                        btn.innerText = originalText;
+                        grecaptcha.reset(exitIntentWidgetId);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        messageDiv.style.display = 'block';
+                        messageDiv.style.color = 'red';
+                        let msg = 'Something went wrong.';
+                        try {
+                            const errObj = JSON.parse(error.message);
+                            if (errObj.captcha) msg = "Captcha Error: " + errObj.captcha[0];
+                        } catch (e) { }
+                        messageDiv.innerText = msg;
+                        btn.disabled = false;
+                        btn.innerText = originalText;
+                        grecaptcha.reset(exitIntentWidgetId);
+                    });
+            }
+
             document.addEventListener('DOMContentLoaded', function () {
                 const newsletterForm = document.getElementById('newsletterForm');
                 if (newsletterForm) {
                     newsletterForm.addEventListener('submit', function (e) {
                         e.preventDefault();
-                        const emailInput = document.getElementById('newsletterEmail');
                         const btn = newsletterForm.querySelector('button');
-                        const successMsg = document.getElementById('newsletterSuccess');
-                        const errorMsg = document.getElementById('newsletterError');
-
-                        const originalText = btn.innerText;
                         btn.disabled = true;
                         btn.innerText = 'Subscribing...';
-                        successMsg.style.display = 'none';
-                        errorMsg.style.display = 'none';
+                        document.getElementById('newsletterSuccess').style.display = 'none';
+                        document.getElementById('newsletterError').style.display = 'none';
 
-                        // Get CSRF token
-                        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-
-                        fetch('/api/leads/newsletter/', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRFToken': csrfToken
-                            },
-                            body: JSON.stringify({
-                                email: emailInput.value
-                            })
-                        })
-                            .then(response => {
-                                if (response.ok) return response.json();
-                                throw new Error('Network response was not ok');
-                            })
-                            .then(data => {
-                                newsletterForm.style.display = 'none';
-                                successMsg.innerHTML = '<i class="fas fa-check-circle"></i> ' + data.message;
-                                successMsg.style.display = 'block';
-                            })
-                            .catch(err => {
-                                console.error(err);
-                                errorMsg.style.display = 'block';
-                                btn.disabled = false;
-                                btn.innerText = originalText;
-                            });
+                        grecaptcha.execute(newsletterWidgetId);
                     });
                 }
             });
@@ -1870,6 +2014,8 @@
                         style="color: red; display: none; font-size: 0.85rem; margin-top: 0.25rem;">Please use a
                         corporate email address.</small>
                 </div>
+
+                <div id="exit-recaptcha"></div>
 
                 <p class="corporate-email-note">*corporate emails only, please.</p>
 
@@ -2201,13 +2347,6 @@
             }
 
             const formData = new FormData(form);
-            const data = {
-                full_name: formData.get('full_name'),
-                email: formData.get('email'),
-                report: "{{ report.id }}",
-                lead_type: "SAMPLE",
-                message: "Generated from Exit Intent Popup (Mobile/Exit Intent)"
-            };
 
             // Disable button
             const btn = form.querySelector('button[type="submit"]');
@@ -2215,37 +2354,14 @@
             btn.disabled = true;
             btn.innerText = 'Sending...';
 
-            fetch('/api/leads/inquiry/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
-                },
-                body: JSON.stringify(data)
-            })
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    }
-                    return response.json().then(err => { throw new Error(JSON.stringify(err)) });
-                })
-                .then(data => {
-                    // Success State
-                    formContainer.style.display = 'none';
-                    successDiv.style.display = 'block';
-
-                    form.reset();
-                    btn.disabled = false;
-                    btn.innerText = originalText;
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    messageDiv.style.display = 'block';
-                    messageDiv.style.color = 'red';
-                    messageDiv.innerText = 'Something went wrong. Please check your network.';
-                    btn.disabled = false;
-                    btn.innerText = originalText;
-                });
+            if (typeof exitIntentWidgetId !== 'undefined') {
+                grecaptcha.execute(exitIntentWidgetId);
+            } else {
+                console.error("Recaptcha not loaded yet");
+                alert("Please wait for security check to load.");
+                btn.disabled = false;
+                btn.innerText = originalText;
+            }
         });
 
         // Clear error on input

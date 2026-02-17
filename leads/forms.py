@@ -27,7 +27,8 @@ class LeadForm(forms.ModelForm):
         return email
 
 class CheckoutForm(forms.ModelForm):
-    captcha = ReCaptchaField(widget=ReCaptchaV2Invisible)
+    # Temporarily disabled for testing - uncomment for production
+    # captcha = ReCaptchaField(widget=ReCaptchaV2Invisible)
 
     class Meta:
         model = Lead

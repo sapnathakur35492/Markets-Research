@@ -6,6 +6,7 @@ from .serializers import ReportListSerializer, ReportDetailSerializer, CategoryS
 from rest_framework.pagination import PageNumberPagination
 from django.views.generic import TemplateView, DetailView, ListView
 from django.db.models import Count
+from django.conf import settings
 
 class StandardResultsSetPagination(PageNumberPagination):
     page_size = 20
@@ -51,6 +52,7 @@ class ReportListView(ListView):
             context['total_reports_count'] = context['paginator'].count
         else:
             context['total_reports_count'] = self.get_queryset().count()
+        context['recaptcha_public_key'] = settings.RECAPTCHA_PUBLIC_KEY
         return context
 
 from leads.forms import LeadForm
@@ -73,6 +75,7 @@ class ReportDetailView(DetailView):
             report_count=Count('reports')
         ).filter(report_count__gt=0).order_by('name')
         
+        context['recaptcha_public_key'] = settings.RECAPTCHA_PUBLIC_KEY
         return context
 
 class ReportMethodologyView(DetailView):

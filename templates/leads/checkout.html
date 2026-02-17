@@ -55,7 +55,8 @@
         width: 100% !important;
         background: white !important;
         border: none !important;
-        padding: 0.7rem 1rem !important;
+        padding: 0.7rem 1rem;
+        /* Removed !important to allow intl-tel-input to set padding */
         border-radius: 6px !important;
         color: #1e293b !important;
         font-size: 0.95rem !important;
@@ -119,6 +120,9 @@
         color: #1e293b !important;
     }
 
+
+
+
     .form-control#id_phone_checkout {
         padding-left: 100px !important;
         /* Ensure enough space for separate dial code */
@@ -130,7 +134,7 @@
     }
 
     .btn-complete {
-        background: #06b6d4;
+        background: #1b6acf;
         color: white;
         font-weight: 700;
         padding: 1rem;
@@ -239,14 +243,18 @@
                         <label class="form-label">Zip Code</label>
                         <div class="form-input-wrapper">{{ form.zip_code }}</div>
                     </div>
+
                     <div class="form-row">
                         <label class="form-label">Country</label>
                         <div class="form-input-wrapper">{{ form.country }}</div>
                     </div>
 
+                    <!-- Temporarily disabled for testing -->
+                    <!--
                     <div style="margin-top: 2rem;">
                         {{ form.captcha }}
                     </div>
+                    -->
 
                     <div id="payment-errors"
                         style="display: none; background: #fee2e2; color: #b91c1c; padding: 1rem; border-radius: 6px; margin-top: 1.5rem;">
@@ -280,8 +288,11 @@
                 <h3 style="margin-bottom: 1.5rem; color: #0f172a;">Order Summary</h3>
                 <div class="summary-item">
                     <span style="color: #64748b;">Report</span>
-                    <span style="font-weight: 600; text-align: right; flex: 1; margin-left: 1rem;">{{ report.title
-                        }}</span>
+                    <span style="font-weight: 600; text-align: right; flex: 1; margin-left: 1rem;">
+                        <a href="{% url 'report-detail' report.slug %}" style="color: #2563eb; text-decoration: none;">
+                            {{ report.title|truncatewords:4 }}
+                        </a>
+                    </span>
                 </div>
                 <div class="summary-item">
                     <span style="color: #64748b;">License</span>
@@ -336,9 +347,18 @@
 
             e.preventDefault(); // Stop default for AJAX
 
-            // Update country code
-            const dialCode = iti.getSelectedCountryData().dialCode;
-            countryCodeInput.value = "+" + dialCode;
+            // Update country code and country name
+            const countryData = iti.getSelectedCountryData();
+            if (countryData.dialCode) {
+                countryCodeInput.value = "+" + countryData.dialCode;
+                console.log("Setting country code to:", countryCodeInput.value);
+            }
+
+            // Auto-fill country name if empty
+            const countryInput = document.querySelector("#id_country");
+            if (countryInput && !countryInput.value && countryData.name) {
+                countryInput.value = countryData.name.split(' (')[0];
+            }
 
             btn.innerHTML = 'Saving Details...';
             btn.disabled = true;

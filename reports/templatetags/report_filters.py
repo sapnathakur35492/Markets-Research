@@ -141,3 +141,45 @@ def get_category_icon(category_name):
         return '🛍️'
     else:
         return '📊'
+
+@register.filter(name='get_category_image_url')
+def get_category_image_url(category_name):
+    """
+    Return the path to the category image based on the category name.
+    Handles mapping between full category names and available image files.
+    """
+    if not category_name:
+        return '/static/images/default_category.jpg'
+    
+    mapping = {
+        'Aerospace, Defense & Security': 'Aerospace, Defense & Security.jpg',
+        'Chemicals, Materials & Polymers': 'Chemicals.jpg',
+        'FMCG & Consumer Products': 'FMCG.jpg',
+        'Healthcare & Life Sciences': 'Healthcare.jpg',
+        'Heavy Machinery & Equipment': 'Heavy Machinery.jpg',
+        'Industrial Automation & Mobility': 'Industrial Automation.jpg',
+        'Information Technology & Electronics': 'Information Technology.jpg',
+        # Add simpler keys just in case
+        'Aerospace': 'Aerospace, Defense & Security.jpg',
+        'Defense': 'Aerospace, Defense & Security.jpg',
+        'Chemicals': 'Chemicals.jpg',
+        'FMCG': 'FMCG.jpg',
+        'Healthcare': 'Healthcare.jpg',
+        'Machinery': 'Heavy Machinery.jpg',
+        'Automation': 'Industrial Automation.jpg',
+        'IT': 'Information Technology.jpg',
+        'Information Technology': 'Information Technology.jpg'
+    }
+    
+    # Try exact match first
+    filename = mapping.get(category_name)
+    if filename:
+        return f'/static/images/{filename}'
+        
+    # Try partial matching if strict match fails
+    for key, val in mapping.items():
+        if key in category_name:
+            return f'/static/images/{val}'
+            
+    # Fallback: try to use the name directly (assuming it matches a file)
+    return f'/static/images/{category_name}.jpg'

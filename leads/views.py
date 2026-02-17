@@ -1,6 +1,7 @@
 from django.views.generic.edit import CreateView
 from django.views import View
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
+from django.http import JsonResponse
 from django.urls import reverse
 from django.contrib import messages
 from reports.models import Report
@@ -267,34 +268,59 @@ class LeadCaptureView(CreateView):
         return super().form_invalid(form)
 
 class CheckoutView(View):
+    """
+    Handles checkout flow:
+    - GET: Shows checkout form
+    - POST: Processes form and creates lead
+    """
     def get(self, request, *args, **kwargs):
         slug = kwargs.get('slug')
         license_type = kwargs.get('license_type')
         report = get_object_or_404(Report, slug=slug)
         
-        # Test Mode Logic (Dev Bypass)
-        if settings.DEBUG and request.GET.get('test') == 'true':
-            # Create Mock Lead
-            lead = Lead.objects.create(
-                report=report,
-                license_type=license_type,
-                lead_type='PURCHASE',
-                email="test_user@example.com",
-                full_name="Test User",
-                first_name="Test",
-                last_name="User",
-                address="123 Test St",
-                city="Test City",
-                country="US",
-                ip_address=request.META.get('REMOTE_ADDR'),
-                message="[DEV BYPASS: PAYMENT SIMULATED]"
-            )
-            # Send Emails
-            threading.Thread(target=send_lead_emails_task, args=(lead,)).start()
-            # Redirect to success
-            messages.success(request, "Test Payment Successful!")
-            return redirect(reverse('report-detail', kwargs={'slug': slug}) + "?payment=success")
-
+        # Calculate Price
+        price = 0
+        license_label = ''
+        if license_type == 'single':
+            price = report.single_user_price
+            license_label = 'Single User License'
+        elif license_type == 'multi':
+            price = report.multi_user_price
+            license_label = 'Multi User License'
+        elif license_type == 'enterprise':
+            price = report.enterprise_price
+            license_label = 'Enterprise License'
+        elif license_type == 'data':
+            price = report.data_pack_price
+            license_label = 'Data Pack License'
+        
+        if not price:
+            messages.error(request, "Invalid license type or price.")
+            return redirect('report-detail', slug=slug)
+        
+        # Create form
+        from .forms import CheckoutForm
+        form = CheckoutForm()
+        
+        context = {
+            'form': form,
+            'report': report,
+            'license_type': license_type,
+            'license_label': license_label,
+            'price': price,
+            'debug': settings.DEBUG,  # Pass DEBUG to template for dev bypass button
+        }
+        
+        return render(request, 'leads/checkout.html', context)
+    
+    def post(self, request, *args, **kwargs):
+        """
+        Process checkout form submission
+        """
+        slug = kwargs.get('slug')
+        license_type = kwargs.get('license_type')
+        report = get_object_or_404(Report, slug=slug)
+        
         # Calculate Price
         price = 0
         if license_type == 'single': price = report.single_user_price
@@ -303,100 +329,47 @@ class CheckoutView(View):
         elif license_type == 'data': price = report.data_pack_price
         
         if not price:
-            messages.error(request, "Invalid license type or price.")
-            return redirect('report-detail', slug=slug)
-
-        # Create Temporary Lead
-        temp_email = f"pending_{uuid.uuid4()}@temp.local"
+            return JsonResponse({'status': 'error', 'message': 'Invalid price'}, status=400)
         
-        lead = Lead.objects.create(
-            report=report,
-            license_type=license_type,
-            lead_type='PURCHASE',
-            email=temp_email,
-            full_name="Pending Payment",
-            ip_address=request.META.get('REMOTE_ADDR')
-        )
+        # Check if AJAX request
+        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest' or request.POST.get('ajax')
         
-        # Initiate PayPal Order
-        token = get_paypal_access_token()
-        if not token:
-            print("ERROR: Failed to get PayPal Access Token") # Debug
-            messages.error(request, "Payment gateway unavailable. Please try again.")
-            return redirect('report-detail', slug=slug)
-
-        base_url = get_paypal_base_url()
-        url = f"{base_url}/v2/checkout/orders"
+        from .forms import CheckoutForm
+        form = CheckoutForm(request.POST)
         
-        host = request.get_host()
-        protocol = 'https' if request.is_secure() else 'http'
-        return_url = f"{protocol}://{host}/api/leads/paypal-return/?lead_id={lead.id}"
-        cancel_url = f"{protocol}://{host}/api/leads/paypal-cancel/?lead_id={lead.id}"
-
-        payload = {
-            "intent": "CAPTURE",
-            "purchase_units": [{
-                "amount": {
-                    "currency_code": "USD",
-                    "value": str(price),
-                    "breakdown": {
-                        "item_total": {
-                            "currency_code": "USD",
-                            "value": str(price)
-                        }
-                    }
-                },
-                "description": f"{report.title} - {lead.get_license_type_display()}",
-                "items": [{
-                    "name": report.title[:120], # Max length limit
-                    "unit_amount": {
-                        "currency_code": "USD",
-                        "value": str(price)
-                    },
-                    "quantity": "1",
-                    "category": "DIGITAL_GOODS"
-                }]
-            }],
-            "application_context": {
-                "return_url": return_url,
-                "cancel_url": cancel_url,
-                "brand_name": "Market Research",
-                "user_action": "PAY_NOW",
-                "shipping_preference": "NO_SHIPPING" # Don't require shipping for digital goods
-            }
-        }
-        
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {token}"
-        }
-        
-        try:
-            print(f"DEBUG: Creating PayPal Order... URL: {url}")
-            response = requests.post(url, headers=headers, json=payload)
-            print(f"DEBUG: PayPal Response Status: {response.status_code}")
-            print(f"DEBUG: PayPal Response Body: {response.text}")
+        if form.is_valid():
+            # Create Lead
+            lead = form.save(commit=False)
+            lead.report = report
+            lead.license_type = license_type
+            lead.lead_type = 'PURCHASE'
+            lead.ip_address = request.META.get('REMOTE_ADDR')
             
-            if response.status_code in [200, 201]:
-                order_data = response.json()
-                links = order_data.get('links', [])
-                approve_url = next((link['href'] for link in links if link['rel'] == 'approve'), None)
-                
-                if approve_url:
-                    return redirect(approve_url)
-                else:
-                    logger.error("No approve URL in PayPal response")
-                    messages.error(request, "Error initiating payment with PayPal.")
-                    return redirect('report-detail', slug=slug)
+            # Sync full_name
+            lead.full_name = f"{lead.first_name} {lead.last_name}".strip()
+            lead.save()
+            
+            if is_ajax:
+                # Return lead_id for frontend to initiate payment
+                return JsonResponse({
+                    'status': 'success',
+                    'lead_id': lead.id,
+                    'message': 'Details saved successfully'
+                })
             else:
-                logger.error(f"PayPal Order Creation Failed: {response.text}")
-                messages.error(request, "Failed to connect to PayPal.")
+                # Non-AJAX fallback (shouldn't happen normally)
+                messages.success(request, "Details saved. Redirecting to payment...")
                 return redirect('report-detail', slug=slug)
-        except Exception as e:
-            logger.error(f"Error calling PayPal: {e}")
-            print(f"DEBUG EXCEPTION: {e}")
-            messages.error(request, "An unexpected error occurred.")
-            return redirect('report-detail', slug=slug)
+        else:
+            if is_ajax:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Please correct the errors in the form',
+                    'errors': form.errors
+                }, status=400)
+            else:
+                messages.error(request, "Please correct the errors in the form.")
+                return redirect('checkout', slug=slug, license_type=license_type)
 
 class ContactFormView(CreateView):
     model = Lead
@@ -666,6 +639,7 @@ class NewsletterSubscribeAPIView(generics.CreateAPIView):
         if not email:
             return Response({'error': 'Email is required'}, status=status.HTTP_400_BAD_REQUEST)
             
+        captcha = request.data.get('captcha')
         # Check if already subscribed to prevent duplicates
         if Lead.objects.filter(email__iexact=email, lead_type='NEWSLETTER').exists():
             return Response({'message': 'You are already subscribed!'}, status=status.HTTP_200_OK)
@@ -673,7 +647,8 @@ class NewsletterSubscribeAPIView(generics.CreateAPIView):
         data = {
             'email': email,
             'lead_type': 'NEWSLETTER',
-            'message': 'Subscribed via Sidebar Widget'
+            'message': 'Subscribed via Sidebar Widget',
+            'captcha': captcha
         }
         
         serializer = self.get_serializer(data=data)
