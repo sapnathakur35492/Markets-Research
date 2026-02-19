@@ -6,11 +6,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
+
+    {% if site_config.google_search_console_verification_code %}
+    <meta name="google-site-verification" content="{{ site_config.google_search_console_verification_code }}" />
+    {% endif %}
+
+    {% if site_config.google_analytics_measurement_id %}
+    <!-- Google Analytics -->
+    <script async
+        src="https://www.googletagmanager.com/gtag/js?id={{ site_config.google_analytics_measurement_id }}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', '{{ site_config.google_analytics_measurement_id }}');
+    </script>
+    {% endif %}
+
     <title>{% block title %}Market Research Platform{% endblock %}</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=Poppins:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/style.css' %}?v=7">
+    <link rel="stylesheet" href="{% static 'css/blog.css' %}?v=1">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{% static 'django_ckeditor_5/dist/styles.css' %}">
     <link rel="icon" type="image/jpg" href="{% static 'images/favicon.jpg' %}">

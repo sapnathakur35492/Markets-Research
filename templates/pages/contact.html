@@ -202,7 +202,7 @@
         {% if messages %}
         {% for message in messages %}
         <div
-            style="background: #ecfdf5; color: #065f46; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; border: 1px solid #a7f3d0;">
+            style="padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; border: 1px solid {% if 'error' in message.tags %}#fca5a5; background: #fef2f2; color: #991b1b;{% else %}#a7f3d0; background: #ecfdf5; color: #065f46;{% endif %};">
             {{ message }}
         </div>
         {% endfor %}
@@ -254,6 +254,10 @@
                 <label class="form-label">Message</label>
                 {{ form.message }}
                 {{ form.message.errors }}
+            </div>
+
+            <div style="margin-bottom: 2rem; display: none;">
+                {{ form.captcha }}
             </div>
 
             <button type="submit" class="btn-submit">Submit Request</button>

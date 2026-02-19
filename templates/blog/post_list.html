@@ -4,7 +4,7 @@
 
 {% block content %}
 <section class="blog-header"
-    style="background: linear-gradient(135deg, #be1858 0%, #488aec 100%); padding: 4rem 0; text-align: center; color: white;">
+    style="background: linear-gradient(135deg, #000933 0%, #1354b4 100%); padding: 4rem 0; text-align: center; color: white;">
     <div class="container">
         <h1 style="font-size: 2.5rem; color: white; margin-bottom: 1rem;">Market Research Insights</h1>
         <p style="color: rgba(255,255,255,0.9); max-width: 600px; margin: 0 auto;">Latest news, trends, and analysis
@@ -17,28 +17,29 @@
     <div class="container">
         <div class="grid-3">
             {% for post in posts %}
-            <article class="card">
-                {% if post.image %}
-                <img src="{{ post.image.url }}" alt="{{ post.title }}"
-                    style="width: 100%; height: 200px; object-fit: cover;">
-                {% endif %}
-                <div class="card-body" style="padding: 1.5rem;">
-                    <style>
-                        .blog-date {
-                            font-size: 0.8rem;
-                            color: var(--accent);
-                            font-weight: 600;
-                        }
-                    </style>
-                    <span class="blog-date">{{ post.publish_date|date:'F d, Y' }}</span>
-                    <h2 style="font-size: 1.25rem; margin: 0.5rem 0 1rem;">
-                        <a href="{% url 'blog-detail' post.slug %}"
-                            style="text-decoration: none; color: var(--text-main);">{{ post.title }}</a>
+            <article class="blog-card">
+                <div class="blog-card-image-wrapper">
+                    {% if post.image %}
+                    <img src="{{ post.image.url }}" alt="{{ post.title }}" class="blog-card-image">
+                    {% else %}
+                    <!-- Fallback placeholder if no image -->
+                    <div
+                        style="width: 100%; height: 100%; background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%); display: flex; align-items: center; justify-content: center; color: #64748b;">
+                        <i class="fas fa-image" style="font-size: 3rem; opacity: 0.5;"></i>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="blog-card-content">
+                    <div class="blog-card-date">
+                        <i class="far fa-calendar-alt"></i> {{ post.publish_date|date:'F d, Y' }}
+                    </div>
+                    <h2 class="blog-card-title">
+                        <a href="{% url 'blog-detail' post.slug %}">{{ post.title }}</a>
                     </h2>
-                    <p style="color: var(--text-light); font-size: 0.95rem;">{{ post.summary|truncatechars:120 }}</p>
-                    <a href="{% url 'blog-detail' post.slug %}"
-                        style="color: var(--primary); font-weight: 600; font-size: 0.9rem; text-decoration: none;">Read
-                        More &rarr;</a>
+                    <p class="blog-card-excerpt">{{ post.summary|truncatechars:120 }}</p>
+                    <a href="{% url 'blog-detail' post.slug %}" class="blog-read-more">
+                        Read Article <i class="fas fa-arrow-right"></i>
+                    </a>
                 </div>
             </article>
             {% empty %}

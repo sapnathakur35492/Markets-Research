@@ -24,5 +24,14 @@ class BlogPost(models.Model):
             self.slug = slugify(self.title)
         super().save(*args, **kwargs)
 
+    @property
+    def read_time(self):
+        import math
+        # Strip HTML tags
+        from django.utils.html import strip_tags
+        word_count = len(strip_tags(self.content).split())
+        read_time_minutes = math.ceil(word_count / 200) # Assuming 200 words per minute
+        return read_time_minutes
+
     def __str__(self):
         return self.title
