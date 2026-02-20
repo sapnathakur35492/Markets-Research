@@ -19,7 +19,7 @@ class HomeView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['categories'] = Category.objects.annotate(report_count=Count('reports')).filter(report_count__gt=0)
-        context['latest_reports'] = Report.objects.select_related('category').order_by('-publish_date')[:20]
+        context['latest_reports'] = Report.objects.select_related('category').order_by('-publish_date')[:12]
         return context
 
 class ReportListView(ListView):

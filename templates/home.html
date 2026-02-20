@@ -815,18 +815,15 @@
     /* Full Width Container for Latest Publications */
     .publications-container {
         width: 100%;
-        max-width: 100%;
-        padding: 0 1rem;
-        /* Minimal padding on very left/right */
+        max-width: var(--container-width);
+        padding: 0 2rem;
         margin: 0 auto;
     }
 
     .reports-grid {
         display: grid;
-        grid-template-columns: repeat(10, 1fr);
-        /* 10 columns fix */
-        gap: 0.5rem;
-        /* Tighter gap to fit 10 items */
+        grid-template-columns: repeat(6, 1fr);
+        gap: 1.5rem;
         width: 100%;
         margin-bottom: 2rem;
     }
@@ -929,28 +926,33 @@
     }
 
     /* Responsive adjustments */
-    @media (max-width: 1600px) {
+    @media (max-width: 1400px) {
         .reports-grid {
-            /* Still try to keep 10 if screen allows, otherwise maybe 5 */
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
         }
     }
 
-    @media (max-width: 900px) {
+    @media (max-width: 1100px) {
         .reports-grid {
             grid-template-columns: repeat(3, 1fr);
         }
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 768px) {
         .reports-grid {
-            grid-template-columns: 1fr;
-            /* 1 column to prevent cutting */
+            grid-template-columns: repeat(2, 1fr);
             gap: 1rem;
         }
 
         .publications-container {
-            padding: 0 0.5rem;
+            padding: 0 1rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .reports-grid {
+            grid-template-columns: 1fr;
         }
     }
 </style>
