@@ -10,6 +10,7 @@ urlpatterns = [
     # Lead Forms
     path('request-sample/<slug:slug>/', LeadCaptureView.as_view(), name='request-sample'),
     path('ask-for-discount/<slug:slug>/', LeadCaptureView.as_view(), name='ask-for-discount'),
+    path('request-customization/<slug:slug>/', LeadCaptureView.as_view(), name='request-customization'),
     path('speak-to-analyst/<slug:slug>/', LeadCaptureView.as_view(), name='speak-to-analyst'),
     
     # Checkout

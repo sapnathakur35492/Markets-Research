@@ -152,7 +152,7 @@ def send_lead_emails_task(lead):
         logger.info("Admin email sent successfully")
 
         # 2. Key Acknowledgement to User
-        subject_user = "Thank you for contacting Market Research"
+        subject_user = "Thank you for contacting Markets NXT"
         if lead.lead_type == 'PURCHASE':
              subject_user = "Order Confirmation - MarketsNXT"
              message_user = f"Hi {full_name},\n\nThank you for your order of '{lead.report.title}'.\nWe have received your request for the {lead.get_license_type_display()} license.\nOur team will process your order and send you the download link shortly.\n\nBest Regards,\nTeam MarketsNXT"
@@ -232,6 +232,9 @@ class LeadCaptureView(CreateView):
         elif 'discount' in url_name:
             context['page_title'] = "Ask for Discount"
             context['lead_type_code'] = "DISCOUNT"
+        elif 'customization' in url_name:
+            context['page_title'] = "Request Customization"
+            context['lead_type_code'] = "CUSTOMIZATION"
         elif 'analyst' in url_name:
             context['page_title'] = "Speak to Analyst"
             context['lead_type_code'] = "CALLBACK"
@@ -494,7 +497,7 @@ class CreatePayPalOrderView(View):
                 "application_context": {
                     "return_url": return_url,
                     "cancel_url": cancel_url,
-                    "brand_name": "Market Research",
+                    "brand_name": "Markets NXT",
                     "user_action": "PAY_NOW"
                 }
             }

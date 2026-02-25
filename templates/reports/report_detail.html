@@ -2,7 +2,7 @@
 {% load static %}
 {% load report_filters %}
 
-{% block title %}{{ report.title }} - Market Research Platform{% endblock %}
+{% block title %}{{ report.title }} - Markets NXT{% endblock %}
 
 {% block content %}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -31,11 +31,9 @@
     /* Global Background Fix for Sticky */
     html,
     body {
-        background: radial-gradient(at 0% 0%, rgba(226, 232, 240, 0.5) 0px, transparent 50%),
-            radial-gradient(at 100% 0%, rgba(203, 213, 225, 0.4) 0px, transparent 50%),
-            radial-gradient(at 100% 100%, rgba(226, 232, 240, 0.5) 0px, transparent 50%),
-            radial-gradient(at 0% 100%, rgba(203, 213, 225, 0.4) 0px, transparent 50%),
-            #f8fafc !important;
+        background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%) !important;
+        background-attachment: fixed !important;
+        background-color: #e0f2fe !important;
         overflow-x: clip !important;
         /* Prevents breaking sticky while still containing horizontal overflow */
         max-width: 100%;
@@ -83,11 +81,10 @@
     .detail-hero .container {
         position: relative;
         z-index: 2;
-        max-width: 1540px;
-        /* Match detail-grid-container */
+        max-width: 1680px;
+        /* Increased from 1540px */
         margin: 0 auto;
         padding: 0 2rem;
-        /* Match detail-grid-container padding */
     }
 
     .detail-title {
@@ -118,15 +115,15 @@
 
     /* Layout Grid */
     .detail-grid-container {
-        max-width: 1540px;
-        /* Expanded for premium wide feel */
+        max-width: 1680px;
+        /* Expanded for extra wide reveal */
         margin: 0 auto;
-        padding: 4rem 2rem;
+        padding: 3rem 2rem;
         display: grid;
-        grid-template-columns: 1fr 340px;
-        /* Sidebar reduced to 340px */
-        gap: 3rem;
-        /* Reduced gap to bring sidebar closer */
+        grid-template-columns: 1fr 310px;
+        /* Sidebar narrowed to 310px to give main area more room */
+        gap: 2rem;
+        /* Reduced gap to maximize content width */
         align-items: start;
         width: 100%;
         box-sizing: border-box;
@@ -150,17 +147,18 @@
     /* Tabs */
     .tabs-header {
         display: flex;
-        background: #f8fafc;
-        border-bottom: 1px solid #e2e8f0;
+        background: #ffffff;
+        /* Use solid white to hide content behind */
+        border-bottom: 2px solid #e2e8f0;
         overflow-x: auto;
         scrollbar-width: none;
         width: 100%;
         position: sticky;
-        top: 160px;
-        /* Matches header height */
+        top: 130px;
+        /* Matches header height (130px) */
         z-index: 100;
-        /* Ensure it stays above content */
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        /* Fixed invalid % value */
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
 
     .tabs-header::-webkit-scrollbar {
@@ -204,12 +202,12 @@
     }
 
     .tab-body {
-        padding: 3rem;
-        font-size: 1.1rem;
-        /* Slightly larger for readability */
-        line-height: 1.9;
+        padding: 1.5rem 1.5rem;
+        /* Aligned with tab header padding */
+        font-size: 1rem;
+        line-height: 1.7;
         color: #020617;
-        /* Almost black */
+        text-align: left;
     }
 
     .tab-body strong,
@@ -249,11 +247,14 @@
 
     .tab-pane h2 {
         color: #1e3a8a;
-        font-size: 1.5rem;
-        margin-top: 1.5rem;
+        font-size: 1.4rem;
+        /* Reduced from 1.5rem */
+        margin-top: 0;
+        /* Start right under tab */
         margin-bottom: 1rem;
         border-bottom: 1px solid #e2e8f0;
         padding-bottom: 0.5rem;
+        text-align: left;
     }
 
     .tab-pane p {
@@ -308,7 +309,7 @@
         flex-direction: column;
         gap: 1.5rem;
         position: sticky;
-        top: 160px;
+        top: 130px;
         /* Offset from sticky header (matched to header height) */
         align-self: start;
         /* Critical for sticky to work in flex/grid */
@@ -319,50 +320,61 @@
         background: rgba(255, 255, 255, 0.9);
         border: 1px solid rgba(226, 232, 240, 0.8);
         border-radius: 20px;
-        padding: 2rem;
+        padding: 1rem;
+        /* Further reduced */
         display: flex;
-        gap: 1.5rem;
+        gap: 1rem;
+        /* Further reduced */
         box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.03);
         backdrop-filter: blur(10px);
+        align-items: center;
     }
 
     .meta-thumb {
-        width: 90px;
-        height: 120px;
-        background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
-        color: white;
+        width: 95px;
+        height: 125px;
+        background: #f1f5f9;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 0.75rem;
-        font-weight: 700;
-        border-radius: 12px;
+        border-radius: 10px;
         flex-shrink: 0;
-        text-align: center;
-        padding: 0.5rem;
-        box-shadow: 0 8px 15px rgba(30, 58, 138, 0.2);
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .meta-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
     }
 
     .meta-info div {
-        margin-bottom: 0.6rem;
-        font-size: 0.95rem;
+        margin-bottom: 0.4rem;
+        font-size: 0.85rem;
+        /* Slightly smaller to fit content */
         color: #475569;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        align-items: baseline;
     }
 
     .meta-info strong {
         color: #0f172a;
         font-weight: 700;
-        display: block;
-        margin-bottom: 0.1rem;
+        display: inline;
+        /* Changed from block */
+        white-space: nowrap;
     }
 
     /* Sidebar Buttons */
     .sidebar-btn {
         display: block;
-        width: 60%;
-        /* Reduced width */
+        width: 85%;
+        /* Increased to fit smaller sidebar better */
         margin: 0 auto 0.75rem auto;
-        /* Center button and keep bottom margin */
         padding: 0.6rem;
         /* Further reduced padding */
         border-radius: 8px;
@@ -457,7 +469,8 @@
         background: rgba(255, 255, 255, 0.9);
         border: 1px solid rgba(226, 232, 240, 0.8);
         border-top: 5px solid #1e3a8a;
-        padding: 2rem;
+        padding: 1.25rem;
+        /* Reduced from 2rem */
         border-radius: 20px;
         box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.03);
         backdrop-filter: blur(10px);
@@ -466,12 +479,14 @@
     .license-option {
         display: flex;
         align-items: center;
-        gap: 1rem;
-        padding: 1.25rem;
-        border-radius: 12px;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+        /* Reduced from 1.25rem */
+        border-radius: 10px;
         transition: all 0.2s;
         border: 1px solid transparent;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.25rem;
+        /* Reduced from 0.5rem */
         cursor: pointer;
     }
 
@@ -864,7 +879,7 @@
     /* Sidebar - extend to match content height */
     .detail-sidebar {
         position: sticky;
-        top: 160px;
+        top: 130px;
         align-self: start;
         /* CHANGED from stretch to start to allow sticky movement */
     }
@@ -1593,13 +1608,13 @@
         <!-- Metadata Box -->
         <div class="meta-box">
             <div class="meta-thumb">
-                REPORT<br>COVER
+                <img src="{{ report.category.name|get_category_image_url }}" alt="{{ report.category.name }}">
             </div>
             <div class="meta-info">
                 <div><strong>Pages:</strong> {{ report.pages_count|default:"150+" }} Pages</div>
                 <div><strong>Format:</strong> {{ report.format_type|default:"PDF, Excel" }}</div>
                 <div><strong>Language:</strong> English</div>
-                <div><strong>Status:</strong> Available</div>
+                <div><strong>Category:</strong> {{ report.category.name }}</div>
             </div>
         </div>
 
@@ -1675,7 +1690,7 @@
                 </label>
 
                 <button type="submit" class="sidebar-btn btn-green-buy"
-                    style="margin-top: 1.5rem; border: none; cursor: pointer;">
+                    style="margin-top: 0.75rem; border: none; cursor: pointer; width: 100%;">
                     Proceed to Buy
                 </button>
             </form>
@@ -1962,8 +1977,8 @@
                 We offer <strong>10% free customization</strong> with every report. tailoring data to your specific
                 regional or segment requirements.
             </p>
-            <a href="{% url 'ask-for-discount' report.slug %}" class="sidebar-btn btn-blue-analyst"
-                style="margin-bottom: 0;">
+            <a href="{% url 'request-customization' report.slug %}" class="btn-sample"
+                style="background: #0f172a; display: flex; align-items: center; justify-content: center; gap: 0.5rem; text-decoration: none;">
                 Request Customization
             </a>
         </div>

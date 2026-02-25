@@ -1,4 +1,4 @@
-# Market Research Backend
+# Markets NXT Backend
 
 A robust Django backend for managing market research reports, leads, and automated workflows.
 

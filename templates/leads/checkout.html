@@ -5,7 +5,9 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@23.0.11/build/css/intlTelInput.css">
 <style>
     .checkout-section {
-        background: #f1f5f9;
+        background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%) !important;
+        background-attachment: fixed !important;
+        background-color: #e0f2fe !important;
         min-height: 90vh;
         padding: 4rem 0;
     }
@@ -36,15 +38,15 @@
     .form-row {
         display: flex;
         align-items: center;
-        margin-bottom: 1.2rem;
-        gap: 1.5rem;
+        margin-bottom: 0.8rem;
+        gap: 1rem;
     }
 
     .form-label {
-        flex: 0 0 140px;
-        font-weight: 500;
-        font-size: 0.95rem;
-        color: #e2e8f0;
+        flex: 0 0 160px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: #cbd5e1;
     }
 
     .form-input-wrapper {
@@ -52,18 +54,19 @@
     }
 
     .form-control {
-        width: 100% !important;
-        background: white !important;
-        border: none !important;
-        padding: 0.7rem 1rem;
-        /* Removed !important to allow intl-tel-input to set padding */
+        flex: 0 0 400px;
+        width: 400px !important;
+        background: #ffffff !important;
+        border: 1px solid #334155 !important;
+        padding: 0.75rem 1rem !important;
         border-radius: 6px !important;
-        color: #1e293b !important;
+        color: #0f172a !important;
         font-size: 0.95rem !important;
     }
 
     .iti {
-        width: 100%;
+        width: 400px !important;
+        flex: 0 0 400px;
     }
 
     .iti__country-list {
@@ -156,8 +159,34 @@
     }
 
     @media (max-width: 900px) {
+        .checkout-section {
+            padding: 2rem 1rem;
+        }
+
         .checkout-container {
             grid-template-columns: 1fr;
+        }
+
+        .card-dark {
+            padding: 1.5rem;
+        }
+
+        .form-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .form-label {
+            flex: none;
+            width: 100%;
+            margin-bottom: 0.2rem;
+        }
+
+        .form-control,
+        .iti {
+            width: 100% !important;
+            flex: none;
         }
 
         .summary-card {
@@ -188,7 +217,7 @@
                     {% endif %}
 
                     <h4
-                        style="margin-bottom: 1.5rem; color: #94a3b8; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px;">
+                        style="margin-bottom: 2rem; color: #94a3b8; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid #334155; padding-bottom: 0.5rem;">
                         Customer Info</h4>
 
                     <div class="form-row">
@@ -224,7 +253,7 @@
                     </div>
 
                     <h4
-                        style="margin: 2rem 0 1.5rem; color: #94a3b8; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px;">
+                        style="margin: 3rem 0 2rem; color: #94a3b8; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid #334155; padding-bottom: 0.5rem;">
                         Billing Address</h4>
 
                     <div class="form-row">

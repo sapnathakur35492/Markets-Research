@@ -6,7 +6,7 @@ class Lead(models.Model):
         ('CONTACT', 'Contact Us'),
         ('SAMPLE', 'Request Sample'),
         ('DISCOUNT', 'Ask for Discount'),
-        ('CALLBACK', 'Get a Call Back'),
+        ('CUSTOMIZATION', 'Request Customization'),
         ('CALLBACK', 'Get a Call Back'),
         ('PURCHASE', 'Purchase Report'),
         ('NEWSLETTER', 'Newsletter Subscription'),

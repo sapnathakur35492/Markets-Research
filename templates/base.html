@@ -24,7 +24,7 @@
     </script>
     {% endif %}
 
-    <title>{% block title %}Market Research Platform{% endblock %}</title>
+    <title>{% block title %}Markets NXT{% endblock %}</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=Poppins:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
@@ -411,8 +411,8 @@
 
         header {
             background: #ffffff;
-            height: 160px;
-            /* Updated from 86px */
+            height: 130px;
+            /* Matches logo height for a clean fit */
             display: flex;
             align-items: center;
             border-bottom: 1px solid #e2e8f0;
@@ -422,31 +422,13 @@
             box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
         }
 
-        .header-search {
-            display: flex;
-            align-items: center;
-            background: #f1f5f9;
-            /* Slightly darker than white for better contrast */
-            border-radius: 4px;
-            padding: 0;
-            /* Removed padding */
-            border: 1px solid #e2e8f0;
-            overflow: hidden;
-            width: 335px;
-            /* Matched to the horizontal span of top-bar links */
-            height: 34px;
-            margin-left: 30px;
-            /* Spacing between navigation links and search bar */
-            margin-right: -1px;
-            /* Offset for border to align perfectly with links above */
-            transition: all 0.3s ease;
-        }
+
 
         @media (max-width: 991px) {
             header {
                 height: auto;
-                min-height: 110px;
-                padding: 15px 0;
+                min-height: 100px;
+                padding: 10px 0;
             }
 
             .header-search {
@@ -468,48 +450,17 @@
             }
 
             .logo img {
-                height: 110px !important;
+                height: 100px !important;
                 margin: 0;
                 display: block;
             }
         }
 
-        .header-search:focus-within {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
-            transform: translateY(-1px);
-        }
 
-        .header-search input {
-            border: none;
-            background: transparent;
-            padding: 0 12px;
-            font-size: 14px;
-            flex: 1;
-            /* Take remaining space */
-            height: 100%;
-            outline: none;
-            color: #1e293b;
-        }
 
-        .header-search button {
-            background: #2563eb;
-            border: none;
-            color: white;
-            padding: 0 16px;
-            height: 100%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-        }
 
-        .header-search button:hover {
-            transform: scale(1.05);
-            filter: brightness(1.1);
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-        }
+
+
 
         .nav-wrapper {
             display: flex;
@@ -678,7 +629,7 @@
 
             <a href="{% url 'home' %}" class="logo">
                 <img src="{% static 'images/logo_new.jpg' %}" alt="Markets NXT"
-                    style="height: 150px; width: auto; display: block;">
+                    style="height: 130px; width: auto; display: block;">
             </a>
 
             <!-- Repositioned nav to the right side next to search bar -->
@@ -738,17 +689,7 @@
                 </div>
             </nav>
 
-            <!-- Header Search Bar -->
-            <form action="{% url 'report-list' %}" method="GET" class="header-search">
-                <input type="text" name="q" placeholder="Search">
-                <button type="submit">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                    </svg>
-                </button>
-            </form>
+
             <div class="menu-overlay" id="menuOverlay"></div>
             <style>
                 .header-search button {
@@ -764,22 +705,13 @@
                         padding-bottom: 10px;
                     }
 
-                    .header-search {
-                        order: 4;
-                        /* Move to bottom */
-                        width: 100%;
-                        /* Full width on mobile */
-                        margin-top: 5px;
-                        display: flex !important;
-                        /* Force show */
-                    }
+
 
                     /* Ensure logo doesn't get squashed */
                     /* Ensure logo doesn't get squashed */
                     .logo img {
-                        max-width: 200px;
-                        /* Reduce logo size slightly on mobile if needed, or keep 300px but ensure overflow handled */
-                        height: auto;
+                        max-width: 180px;
+                        height: auto !important;
                     }
                 }
 
@@ -894,7 +826,7 @@
                 </div>
 
                 <!-- Company -->
-                <div>
+                <div style="padding-left: 4rem;">
                     <h3
                         style="color: #fff; margin-bottom: 0.875rem; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
                         Company</h3>

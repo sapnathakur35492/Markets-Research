@@ -2,6 +2,7 @@ from django.contrib import admin
 from .models import Lead
 import csv
 from django.http import HttpResponse
+from django.urls import reverse
 
 @admin.register(Lead)
 class LeadAdmin(admin.ModelAdmin):
@@ -27,16 +28,49 @@ class LeadAdmin(admin.ModelAdmin):
         return super().get_readonly_fields(request, obj)
 
     def export_to_csv(self, request, queryset):
-        meta = self.model._meta
-        field_names = [field.name for field in meta.fields]
-
         response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename={}.csv'.format(meta)
+        response['Content-Disposition'] = 'attachment; filename=Leads_Export.csv'
         writer = csv.writer(response)
 
-        writer.writerow(field_names)
+        # Standardized headers for Excel
+        headers = [
+            'ID', 'Date', 'Type', 'Report Title', 'Report URL', 
+            'Name', 'Email', 'Phone', 'Company', 'Designation', 'Country', 
+            'License', 'Message', 'IP'
+        ]
+        writer.writerow(headers)
+
         for obj in queryset:
-            row = writer.writerow([getattr(obj, field) for field in field_names])
+            # Handle Report URL
+            report_title = obj.report.title if obj.report else "N/A"
+            report_url = "N/A"
+            if obj.report:
+                try:
+                    report_path = reverse('report-detail', kwargs={'slug': obj.report.slug})
+                    report_url = request.build_absolute_uri(report_path)
+                except:
+                    report_url = "URL Error"
+            
+            # Format Name
+            name = obj.full_name or f"{obj.first_name or ''} {obj.last_name or ''}".strip() or obj.email
+
+            writer.writerow([
+                obj.id,
+                obj.created_at.strftime('%Y-%m-%d %H:%M'),
+                obj.get_lead_type_display(),
+                report_title,
+                report_url,
+                name,
+                obj.email,
+                f"{obj.country_code or ''} {obj.phone or ''}".strip(),
+                obj.company_name,
+                obj.designation,
+                obj.country,
+                obj.get_license_type_display() if obj.license_type else "N/A",
+                obj.message,
+                obj.ip_address
+            ])
+            
             # Mark as exported
             obj.is_exported = True
             obj.save()

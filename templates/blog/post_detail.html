@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{{ post.title }} - Market Research Insights{% endblock %}
+{% block title %}{{ post.title }} - Markets NXT{% endblock %}
 
 {% block content %}
 <article class="blog-post-wrapper">
@@ -24,6 +24,32 @@
     </header>
 
     <!-- Content Container -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const contentBody = document.querySelector('.blog-article-body');
+            if (!contentBody) return;
+
+            // Regex to find URLs that are NOT already inside an <a> tag
+            const urlPattern = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+
+            // Function to safely linkify text nodes only
+            function linkify(node) {
+                if (node.nodeType === 3) { // Text node
+                    const text = node.textContent;
+                    if (urlPattern.test(text)) {
+                        const span = document.createElement('span');
+                        span.innerHTML = text.replace(urlPattern, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+                        node.parentNode.replaceChild(span, node);
+                    }
+                } else if (node.nodeType === 1 && node.tagName !== 'A' && node.tagName !== 'SCRIPT' && node.tagName !== 'STYLE') {
+                    // Recurse through children, but skip links, scripts, and styles
+                    Array.from(node.childNodes).forEach(linkify);
+                }
+            }
+
+            linkify(contentBody);
+        });
+    </script>
     <div class="container blog-content-container">
         {% if post.image %}
         <img src="{{ post.image.url }}" alt="{{ post.title }}" class="blog-featured-image">

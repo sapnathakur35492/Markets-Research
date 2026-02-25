@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, reverse
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.utils.html import format_html
@@ -45,16 +45,32 @@ class ReportAdmin(admin.ModelAdmin):
     actions = ['export_to_excel', 'update_price_action']
 
     def export_to_excel(self, request, queryset):
-        meta = self.model._meta
-        field_names = [field.name for field in meta.fields]
-
         response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename={}.csv'.format(meta)
+        response['Content-Disposition'] = 'attachment; filename=Reports_Export.csv'
         writer = csv.writer(response)
 
-        writer.writerow(field_names)
+        # Standardized headers
+        headers = ['ID', 'Title', 'Slug', 'Category', 'Publish Date', 'Region', 'Price (Single)', 'Absolute URL']
+        writer.writerow(headers)
+
         for obj in queryset:
-            row = writer.writerow([getattr(obj, field) for field in field_names])
+            report_url = "N/A"
+            try:
+                report_path = reverse('report-detail', kwargs={'slug': obj.slug})
+                report_url = request.build_absolute_uri(report_path)
+            except:
+                pass
+                
+            writer.writerow([
+                obj.id,
+                obj.title,
+                obj.slug,
+                obj.category.name if obj.category else "N/A",
+                obj.publish_date,
+                obj.region,
+                obj.single_user_price,
+                report_url
+            ])
 
         return response
     
@@ -228,5 +244,5 @@ class ReportAdmin(admin.ModelAdmin):
         except Exception as e:
             raise Exception(f"Failed to parse Excel file: {str(e)}")
 
-admin.site.site_header = "Market Research Admin"
-admin.site.site_title = "Market Research Admin Portal"
+admin.site.site_header = "Markets NXT Admin"
+admin.site.site_title = "Markets NXT Admin Portal"
