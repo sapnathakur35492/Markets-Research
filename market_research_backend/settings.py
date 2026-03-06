@@ -176,6 +176,11 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'market_research_backend.urls'
 
+# Trust the X-Forwarded-Proto header from reverse proxies (Nginx)
+# This ensures request.is_secure() returns True for HTTPS connections
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',

@@ -29,23 +29,23 @@ def get_paypal_access_token():
     try:
         client_id = os.environ.get('PAYPAL_CLIENT_ID')
         client_secret = os.environ.get('PAYPAL_CLIENT_SECRET')
-        mode = os.environ.get('PAYPAL_MODE', 'sandbox')
-        
+
         base_url = get_paypal_base_url()
         url = f"{base_url}/v1/oauth2/token"
-        
+
         headers = {
             "Accept": "application/json",
             "Accept-Language": "en_US"
         }
-        
+
         response = requests.post(
-            url, 
-            auth=(client_id, client_secret), 
-            headers=headers, 
-            data={"grant_type": "client_credentials"}
+            url,
+            auth=(client_id, client_secret),
+            headers=headers,
+            data={"grant_type": "client_credentials"},
+            timeout=15  # ← prevent infinite hang
         )
-        
+
         if response.status_code == 200:
             return response.json()['access_token']
         else:
@@ -65,31 +65,26 @@ def verify_paypal_payment(order_id):
         if not token:
             return False, "Could not authenticate with Payment Gateway"
 
-        mode = os.environ.get('PAYPAL_MODE', 'sandbox')
         base_url = get_paypal_base_url()
         url = f"{base_url}/v2/checkout/orders/{order_id}"
-        
+
         headers = {
             "Content-Type": "application/json",
             "Authorization": f"Bearer {token}"
         }
-        
-        response = requests.get(url, headers=headers)
+
+        response = requests.get(url, headers=headers, timeout=15)  # ← timeout added
         if response.status_code != 200:
             return False, f"Could not retrieve order details: {response.text}"
-            
+
         order_data = response.json()
-        status = order_data.get('status')
-        
-        # Valid statuses for a captured/approved payment depending on flow
-        # COMPLETED: Payment has been captured.
-        # APPROVED: Payment is approved but not yet captured (if we were doing server-side capture).
-        # Since client-side captures, we look for COMPLETED.
-        if status == 'COMPLETED':
+        order_status = order_data.get('status')
+
+        if order_status == 'COMPLETED':
             return True, None
-        
-        return False, f"Payment status is {status}, not COMPLETED"
-        
+
+        return False, f"Payment status is {order_status}, not COMPLETED"
+
     except Exception as e:
         logger.error(f"Payment verification error: {e}")
         return False, str(e)
@@ -223,6 +218,9 @@ class LeadCaptureView(CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['report'] = self.report
+        # Pre-truncate title to 5 words so the template doesn't need a filter tag
+        words = self.report.title.split()
+        context['short_title'] = ' '.join(words[:5]) + (' ...' if len(words) > 5 else '')
         
         # Determine Title based on URL or Type
         url_name = self.request.resolver_match.url_name
@@ -311,7 +309,8 @@ class CheckoutView(View):
             'license_type': license_type,
             'license_label': license_label,
             'price': price,
-            'debug': settings.DEBUG,  # Pass DEBUG to template for dev bypass button
+            # Only show dev bypass button when in sandbox mode AND DEBUG=True
+            'debug': settings.DEBUG and os.environ.get('PAYPAL_MODE', 'sandbox') != 'live',
         }
         
         return render(request, 'leads/checkout.html', context)
@@ -458,139 +457,179 @@ class CreatePayPalOrderView(View):
             lead_id = data.get('lead_id')
             if not lead_id:
                 return JsonResponse({'error': 'Missing lead_id'}, status=400)
-                
+
             lead = get_object_or_404(Lead, id=lead_id)
-            
-            # licensing logic to get price
+
+            # Get price from license type
             price = 0
-            if lead.license_type == 'single': price = lead.report.single_user_price
-            elif lead.license_type == 'multi': price = lead.report.multi_user_price
+            if lead.license_type == 'single':     price = lead.report.single_user_price
+            elif lead.license_type == 'multi':    price = lead.report.multi_user_price
             elif lead.license_type == 'enterprise': price = lead.report.enterprise_price
-            elif lead.license_type == 'data': price = lead.report.data_pack_price
-            
+            elif lead.license_type == 'data':     price = lead.report.data_pack_price
+
             if not price:
                 return JsonResponse({'error': 'Invalid price configuration'}, status=400)
 
             token = get_paypal_access_token()
             if not token:
-                return JsonResponse({'error': 'Failed to authenticate with PayPal'}, status=500)
+                logger.error("PayPal auth failed when creating order")
+                return JsonResponse({'error': 'Failed to authenticate with PayPal. Please try again.'}, status=500)
 
             base_url = get_paypal_base_url()
             url = f"{base_url}/v2/checkout/orders"
-            
-            # Construct return URLs
-            # In production these should be absolute URLs from settings or requesting host
+
+            # Construct return URLs — use HTTPS in production via SECURE_PROXY_SSL_HEADER
             host = request.get_host()
             protocol = 'https' if request.is_secure() else 'http'
             return_url = f"{protocol}://{host}/api/leads/paypal-return/?lead_id={lead.id}"
-            cancel_url = f"{protocol}://{host}/api/leads/paypal-cancel/?lead_id={lead.id}"
+            cancel_url  = f"{protocol}://{host}/api/leads/paypal-cancel/?lead_id={lead.id}"
+
+            # Format price correctly for PayPal (must be string with 2 decimal places)
+            price_str = "{:.2f}".format(float(price))
 
             payload = {
                 "intent": "CAPTURE",
                 "purchase_units": [{
+                    "reference_id": f"lead-{lead.id}",
                     "amount": {
                         "currency_code": "USD",
-                        "value": str(price)
+                        "value": price_str
                     },
-                    "description": f"{lead.report.title} - {lead.get_license_type_display()}"
+                    "description": f"{lead.report.title[:120]} - {lead.get_license_type_display()}"
                 }],
                 "application_context": {
                     "return_url": return_url,
                     "cancel_url": cancel_url,
                     "brand_name": "Markets NXT",
-                    "user_action": "PAY_NOW"
+                    "user_action": "PAY_NOW",
+                    "shipping_preference": "NO_SHIPPING"
                 }
             }
-            
+
             headers = {
                 "Content-Type": "application/json",
-                "Authorization": f"Bearer {token}"
+                "Authorization": f"Bearer {token}",
+                # Idempotency key: same lead always gets same order → prevents duplicate charges
+                "PayPal-Request-Id": f"order-lead-{lead.id}"
             }
-            
-            response = requests.post(url, headers=headers, json=payload)
+
+            response = requests.post(url, headers=headers, json=payload, timeout=30)
+
             if response.status_code in [200, 201]:
                 order_data = response.json()
                 links = order_data.get('links', [])
                 approve_url = next((link['href'] for link in links if link['rel'] == 'approve'), None)
-                
+
                 if approve_url:
                     return JsonResponse({'approve_url': approve_url})
                 else:
+                    logger.error(f"No approve link in PayPal response: {order_data}")
                     return JsonResponse({'error': 'No approve link found from PayPal'}, status=500)
             else:
-                logger.error(f"PayPal Order Creation Failed: {response.text}")
-                return JsonResponse({'error': 'Failed to create PayPal order'}, status=500)
-                
+                logger.error(f"PayPal Order Creation Failed ({response.status_code}): {response.text}")
+                return JsonResponse({'error': 'Failed to create PayPal order. Please try again.'}, status=500)
+
         except Exception as e:
-            logger.error(f"Error creating PayPal order: {e}")
-            return JsonResponse({'error': str(e)}, status=500)
+            logger.error(f"Error creating PayPal order: {e}", exc_info=True)
+            return JsonResponse({'error': 'An unexpected error occurred. Please try again.'}, status=500)
 
 class PayPalReturnView(View):
     def get(self, request, *args, **kwargs):
         lead_id = request.GET.get('lead_id')
-        token = request.GET.get('token') # Order ID
-        
+        token   = request.GET.get('token')  # PayPal Order ID
+
         if not lead_id or not token:
-             return HttpResponse("Missing details", status=400)
-             
-        # Capture the order
-        access_token = get_paypal_access_token()
-        base_url = get_paypal_base_url()
-        url = f"{base_url}/v2/checkout/orders/{token}/capture"
-        
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {access_token}"
-        }
-        
-        response = requests.post(url, headers=headers)
-        
-        if response.status_code in [200, 201]:
-             # Success
-             lead = get_object_or_404(Lead, id=lead_id)
-             lead.message = f"{lead.message}\n\n[PAYPAL ORDER ID: {token}] [CAPTURED]"
-             
-             # Fetch Payer Info from Captured Order
-             # The capture response contains payer details
-             capture_data = response.json()
-             payer = capture_data.get('payer', {})
-             
-             # Update Lead Details from PayPal
-             if payer:
-                 lead.email = payer.get('email_address', lead.email)
-                 lead.first_name = payer.get('name', {}).get('given_name', lead.first_name)
-                 lead.last_name = payer.get('name', {}).get('surname', lead.last_name)
-                 lead.full_name = f"{lead.first_name} {lead.last_name}".strip()
-                 
-                 # Address (if available in purchase_units)
-                 purchase_units = capture_data.get('purchase_units', [])
-                 if purchase_units:
-                     shipping = purchase_units[0].get('shipping', {})
-                     address = shipping.get('address', {})
-                     if address:
-                         lead.address = address.get('address_line_1', '')
-                         lead.city = address.get('admin_area_2', '') # City
-                         lead.state = address.get('admin_area_1', '') # State
-                         lead.zip_code = address.get('postal_code', '')
-                         lead.country = address.get('country_code', '')
-             
-             lead.save()
-             
-             threading.Thread(target=send_lead_emails_task, args=(lead,)).start()
-             
-             return redirect(reverse('report-detail', kwargs={'slug': lead.report.slug}) + "?payment=success")
-        else:
-             logger.error(f"Capture failed: {response.text}")
-             return HttpResponse("Payment capture failed. Please contact support.", status=500)
+            logger.error(f"PayPal return missing params: lead_id={lead_id}, token={token}")
+            return redirect('/')
+
+        try:
+            lead = get_object_or_404(Lead, id=lead_id)
+
+            # ── Idempotency guard: already captured? Redirect straight to success ──
+            if '[CAPTURED]' in (lead.message or ''):
+                logger.info(f"Lead {lead_id} already captured — skipping duplicate capture")
+                return redirect(reverse('report-detail', kwargs={'slug': lead.report.slug}) + "?payment=success")
+
+            # ── Get access token ──
+            access_token = get_paypal_access_token()
+            if not access_token:
+                logger.error("PayPal auth failed during capture")
+                return redirect(
+                    reverse('checkout', kwargs={'slug': lead.report.slug, 'license_type': lead.license_type})
+                    + "?payment=failed"
+                )
+
+            base_url = get_paypal_base_url()
+            url = f"{base_url}/v2/checkout/orders/{token}/capture"
+
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {access_token}",
+                # Idempotency key prevents double-charge on retry/refresh
+                "PayPal-Request-Id": f"capture-lead-{lead_id}-{token[:12]}"
+            }
+
+            response = requests.post(url, headers=headers, json={}, timeout=30)
+
+            # ── SUCCESS ──
+            if response.status_code in [200, 201]:
+                capture_data = response.json()
+                payer = capture_data.get('payer', {})
+
+                lead.message = f"{lead.message}\n\n[PAYPAL ORDER ID: {token}] [CAPTURED]"
+
+                if payer:
+                    lead.email      = payer.get('email_address', lead.email)
+                    lead.first_name = payer.get('name', {}).get('given_name', lead.first_name)
+                    lead.last_name  = payer.get('name', {}).get('surname',    lead.last_name)
+                    lead.full_name  = f"{lead.first_name} {lead.last_name}".strip()
+
+                    purchase_units = capture_data.get('purchase_units', [])
+                    if purchase_units:
+                        address = purchase_units[0].get('shipping', {}).get('address', {})
+                        if address:
+                            lead.address  = address.get('address_line_1', lead.address)
+                            lead.city     = address.get('admin_area_2',   lead.city)
+                            lead.state    = address.get('admin_area_1',   lead.state)
+                            lead.zip_code = address.get('postal_code',    lead.zip_code)
+                            lead.country  = address.get('country_code',   lead.country)
+
+                lead.save()
+                threading.Thread(target=send_lead_emails_task, args=(lead,)).start()
+                return redirect(reverse('report-detail', kwargs={'slug': lead.report.slug}) + "?payment=success")
+
+            # ── 422: Already captured (e.g. user refreshed) → treat as success ──
+            elif response.status_code == 422:
+                logger.warning(f"PayPal 422 for lead {lead_id} order {token} — already captured, treating as success")
+                if '[CAPTURED]' not in (lead.message or ''):
+                    lead.message = f"{lead.message}\n\n[PAYPAL ORDER ID: {token}] [CAPTURED-DUPLICATE]"
+                    lead.save()
+                    threading.Thread(target=send_lead_emails_task, args=(lead,)).start()
+                return redirect(reverse('report-detail', kwargs={'slug': lead.report.slug}) + "?payment=success")
+
+            # ── Any other failure → back to checkout with error flag ──
+            else:
+                logger.error(f"PayPal capture failed ({response.status_code}): {response.text}")
+                return redirect(
+                    reverse('checkout', kwargs={'slug': lead.report.slug, 'license_type': lead.license_type})
+                    + "?payment=failed"
+                )
+
+        except Exception as e:
+            logger.error(f"PayPalReturnView unexpected error: {e}", exc_info=True)
+            return redirect('/')
 
 class PayPalCancelView(View):
     def get(self, request, *args, **kwargs):
         lead_id = request.GET.get('lead_id')
-        lead = get_object_or_404(Lead, id=lead_id)
-        # Redirect back to checkout or show message
-        # We can't easily go back to checkout form with data pre-filled without session, 
-        # so mostly redirect to report page or a cancel page.
-        return redirect(reverse('checkout', kwargs={'slug': lead.report.slug, 'license_type': lead.license_type}) + "?payment=cancelled")
+        try:
+            lead = get_object_or_404(Lead, id=lead_id)
+            return redirect(
+                reverse('checkout', kwargs={'slug': lead.report.slug, 'license_type': lead.license_type})
+                + "?payment=cancelled"
+            )
+        except Exception:
+            return redirect('/')
 
 class DevBypassView(View):
     """

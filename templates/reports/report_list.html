@@ -135,34 +135,48 @@
         opacity: 0.9;
     }
 
-    /* Report List Item (Clean Text Layout) */
-    .vmr-list-item {
-        padding: 1.5rem 0;
-        border-bottom: 1px dashed #cbd5e1;
+    /* Report List Item (Premium Card Layout) */
+    .vmr-list {
         display: flex;
         flex-direction: column;
-        gap: 0.5rem;
+        gap: 1.5rem;
+        background: transparent !important;
+        padding: 0 !important;
+        border: none !important;
     }
 
-    .vmr-list-item:last-child {
-        border-bottom: none;
+    .vmr-list-item {
+        background: white;
+        padding: 1.75rem;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        text-decoration: none !important;
+    }
+
+    .vmr-list-item:hover {
+        transform: translateY(-4px);
+        border-color: #3b82f6;
+        box-shadow: 0 10px 25px rgba(37, 99, 235, 0.08);
     }
 
     .vmr-title {
-        font-size: 1.1rem;
-        /* Reduced from 1.25rem */
+        font-size: 1.25rem;
         font-weight: 700;
-        color: #1e1b4b;
-        /* Darker blue/black */
+        color: #0f172a;
         text-decoration: none;
         line-height: 1.4;
         display: block;
         margin-bottom: 0.25rem;
+        transition: color 0.2s;
     }
 
-    .vmr-title:hover {
+    .vmr-list-item:hover .vmr-title {
         color: #2563eb;
-        text-decoration: underline;
     }
 
     .vmr-desc {
@@ -188,9 +202,22 @@
 
     .vmr-meta {
         font-size: 0.85rem;
-        color: #94a3b8;
-        /* Light gray for date */
-        margin-top: 0.25rem;
+        color: #64748b;
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .publish-badge {
+        background: #f1f5f9;
+        color: #475569;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
     }
 
     /* Responsive */
@@ -296,11 +323,86 @@
             word-break: break-word;
         }
 
-        /* Ensure Title Wraps */
-        .vmr-title {
-            word-wrap: break-word;
-            word-break: break-word;
-            hyphens: auto;
+    }
+
+    /* Segmented Pagination (Reference-inspired) */
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        /* Centered */
+        margin-top: 4rem;
+        padding-top: 2rem;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .pagination-group {
+        display: flex;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .page-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 40px;
+        padding: 0 1.25rem;
+        background: white;
+        color: #007bff;
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+        border-right: 1px solid #dee2e6;
+        transition: all 0.2s;
+    }
+
+    .page-item:last-child {
+        border-right: none;
+    }
+
+    /* First and Prev specific light gray background from SS */
+    .page-item.nav-btn {
+        background: #f1f3f5;
+        color: #495057;
+    }
+
+    .page-item:hover:not(.active):not(.disabled) {
+        background: #f8f9fa;
+        color: #0056b3;
+    }
+
+    .page-item.active {
+        background: #007bff;
+        color: white;
+        border-color: #007bff;
+    }
+
+    .page-item.disabled {
+        background: #f8f9fa;
+        color: #adb5bd;
+        cursor: default;
+        pointer-events: none;
+    }
+
+    @media (max-width: 768px) {
+        .pagination-container {
+            justify-content: center;
+        }
+
+        .pagination-group {
+            flex-wrap: wrap;
+            justify-content: center;
+            border: none;
+            gap: 5px;
+        }
+
+        .page-item {
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 0 0.8rem;
+            height: 36px;
         }
     }
 </style>
@@ -373,22 +475,24 @@
         </div>
 
         <!-- Reports List -->
-        <div class="vmr-list" style="background: white; padding: 2rem; border-radius: 8px; border: 1px solid #e2e8f0;">
+        <div class="vmr-list">
             {% for report in reports %}
-            <article class="vmr-list-item">
-                <a href="{% url 'report-detail' report.slug %}" class="vmr-title">
+            <a href="{% url 'report-detail' report.slug %}" class="vmr-list-item">
+                <h3 class="vmr-title">
                     {{ report.title }}
-                </a>
+                </h3>
 
                 <div class="vmr-desc">
-                    {{ report.summary|striptags|truncatewords:40 }}
-                    <a href="{% url 'report-detail' report.slug %}" class="read-more">Read More »</a>
+                    {{ report.summary|striptags|truncatewords:45 }}
+                    <span class="read-more">Read More <i class="fas fa-chevron-right"
+                            style="font-size: 0.8rem; margin-left: 3px;"></i></span>
                 </div>
 
                 <div class="vmr-meta">
-                    {{ report.publish_date|date:"F Y" }}
+                    <span class="publish-badge">Published</span>
+                    <span>{{ report.publish_date|date:"F Y" }}</span>
                 </div>
-            </article>
+            </a>
             {% empty %}
             <div style="text-align: center; padding: 4rem; background: white; border-radius: 8px;">
                 <p style="color: #64748b; font-size: 1.1rem;">No reports found matching your criteria.</p>
@@ -398,26 +502,44 @@
             {% endfor %}
         </div>
 
-        <!-- Pagination -->
+        <!-- Segmented Numeric Pagination -->
         {% if is_paginated %}
-        <div style="display: flex; justify-content: center; gap: 0.5rem; margin-top: 3rem;">
-            {% if page_obj.has_previous %}
-            <a href="?page=1{% if search_query %}&q={{ search_query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}"
-                class="vmr-btn" style="background: white; border: 1px solid #e2e8f0; color: #64748b;">First</a>
-            <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}"
-                class="vmr-btn" style="background: white; border: 1px solid #e2e8f0; color: #64748b;">Prev</a>
-            {% endif %}
+        <div class="pagination-container">
+            <div class="pagination-group">
+                <!-- First -->
+                {% if page_obj.has_previous %}
+                <a href="?page=1{% if search_query %}&q={{ search_query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}"
+                    class="page-item nav-btn">First</a>
+                <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}"
+                    class="page-item nav-btn">Prev</a>
+                {% else %}
+                <span class="page-item disabled">First</span>
+                <span class="page-item disabled">Prev</span>
+                {% endif %}
 
-            <span class="vmr-btn" style="background: #1e3a8a; color: white;">
-                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
-            </span>
+                <!-- Dynamic Page Numbers -->
+                {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                <span class="page-item active">{{ num }}</span>
+                {% elif num > page_obj.number|add:'-4' and num < page_obj.number|add:'4' %} <a
+                    href="?page={{ num }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}"
+                    class="page-item">
+                    {{ num }}
+                    </a>
+                    {% endif %}
+                    {% endfor %}
 
-            {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}"
-                class="vmr-btn" style="background: white; border: 1px solid #e2e8f0; color: #64748b;">Next</a>
-            <a href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}"
-                class="vmr-btn" style="background: white; border: 1px solid #e2e8f0; color: #64748b;">Last</a>
-            {% endif %}
+                    <!-- Next & Last -->
+                    {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}"
+                        class="page-item">Next</a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}"
+                        class="page-item">Last</a>
+                    {% else %}
+                    <span class="page-item disabled">Next</span>
+                    <span class="page-item disabled">Last</span>
+                    {% endif %}
+            </div>
         </div>
         {% endif %}
 

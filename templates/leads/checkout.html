@@ -43,9 +43,9 @@
     }
 
     .form-label {
-        flex: 0 0 160px;
+        flex: 0 0 140px;
         font-weight: 600;
-        font-size: 0.85rem;
+        font-size: 0.72rem;
         color: #cbd5e1;
     }
 
@@ -563,6 +563,24 @@
                         });
                 });
             }
+        }
+
+        // Handle URL parameters for payment messages
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('payment') === 'failed') {
+            Swal.fire({
+                title: 'Payment Failed',
+                text: 'Your payment could not be processed. Please try again or contact support.',
+                icon: 'error',
+                confirmButtonColor: '#3b82f6'
+            });
+        } else if (urlParams.get('payment') === 'cancelled') {
+            Swal.fire({
+                title: 'Payment Cancelled',
+                text: 'The payment process was cancelled. You can try again whenever you are ready.',
+                icon: 'info',
+                confirmButtonColor: '#3b82f6'
+            });
         }
     });
 </script>
