@@ -142,6 +142,179 @@ def get_category_icon(category_name):
     else:
         return '📊'
 
+
+@register.filter(name='format_market_coverage')
+def format_market_coverage(content):
+    """
+    Convert market coverage content (lists or paragraphs) into a styled, attractive table.
+    Handles separators like ':' and '|'.
+    """
+    if not content:
+        return ''
+    
+    # If it's already a table, mark as safe but try to strip some basic tags if they look like the messy ones
+    if '<table' in content.lower() and 'border-collapse' not in content:
+        # It's a raw table from somewhere else, we might want to let it through 
+        # but the goal is to standardize. For now, let's process if it doesn't look like our styled table.
+        pass
+    
+    # Extract items
+    items = re.findall(r'<li>(.*?)</li>', content, re.DOTALL)
+    if not items:
+        items = re.findall(r'<p>(.*?)</p>', content, re.DOTALL)
+    if not items:
+        clean_content = re.sub(r'<[^>]+>', '\n', content)
+        items = [line.strip() for line in clean_content.split('\n') if line.strip()]
+
+    rows = []
+    is_first = True
+    
+    for item in items:
+        # Remove markdown bold/italics for processing but keep some HTML if we trust it
+        clean_item = re.sub(r'<(?!strong|b|em|i)[^>]+>', '', item).strip()
+        if not clean_item: continue
+
+        # Detect separator (prefer | then :)
+        sep = '|' if '|' in clean_item else ':' if ':' in clean_item else None
+        
+        if sep:
+            parts = clean_item.split(sep, 1)
+            key = parts[0].strip()
+            # Remove styling from key for a clean look
+            key_clean = re.sub(r'<[^>]+>', '', key)
+            value = parts[1].strip()
+            
+            if is_first and (key_clean.lower() == 'parameter' or key_clean.lower() == 'details'):
+                # Header row styling
+                rows.append(f'''
+                <tr style="background: #1e3a8a; color: white;">
+                    <th style="padding: 1.25rem 1.5rem; font-weight: 700; border-right: 1px solid rgba(255,255,255,0.1); width: 40%; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.05em;">{key_clean}</th>
+                    <th style="padding: 1.25rem 1.5rem; font-weight: 700; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.05em;">{value}</th>
+                </tr>''')
+                is_first = False
+                continue
+
+            # Alternate row backgrounds
+            bg_color = "#ffffff" # Transparent or white
+            
+            rows.append(f'''
+            <tr style="border-bottom: 2px solid #f8fafc; transition: all 0.2s ease;">
+                <td style="padding: 1.25rem 1.5rem; font-weight: 700; color: #1e3a8a; background: #fbfcfe; width: 38%; font-size: 0.95rem;">
+                    {key_clean}
+                </td>
+                <td style="padding: 1.25rem 1.5rem; color: #334155; font-size: 0.95rem; line-height: 1.6; background: #ffffff;">
+                    {value}
+                </td>
+            </tr>''')
+            is_first = False
+        else:
+            # Full width row for descriptive lines
+            rows.append(f'''
+            <tr style="border-bottom: 1px solid #f1f5f9;">
+                <td colspan="2" style="padding: 1.1rem 1.5rem; color: #64748b; font-style: italic; background: #fefeff; font-size: 0.9rem;">
+                    {clean_item}
+                </td>
+            </tr>''')
+
+    if not rows:
+        return mark_safe(content)
+        
+    table_html = f'''
+    <div class="market-coverage-wrapper" style="margin: 2.5rem 0; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02); background: white;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <tbody>
+                {''.join(rows)}
+            </tbody>
+        </table>
+    </div>
+    <style>
+        .market-coverage-wrapper tr:hover {{
+            background-color: #f0f7ff !important;
+        }}
+    </style>
+    '''
+    return mark_safe(table_html)
+
+
+@register.filter(name='format_list')
+def format_list(content):
+    """
+    Convert content into a clean bulleted list with tight spacing.
+    Extracts text from paragraphs or headers if necessary.
+    """
+    if not content:
+        return ''
+    
+    # If it already has list tags, just wrap and adjust gaps via CSS if needed
+    if '<li>' in content.lower():
+        # Add tight-list class for styling
+        return mark_safe(f'<div class="tight-list-container">{content}</div>')
+
+    # Extract text from p, h1, h2 etc.
+    lines = re.findall(r'<(?:p|h[1-6])>(.*?)</(?:p|h[1-6])>', content, re.DOTALL)
+    if not lines:
+        lines = [line.strip() for line in content.split('\n') if line.strip()]
+        
+    if not lines:
+        return mark_safe(content)
+        
+    li_items = []
+    for line in lines:
+        # Strip any existing internal tags to avoid nested mess
+        clean_text = re.sub(r'<[^>]+>', '', line).strip()
+        if clean_text:
+            li_items.append(f'<li style="margin-bottom: 0.4rem; color: #334155; font-weight: 500; font-size: 1.2rem;">{clean_text}</li>')
+            
+    if not li_items:
+        return mark_safe(content)
+        
+    return mark_safe(f'<ul style="list-style-type: disc; padding-left: 1.5rem; margin: 1rem 0;">{"".join(li_items)}</ul>')
+
+
+@register.filter(name='format_segmentation')
+def format_segmentation(content):
+    """
+    Format market segmentation content:
+    - Bold and Blue color for 'By XYZ' segments
+    - Bullet points for sub-segments
+    """
+    if not content:
+        return ''
+    
+    # Normalize by converting tags to newlines to extract clean lines
+    text = re.sub(r'<(?:br|p|h[1-6]|li)[^>]*>', '\n', content)
+    text = re.sub(r'</(?:p|h[1-6]|li)>', '\n', text)
+    text = re.sub(r'<[^>]+>', '', text)
+    
+    lines = [line.strip() for line in text.split('\n') if line.strip()]
+    
+    formatted_output = []
+    current_list = []
+    
+    for line in lines:
+        # Check if line starts with "By " (case insensitive)
+        if re.match(r'^By\s+', line, re.IGNORECASE):
+            # Close previous list
+            if current_list:
+                formatted_output.append(f'<ul style="list-style-type: disc; padding-left: 2rem; margin-bottom: 1.5rem;">{"".join(current_list)}</ul>')
+                current_list = []
+            
+            # Style header (Blue & Bold)
+            formatted_output.append(f'<div style="font-weight: 800; color: #1e3a8a; font-size: 1.3rem; margin-top: 1.8rem; margin-bottom: 0.8rem;">{line}</div>')
+        else:
+            # Add to bullet list
+            current_list.append(f'<li style="margin-bottom: 0.5rem; color: #334155; font-size: 1.15rem; font-weight: 500;">{line}</li>')
+
+    # Close final list
+    if current_list:
+        formatted_output.append(f'<ul style="list-style-type: disc; padding-left: 2rem; margin-bottom: 1.5rem;">{"".join(current_list)}</ul>')
+        
+    if not formatted_output:
+        return mark_safe(content)
+        
+    return mark_safe("".join(formatted_output))
+
+
 @register.filter(name='get_category_image_url')
 def get_category_image_url(category_name):
     """
