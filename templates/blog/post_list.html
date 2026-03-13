@@ -30,8 +30,15 @@
                     {% endif %}
                 </div>
                 <div class="blog-card-content">
-                    <div class="blog-card-date">
-                        <i class="far fa-calendar-alt"></i> {{ post.publish_date|date:'F d, Y' }}
+                    <div class="blog-card-meta"
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <span class="blog-card-category"
+                            style="background: rgba(0, 194, 203, 0.1); color: #008985; padding: 2px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700;">
+                            {{ post.category.name|default:"Uncategorized" }}
+                        </span>
+                        <div class="blog-card-date" style="font-size: 0.8rem; color: #64748b;">
+                            <i class="far fa-calendar-alt"></i> {{ post.publish_date|date:'M d, Y' }}
+                        </div>
                     </div>
                     <h2 class="blog-card-title">
                         <a href="{% url 'blog-detail' post.slug %}">{{ post.title }}</a>

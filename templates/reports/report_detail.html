@@ -3,6 +3,9 @@
 {% load report_filters %}
 
 {% block title %}{{ report.title }} - Markets NXT{% endblock %}
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+{% endblock %}
 
 {% block content %}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -35,8 +38,8 @@
         background-attachment: fixed !important;
         background-color: #e0f2fe !important;
         overflow-x: clip !important;
-        /* Prevents breaking sticky while still containing horizontal overflow */
         max-width: 100%;
+        font-family: 'Outfit', 'Inter', sans-serif !important;
     }
 
     /* Hero Section */
@@ -44,7 +47,8 @@
         position: relative;
         background: radial-gradient(circle at 10% 20%, #1e3a8a 0%, #1e40af 90%);
         color: white;
-        padding: 1.5rem 0 1.2rem;
+        padding: 1.25rem 0 1rem;
+        /* Compact hero */
         border-bottom: 5px solid #f97316;
         margin-bottom: 0;
         text-align: left;
@@ -88,8 +92,8 @@
     }
 
     .detail-title {
-        font-size: 2.2rem;
-        font-weight: 800;
+        font-size: 1.6rem;
+        font-weight: 700;
         line-height: 1.3;
         color: white;
         margin-bottom: 1rem;
@@ -120,9 +124,7 @@
         padding: 3rem 2rem;
         display: grid;
         grid-template-columns: 1fr 310px;
-        /* Sidebar narrowed to 310px to give main area more room */
         gap: 2rem;
-        /* Reduced gap to maximize content width */
         align-items: start;
         width: 100%;
         box-sizing: border-box;
@@ -131,14 +133,11 @@
     /* Main Content Area */
     .detail-main {
         background: #ffffff;
-        border-radius: 16px;
-        /* Thicker and darker outline */
-        border: 4px solid #0e4ae0;
-        /* Deep brand blue */
-        /* Enhanced shadow for depth */
-        box-shadow: 0 20px 40px -5px rgba(1, 32, 111, 0.2),
-            0 10px 20px -5px rgba(0, 0, 0, 0.04);
-        /* REMOVED overflow: hidden to allow sticky tabs */
+        border-radius: 12px;
+        /* Cleaner rounded corners */
+        border: 2px solid #e2e8f0;
+        /* Professional border */
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
         width: 100%;
         position: relative;
     }
@@ -147,20 +146,18 @@
     .tabs-header {
         display: flex;
         background: #ffffff;
-        /* Use solid white to hide content behind */
-        border-bottom: 2px solid #e2e8f0;
+        border-bottom: 2px solid #f1f5f9;
         overflow-x: auto;
         scrollbar-width: none;
         width: 100%;
         position: sticky;
         top: 130px;
-        /* Matches header height (130px) */
         z-index: 100;
-        /* Fixed invalid % value */
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.05);
     }
 
     .tabs-header::-webkit-scrollbar {
+        height: 0;
         display: none;
     }
 
@@ -201,11 +198,22 @@
     }
 
     .tab-body {
-        padding: 0rem 1.5rem 1.5rem 1.5rem;
+        padding: 0 1.5rem 1.5rem 1.5rem;
         font-size: 1rem;
         line-height: 1.7;
         color: #020617;
         text-align: left;
+    }
+
+    /* Remove first-child gap inside tabs */
+    .tab-pane>*:first-child {
+        margin-top: 0 !important;
+    }
+
+    /* Specifically handle section-header if it's the first child */
+    .tab-pane>.section-header:first-child {
+        margin-top: 1rem !important;
+        /* Slight breathing room but well-aligned */
     }
 
     .tab-body strong,
@@ -242,14 +250,16 @@
 
     .section-header {
         position: relative !important;
-        font-size: 1.4rem !important;
+        font-size: 1.3rem !important;
+        /* Balanced size */
         font-weight: 700 !important;
         color: #1e3a8a !important;
-        margin: 2.5rem 0 1.25rem 0 !important;
-        padding: 0.8rem 1rem 0.8rem 1.5rem !important;
-        border-left: 5px solid #1e3a8a !important;
-        background: linear-gradient(to right, #f8fafc, transparent) !important;
-        border-radius: 0 8px 8px 0 !important;
+        margin: 2.5rem 0 0.5rem 0 !important;
+        /* Reduced bottom margin to bring content closer */
+        padding: 0.75rem 1rem 0.75rem 1.25rem !important;
+        border-left: 4px solid #1e3a8a !important;
+        background: linear-gradient(to right, rgba(248, 250, 252, 0.8), transparent) !important;
+        border-radius: 0 6px 6px 0 !important;
         line-height: 1.3 !important;
         display: flex !important;
         align-items: center !important;
@@ -351,6 +361,7 @@
 
     .tab-pane th {
         background-color: #1e3a8a !important;
+        color: white !important;
         font-weight: 700;
         text-align: left;
     }
@@ -981,37 +992,35 @@
         .detail-grid-container {
             grid-template-columns: 1fr;
             padding: 1rem;
-            /* Ensure it fits */
-            width: 100%;
-            max-width: 100vw;
+            gap: 1.5rem;
         }
 
         .tabs-header {
-            top: 110px;
-            /* Match mobile header height */
+            top: 100px;
+            /* Adjust for mobile header */
         }
 
         .detail-sidebar {
             position: static;
             order: 2;
             width: 100%;
-            max-width: 100%;
-        }
-
-        .sidebar-btn {
-            width: 75%;
-            max-width: 100%;
-            white-space: normal;
-            /* Allow text wrapping */
         }
 
         .detail-main {
             order: 1;
             width: 100%;
+            border-width: 2px;
+            /* Thinner border on mobile */
         }
 
         .tab-body {
             padding: 1rem;
+        }
+
+        .section-header {
+            font-size: 1.15rem !important;
+            padding: 0.6rem 0.8rem 0.6rem 1rem !important;
+            margin: 2rem 0 1rem 0 !important;
         }
     }
 
@@ -1022,7 +1031,7 @@
 
         /* Mobile Typography Fix */
         .detail-title {
-            font-size: 1.35rem;
+            font-size: 1.2rem;
             /* Smaller font */
             line-height: 1.25;
             /* Tighter leading */
@@ -1430,10 +1439,15 @@
                 {{ report.geographic_analysis|safe }}
                 {% endif %}
 
-                <!-- Regional Map Image - ALWAYS after Geographic Performance Analysis -->
+                <!-- Regional Map Image or Dashboard for Country Reports -->
                 <div style="text-align: center; margin: 3rem 0;">
+                    {% if 'global' in report.region|lower %}
                     <img src="{% static 'images/reports/regional_map_standard.png' %}" alt="Geographic Coverage Map"
                         style="max-width: 85%; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.1);">
+                    {% else %}
+                    <img src="{% static 'images/reports/deck_standard.jpg' %}" alt="Market Analysis Dashboard"
+                        style="max-width: 85%; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.1);">
+                    {% endif %}
                     <div style="margin-top: 1rem; font-weight: 500; color: #334155;">
                         Limited Budget ? - <a href="{% url 'ask-for-discount' report.slug %}"
                             style="color: #2563eb; text-decoration: underline;">Ask for Discount</a>
@@ -1452,7 +1466,8 @@
                 {{ report.leading_participants|format_list }}
                 {% endif %}
 
-                <!-- Deck Image - ALWAYS after Leading Market Participants -->
+                <!-- Deck Image - ONLY for Global Reports (since it's moved up for Country reports) -->
+                {% if 'global' in report.region|lower %}
                 <div style="text-align: center; margin: 3rem 0;">
                     <img src="{% static 'images/reports/deck_standard.jpg' %}" alt="Market Analysis Dashboard"
                         style="max-width: 85%; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.1);">
@@ -1461,6 +1476,7 @@
                             style="color: #2563eb; text-decoration: underline;">Get my Report Customized</a>
                     </div>
                 </div>
+                {% endif %}
 
                 <!-- Long-Term Market Perspective -->
                 {% if report.long_term_perspective %}
@@ -1869,8 +1885,8 @@
 
         <!-- Support Widget -->
         <div class="sidebar-widget support-widget">
-            <h1 class="section-header widget-title"
-                style="border-left:none !important; background:none !important; padding:0 !important; margin:0 0 1rem 0 !important; font-size: 1.1rem !important;">
+            <h1 class="widget-title"
+                style="color: white !important; border-bottom-color: rgba(255,255,255,0.2) !important; margin:0 0 1rem 0 !important; font-size: 1.15rem !important;">
                 Need Assistance?</h1>
             <p class="support-text">Our experts are here to help you find the right market insights for your
                 business.
@@ -1880,8 +1896,8 @@
 
         <!-- Newsletter Widget -->
         <div class="sidebar-widget newsletter-widget">
-            <h1 class="section-header widget-title"
-                style="border-left:none !important; background:none !important; padding:0 !important; margin:0 0 1rem 0 !important; font-size: 1.1rem !important;">
+            <h1 class="widget-title"
+                style="color: white !important; border-bottom-color: rgba(255,255,255,0.1) !important; margin:0 0 1rem 0 !important; font-size: 1.15rem !important;">
                 Get Market Updates</h1>
             <p style="font-size: 0.85rem; margin-bottom: 1rem; opacity: 0.8;">Subscribe to receive latest industry
                 insights and reports.</p>
@@ -2091,419 +2107,469 @@
                 Request Customization
             </a>
         </div>
+    </aside>
+</div> <!-- End of detail-grid-container -->
 
-        <script>
-            // Tab Switching Logic
-            document.addEventListener('DOMContentLoaded', function () {
-                const tabs = document.querySelectorAll('button.tab-btn');
-                const panes = document.querySelectorAll('.tab-pane');
+<script>
+    // Tab Switching Logic
+    document.addEventListener('DOMContentLoaded', function () {
+        const tabs = document.querySelectorAll('button.tab-btn');
+        const panes = document.querySelectorAll('.tab-pane');
 
-                tabs.forEach(tab => {
-                    tab.addEventListener('click', () => {
-                        // Remove active class from all
-                        tabs.forEach(t => t.classList.remove('active'));
-                        panes.forEach(p => p.classList.remove('active'));
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all
+                tabs.forEach(t => t.classList.remove('active'));
+                panes.forEach(p => p.classList.remove('active'));
 
-                        // Add active to clicked
-                        tab.classList.add('active');
+                // Add active to clicked
+                tab.classList.add('active');
 
-                        // Show corresponding pane
-                        const targetId = tab.dataset.tab;
-                        document.getElementById(targetId).classList.add('active');
-                    });
-                });
+                // Show corresponding pane
+                const targetId = tab.dataset.tab;
+                document.getElementById(targetId).classList.add('active');
             });
+        });
 
-            // Buy Link Update
-            function updateBuyLink(radio, slug) {
-                const type = radio.value;
-                const form = document.getElementById('buyForm');
-                form.action = `/reports/checkout/${slug}/${type}/`;
-            }
-        </script>
+        // Heading Cleanup Logic (Fix for CAGR and Market Size appearing as H1)
+        const contentPanes = document.querySelectorAll('.tab-pane');
+        contentPanes.forEach(pane => {
+            const headings = pane.querySelectorAll('h1, h2');
+            headings.forEach(h => {
+                const text = h.innerText.toUpperCase();
+                if (text.includes('CAGR') || text.includes('MARKET SIZE') || text.includes('USD')) {
+                    // Clean up existing bullet markers from the text since LI will add its own
+                    const cleanHtml = h.innerHTML.replace(/^[•\-\s\*]+/, '').trim();
+
+                    // Find previous UL if exists, otherwise create one
+                    let prevUl = h.previousElementSibling;
+                    if (prevUl && prevUl.tagName === 'UL') {
+                        const li = document.createElement('li');
+                        li.innerHTML = cleanHtml;
+                        prevUl.appendChild(li);
+                        h.remove();
+                    } else {
+                        // Just demote to a paragraph or list item
+                        const li = document.createElement('li');
+                        li.innerHTML = cleanHtml;
+                        const ul = document.createElement('ul');
+                        ul.appendChild(li);
+                        h.parentNode.replaceChild(ul, h);
+                    }
+                }
+            });
+        });
+    });
+
+    // Buy Link Update
+    function updateBuyLink(radio, slug) {
+        const type = radio.value;
+        const form = document.getElementById('buyForm');
+        form.action = `/reports/checkout/${slug}/${type}/`;
+    }
+</script>
 
 
 
-        <!-- Exit Intent Popup (Redesigned) -->
-        <div id="exitIntentPopup" class="exit-popup-overlay" style="display: none;">
-            <div class="exit-popup-content">
-                <button class="exit-popup-close">&times;</button>
-                <div class="popup-header-accent"></div>
+<!-- Exit Intent Popup (Redesigned) -->
+<div id="exitIntentPopup" class="exit-popup-overlay" style="display: none;">
+    <div class="exit-popup-content">
+        <button class="exit-popup-close">&times;</button>
+        <div class="popup-header-accent"></div>
 
-                <div id="popupFormContainer">
-                    <h2 class="exit-popup-title" id="exitPopupTitle">{{ report.title }}</h2>
-                    <h3 class="exit-popup-subtitle">Want Free Sample Report ? Get it Now in Minutes.</h3>
+        <div id="popupFormContainer">
+            <h2 class="exit-popup-title" id="exitPopupTitle">{{ report.title }}</h2>
+            <h3 class="exit-popup-subtitle">Want Free Sample Report ? Get it Now in Minutes.</h3>
 
-                    <form id="exitIntentForm" class="exit-popup-form">
-                        {% csrf_token %}
-                        <div class="form-group">
-                            <label for="exitName">Name</label>
-                            <input type="text" id="exitName" name="full_name" required placeholder="Full Name">
-                        </div>
-                        <div class="form-group">
-                            <label for="exitEmail">Email</label>
-                            <input type="email" id="exitEmail" name="email" required placeholder="Work Email">
-                            <small id="emailError"
-                                style="color: red; display: none; font-size: 0.85rem; margin-top: 0.25rem;">Please
-                                use a
-                                corporate email address.</small>
-                        </div>
-
-                        <div id="exit-recaptcha"></div>
-
-                        <p class="corporate-email-note">*corporate emails only, please.</p>
-
-                        <button type="submit" class="exit-popup-submit">Get Free Sample Now</button>
-                        <div id="exitFormMessage" style="display:none; margin-top: 10px; font-weight: bold;"></div>
-                    </form>
+            <form id="exitIntentForm" class="exit-popup-form">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="exitName">Name</label>
+                    <input type="text" id="exitName" name="full_name" required placeholder="Full Name">
+                </div>
+                <div class="form-group">
+                    <label for="exitEmail">Email</label>
+                    <input type="email" id="exitEmail" name="email" required placeholder="Work Email">
+                    <small id="emailError"
+                        style="color: red; display: none; font-size: 0.85rem; margin-top: 0.25rem;">Please
+                        use a
+                        corporate email address.</small>
                 </div>
 
-                <div id="popupSuccess" class="success-state" style="display: none;">
-                    <div class="success-icon">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
-                    <h3>Thank You!</h3>
-                    <p>Your sample request has been received.</p>
-                    <p class="success-subtext">Our team will reach out to you shortly with the sample
-                        report.</p>
-                    <button class="exit-popup-close-btn"
-                        onclick="document.getElementById('exitIntentPopup').style.display='none'">Close</button>
-                </div>
-            </div>
+                <div id="exit-recaptcha"></div>
+
+                <p class="corporate-email-note">*corporate emails only, please.</p>
+
+                <button type="submit" class="exit-popup-submit">Get Free Sample Now</button>
+                <div id="exitFormMessage" style="display:none; margin-top: 10px; font-weight: bold;"></div>
+            </form>
         </div>
 
-        <style>
-            .exit-popup-overlay {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.6);
-                /* Slightly darker overlay */
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                z-index: 9999;
-                backdrop-filter: blur(4px);
+        <div id="popupSuccess" class="success-state" style="display: none;">
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h3>Thank You!</h3>
+            <p>Your sample request has been received.</p>
+            <p class="success-subtext">Our team will reach out to you shortly with the sample
+                report.</p>
+            <button class="exit-popup-close-btn"
+                onclick="document.getElementById('exitIntentPopup').style.display='none'">Close</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .exit-popup-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(15, 23, 42, 0.85);
+        /* Deep slate overlay for better focus */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 999999;
+        /* Absolute top priority */
+        backdrop-filter: blur(8px);
+        /* More premium blur */
+        padding: 1rem;
+        /* Padding for small screens */
+    }
+
+    .exit-popup-content {
+        background: white;
+        padding: 0;
+        border-radius: 20px;
+        /* Modern rounded corners */
+        width: 90%;
+        max-width: 520px;
+        /* More focused width */
+        position: relative;
+        box-shadow: 0 30px 60px -12px rgba(1, 32, 111, 0.3);
+        text-align: left;
+        /* Left-aligned text for better readability */
+        overflow: hidden;
+        animation: popupSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .popup-header-accent {
+        height: 6px;
+        background: linear-gradient(90deg, #1e3a8a 0%, #3b82f6 100%);
+        width: 100%;
+    }
+
+    #popupFormContainer,
+    #popupSuccess {
+        padding: 2.5rem;
+    }
+
+    @keyframes popupSlideIn {
+        from {
+            transform: translateY(-20px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .exit-popup-close {
+        position: absolute;
+        top: 1rem;
+        right: 1.5rem;
+        font-size: 2rem;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #94a3b8;
+        line-height: 1;
+        z-index: 10;
+        transition: color 0.2s;
+    }
+
+    .exit-popup-close:hover {
+        color: #1e293b;
+    }
+
+    .exit-popup-title {
+        color: #1e3a8a;
+        font-size: 1.25rem;
+        line-height: 1.3;
+        margin-bottom: 0.5rem;
+        font-weight: 700;
+        padding: 0 0.5rem 1rem;
+        border-bottom: 1px solid #e2e8f0;
+        word-wrap: break-word;
+        text-align: left;
+    }
+
+    .exit-popup-subtitle {
+        color: #475569;
+        font-size: 1.1rem;
+        font-weight: 500;
+        margin-bottom: 2rem;
+        line-height: 1.5;
+        text-align: left;
+    }
+
+    .exit-popup-form .form-group {
+        margin-bottom: 1.25rem;
+    }
+
+    .exit-popup-form label {
+        display: block;
+        margin-bottom: 0.4rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #475569;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        text-align: left;
+    }
+
+    .exit-popup-form input {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        font-size: 1rem;
+        transition: all 0.2s;
+        background: #f8fafc;
+    }
+
+    .exit-popup-form input:focus {
+        outline: none;
+        border-color: #2563eb;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .corporate-email-note {
+        font-size: 0.85rem;
+        color: #64748b;
+        margin-bottom: 1.5rem;
+        font-style: italic;
+        text-align: left;
+    }
+
+    .exit-popup-submit {
+        background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+        color: white;
+        padding: 1rem 2rem;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s;
+        width: 100%;
+        box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.3);
+    }
+
+    .exit-popup-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 25px -5px rgba(37, 99, 235, 0.4);
+    }
+
+    /* Success State Styling */
+    .success-state {
+        text-align: center;
+        padding: 3rem 2rem !important;
+    }
+
+    .success-icon {
+        font-size: 5rem;
+        color: #10b981;
+        margin-bottom: 1.5rem;
+        animation: scaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .success-state h3 {
+        color: #0f172a;
+        font-size: 2rem;
+        font-weight: 800;
+        margin-bottom: 0.75rem;
+    }
+
+    .success-state p {
+        color: #475569;
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .success-subtext {
+        font-size: 1rem;
+        color: #64748b;
+        margin-bottom: 2.5rem !important;
+    }
+
+    .exit-popup-close-btn {
+        background: #f1f5f9;
+        color: #334155;
+        padding: 0.875rem 3rem;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 1rem;
+        transition: all 0.2s;
+    }
+
+    .exit-popup-close-btn:hover {
+        background: #e2e8f0;
+        color: #0f172a;
+    }
+
+    @keyframes scaleIn {
+        from {
+            transform: scale(0);
+            opacity: 0;
+        }
+
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .exit-popup-content {
+            width: 95%;
+            margin: 0 10px;
+        }
+
+        #popupFormContainer {
+            padding: 1.5rem;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const popup = document.getElementById('exitIntentPopup');
+        const closeBtn = document.querySelector('.exit-popup-close');
+        const form = document.getElementById('exitIntentForm');
+        const messageDiv = document.getElementById('exitFormMessage');
+        const successDiv = document.getElementById('popupSuccess');
+        const formContainer = document.getElementById('popupFormContainer');
+        const popupTitle = document.getElementById('exitPopupTitle');
+        const emailInput = document.getElementById('exitEmail');
+        const emailError = document.getElementById('emailError');
+
+        // Truncate Title Logic
+        if (popupTitle) {
+            const originalTitle = popupTitle.innerText;
+            // Split by " Market" (case sensitive usually, but assuming standardized titles)
+            const marketIndex = originalTitle.indexOf(' Market');
+            if (marketIndex !== -1) {
+                // Include " Market" in the result length (7 characters)
+                popupTitle.innerText = originalTitle.substring(0, marketIndex + 7);
             }
+        }
 
-            .exit-popup-content {
-                background: white;
-                padding: 0;
-                /* Removing padding from container to handle border/header better */
-                border-radius: 8px;
-                /* Slightly sharper corners */
-                width: 90%;
-                max-width: 600px;
-                /* Reduced width for focus */
-                position: relative;
-                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-                text-align: left;
-                /* Left align content */
-                overflow: hidden;
-                /* For border radius */
-                animation: popupSlideIn 0.3s ease-out forwards;
+        // Corporate Email Validation Logic
+        const blockedDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'aol.com', 'icloud.com', 'protonmail.com'];
+
+        function isCorporateEmail(email) {
+            if (!email.includes('@')) return false;
+            const domain = email.split('@')[1].toLowerCase();
+            return !blockedDomains.includes(domain);
+        }
+
+        // Use a simple variable instead of localStorage so it resets on every page load
+        let hasShownPopup = false;
+
+        function showPopup() {
+            if (!hasShownPopup) {
+                // Reset form state on new show
+                if (formContainer) formContainer.style.display = 'block';
+                if (successDiv) successDiv.style.display = 'none';
+                popup.style.display = 'flex';
+                hasShownPopup = true;
             }
+        }
 
-            .popup-header-accent {
-                height: 6px;
-                background: linear-gradient(90deg, #1e3a8a 0%, #3b82f6 100%);
-                width: 100%;
+        // Exit Intent Logic (Desktop)
+        document.addEventListener('mouseleave', function (e) {
+            if (e.clientY < 10) {
+                showPopup();
             }
+        });
 
-            #popupFormContainer,
-            #popupSuccess {
-                padding: 2.5rem;
+        // Mobile Triggers (Timer and Scroll)
+        // 1. Timer: Show after 30 seconds
+        setTimeout(showPopup, 30000);
+
+        // 2. Scroll: Show after scrolling 50% of the page
+        window.addEventListener('scroll', function () {
+            const scrollPercentage = (window.scrollY + window.innerHeight) / document.documentElement.scrollHeight * 100;
+            if (scrollPercentage > 50) {
+                showPopup();
             }
+        });
 
-            @keyframes popupSlideIn {
-                from {
-                    transform: translateY(-20px);
-                    opacity: 0;
-                }
+        // Close Logic
+        closeBtn.addEventListener('click', function () {
+            popup.style.display = 'none';
+        });
 
-                to {
-                    transform: translateY(0);
-                    opacity: 1;
-                }
-            }
-
-            .exit-popup-close {
-                position: absolute;
-                top: 1rem;
-                right: 1.5rem;
-                font-size: 2rem;
-                background: none;
-                border: none;
-                cursor: pointer;
-                color: #94a3b8;
-                line-height: 1;
-                z-index: 10;
-                transition: color 0.2s;
-            }
-
-            .exit-popup-close:hover {
-                color: #1e293b;
-            }
-
-            .exit-popup-title {
-                color: #1e3a8a;
-                /* Dark Blue */
-                font-size: 1.15rem;
-                line-height: 1.4;
-                margin-bottom: 0.75rem;
-                font-weight: 600;
-                border-bottom: 2px solid #f1f5f9;
-                padding-bottom: 0.75rem;
-            }
-
-            .exit-popup-subtitle {
-                color: #0f172a;
-                /* Dark text for headline */
-                font-size: 1.35rem;
-                /* Large headline */
-                font-weight: 800;
-                margin-bottom: 1.5rem;
-                letter-spacing: -0.02em;
-            }
-
-            .exit-popup-form .form-group {
-                margin-bottom: 1.25rem;
-            }
-
-            .exit-popup-form label {
-                display: block;
-                margin-bottom: 0.4rem;
-                font-weight: 600;
-                font-size: 0.9rem;
-                color: #475569;
-                text-transform: uppercase;
-                letter-spacing: 0.05em;
-            }
-
-            .exit-popup-form input {
-                width: 100%;
-                padding: 0.875rem 1rem;
-                border: 1px solid #cbd5e1;
-                border-radius: 6px;
-                font-size: 1rem;
-                transition: all 0.2s;
-                background: #f8fafc;
-            }
-
-            .exit-popup-form input:focus {
-                outline: none;
-                border-color: #2563eb;
-                background: white;
-                box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-            }
-
-            .corporate-email-note {
-                font-size: 0.85rem;
-                color: #64748b;
-                margin-bottom: 1.5rem;
-                font-style: italic;
-            }
-
-            .exit-popup-submit {
-                background: #2563eb;
-                /* Brand Blue */
-                color: white;
-                padding: 1rem 2rem;
-                border: none;
-                border-radius: 6px;
-                font-size: 1.1rem;
-                font-weight: 700;
-                cursor: pointer;
-                transition: background-color 0.2s;
-                width: 100%;
-                text-transform: uppercase;
-                letter-spacing: 0.025em;
-            }
-
-            .exit-popup-submit:hover {
-                background: #1d4ed8;
-            }
-
-            /* Success State Styling */
-            .success-state {
-                text-align: center;
-                padding: 3rem 2rem !important;
-            }
-
-            .success-icon {
-                font-size: 5rem;
-                color: #10b981;
-                margin-bottom: 1.5rem;
-                animation: scaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            }
-
-            .success-state h3 {
-                color: #0f172a;
-                font-size: 2rem;
-                font-weight: 800;
-                margin-bottom: 0.75rem;
-            }
-
-            .success-state p {
-                color: #475569;
-                font-size: 1.1rem;
-                margin-bottom: 0.5rem;
-            }
-
-            .success-subtext {
-                font-size: 1rem;
-                color: #64748b;
-                margin-bottom: 2.5rem !important;
-            }
-
-            .exit-popup-close-btn {
-                background: #f1f5f9;
-                color: #334155;
-                padding: 0.875rem 3rem;
-                border: none;
-                border-radius: 6px;
-                cursor: pointer;
-                font-weight: 700;
-                font-size: 1rem;
-                transition: all 0.2s;
-            }
-
-            .exit-popup-close-btn:hover {
-                background: #e2e8f0;
-                color: #0f172a;
-            }
-
-            @keyframes scaleIn {
-                from {
-                    transform: scale(0);
-                    opacity: 0;
-                }
-
-                to {
-                    transform: scale(1);
-                    opacity: 1;
-                }
-            }
-
-            @media (max-width: 640px) {
-                .exit-popup-content {
-                    width: 95%;
-                    margin: 0 10px;
-                }
-
-                #popupFormContainer {
-                    padding: 1.5rem;
-                }
-            }
-        </style>
-
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const popup = document.getElementById('exitIntentPopup');
-                const closeBtn = document.querySelector('.exit-popup-close');
-                const form = document.getElementById('exitIntentForm');
-                const messageDiv = document.getElementById('exitFormMessage');
-                const successDiv = document.getElementById('popupSuccess');
-                const formContainer = document.getElementById('popupFormContainer');
-                const popupTitle = document.getElementById('exitPopupTitle');
-                const emailInput = document.getElementById('exitEmail');
-                const emailError = document.getElementById('emailError');
-
-                // Truncate Title Logic
-                if (popupTitle) {
-                    const originalTitle = popupTitle.innerText;
-                    // Split by " Market" (case sensitive usually, but assuming standardized titles)
-                    const marketIndex = originalTitle.indexOf(' Market');
-                    if (marketIndex !== -1) {
-                        // Include " Market" in the result length (7 characters)
-                        popupTitle.innerText = originalTitle.substring(0, marketIndex + 7);
-                    }
-                }
-
-                // Corporate Email Validation Logic
-                const blockedDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'aol.com', 'icloud.com', 'protonmail.com'];
-
-                function isCorporateEmail(email) {
-                    if (!email.includes('@')) return false;
-                    const domain = email.split('@')[1].toLowerCase();
-                    return !blockedDomains.includes(domain);
-                }
-
-                // Use a simple variable instead of localStorage so it resets on every page load
-                let hasShownPopup = false;
-
-                // Exit Intent Logic
-                document.addEventListener('mouseleave', function (e) {
-                    if (e.clientY < 10) {
-                        if (!hasShownPopup) {
-                            // Reset form state on new show
-                            formContainer.style.display = 'block';
-                            successDiv.style.display = 'none';
-                            popup.style.display = 'flex';
-                            hasShownPopup = true;
-                        }
-                    }
-                });
-
-                // Close Logic
-                closeBtn.addEventListener('click', function () {
-                    popup.style.display = 'none';
-                });
-
-                // Allow closing success screen
-                const successClose = document.querySelector('.exit-popup-close-btn');
-                if (successClose) {
-                    successClose.addEventListener('click', function () {
-                        popup.style.display = 'none';
-                    });
-                }
-
-                popup.addEventListener('click', function (e) {
-                    if (e.target === popup) {
-                        popup.style.display = 'none';
-                    }
-                });
-
-                // Form Submission
-                form.addEventListener('submit', function (e) {
-                    e.preventDefault();
-
-                    const email = emailInput.value;
-                    if (!isCorporateEmail(email)) {
-                        emailError.style.display = 'block';
-                        emailInput.style.borderColor = 'red';
-                        emailInput.focus();
-                        return;
-                    } else {
-                        emailError.style.display = 'none';
-                        emailInput.style.borderColor = '#cbd5e1';
-                    }
-
-                    const formData = new FormData(form);
-
-                    // Disable button
-                    const btn = form.querySelector('button[type="submit"]');
-                    const originalText = btn.innerText;
-                    btn.disabled = true;
-                    btn.innerText = 'Sending...';
-
-                    if (typeof exitIntentWidgetId !== 'undefined') {
-                        grecaptcha.execute(exitIntentWidgetId);
-                    } else {
-                        console.error("Recaptcha not loaded yet");
-                        alert("Please wait for security check to load.");
-                        btn.disabled = false;
-                        btn.innerText = originalText;
-                    }
-                });
-
-                // Clear error on input
-                emailInput.addEventListener('input', function () {
-                    emailError.style.display = 'none';
-                    this.style.borderColor = '#cbd5e1';
-                });
+        // Allow closing success screen
+        const successClose = document.querySelector('.exit-popup-close-btn');
+        if (successClose) {
+            successClose.addEventListener('click', function () {
+                popup.style.display = 'none';
             });
-        </script>
-        {% endblock %}
+        }
+
+        popup.addEventListener('click', function (e) {
+            if (e.target === popup) {
+                popup.style.display = 'none';
+            }
+        });
+
+        // Form Submission
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const email = emailInput.value;
+            if (!isCorporateEmail(email)) {
+                emailError.style.display = 'block';
+                emailInput.style.borderColor = 'red';
+                emailInput.focus();
+                return;
+            } else {
+                emailError.style.display = 'none';
+                emailInput.style.borderColor = '#cbd5e1';
+            }
+
+            const formData = new FormData(form);
+
+            // Disable button
+            const btn = form.querySelector('button[type="submit"]');
+            const originalText = btn.innerText;
+            btn.disabled = true;
+            btn.innerText = 'Sending...';
+
+            if (typeof exitIntentWidgetId !== 'undefined') {
+                grecaptcha.execute(exitIntentWidgetId);
+            } else {
+                console.error("Recaptcha not loaded yet");
+                alert("Please wait for security check to load.");
+                btn.disabled = false;
+                btn.innerText = originalText;
+            }
+        });
+
+        // Clear error on input
+        emailInput.addEventListener('input', function () {
+            emailError.style.display = 'none';
+            this.style.borderColor = '#cbd5e1';
+        });
+    });
+</script>
+{% endblock %}

@@ -25,35 +25,46 @@ def format_faqs(faq_content):
     if not faq_content:
         return ''
     
-    # Extract all <p> tags
-    paragraphs = re.findall(r'<p>(.*?)</p>', faq_content, re.DOTALL)
+    # Extract all tags (p, h1-h6, li)
+    paragraphs = re.findall(r'<(p|h[1-6]|li)>(.*?)</\1>', faq_content, re.DOTALL)
     
     if not paragraphs:
-        return faq_content
+        # Fallback: if no tags found, try to split by double newlines or just return content
+        return mark_safe(faq_content)
     
     # Build FAQ cards
     faq_cards = []
     i = 0
     while i < len(paragraphs):
-        para = paragraphs[i].strip()
+        tag, para = paragraphs[i]
+        para = para.strip()
         
         # Skip empty paragraphs
         if not para:
             i += 1
             continue
         
-        # Check if this looks like a question (short, no period at end, or ends with ?)
-        # Questions are typically shorter and don't have long explanatory text
+        # Check if this looks like a question
+        # 1. It's a heading tag (h1-h6)
+        # 2. It's short and doesn't end with a period
+        # 3. It ends with a question mark
+        # 4. It starts with "Q:" or "Question:"
         is_question = (
-            len(para) < 200 and 
-            (not para.endswith('.') or para.endswith('?') or 
-             any(keyword in para.lower() for keyword in ['what', 'why', 'how', 'which', 'who', 'when', 'where']))
+            tag.startswith('h') or
+            (len(para) < 250 and (not para.endswith('.') or para.endswith('?'))) or
+            any(keyword in para.lower() for keyword in ['what', 'why', 'how', 'which', 'who', 'when', 'where', 'faq', 'question']) or
+            re.match(r'^(Q|Question|Q\d+)\s*:', para, re.IGNORECASE)
         )
         
         if is_question and i + 1 < len(paragraphs):
-            # This is a question, next paragraph is the answer
+            # This is a question, use next paragraph as answer
             question = para
-            answer = paragraphs[i + 1].strip()
+            _, answer = paragraphs[i + 1]
+            answer = answer.strip()
+            
+            # Clean up "Q:" or "A:" prefixes if present
+            question = re.sub(r'^(Q|Question|Q\d+)\s*:\s*', '', question, flags=re.IGNORECASE)
+            answer = re.sub(r'^(A|Answer|Ans)\s*:\s*', '', answer, flags=re.IGNORECASE)
             
             faq_card = f'''<div class="faq-item">
     <div class="faq-question">{question}</div>
@@ -62,7 +73,7 @@ def format_faqs(faq_content):
             faq_cards.append(faq_card)
             i += 2  # Skip both question and answer
         else:
-            # Not a Q&A pair, just render as-is in a card
+            # Not a clear Q&A pair, render as answer/text in a card
             faq_card = f'''<div class="faq-item">
     <div class="faq-answer">{para}</div>
 </div>'''
@@ -170,48 +181,41 @@ def format_market_coverage(content):
     is_first = True
     
     for item in items:
-        # Remove markdown bold/italics for processing but keep some HTML if we trust it
         clean_item = re.sub(r'<(?!strong|b|em|i)[^>]+>', '', item).strip()
         if not clean_item: continue
 
-        # Detect separator (prefer | then :)
         sep = '|' if '|' in clean_item else ':' if ':' in clean_item else None
         
         if sep:
             parts = clean_item.split(sep, 1)
             key = parts[0].strip()
-            # Remove styling from key for a clean look
             key_clean = re.sub(r'<[^>]+>', '', key)
             value = parts[1].strip()
             
             if is_first and (key_clean.lower() == 'parameter' or key_clean.lower() == 'details'):
-                # Header row styling
+                # Header row styling - Simple Gray
                 rows.append(f'''
-                <tr style="background: #1e3a8a; color: white;">
-                    <th style="padding: 1.25rem 1.5rem; font-weight: 700; border-right: 1px solid rgba(255,255,255,0.1); width: 40%; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.05em;">{key_clean}</th>
-                    <th style="padding: 1.25rem 1.5rem; font-weight: 700; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.05em;">{value}</th>
+                <tr style="background: #1e3a8a; border-bottom: 2px solid #1e3a8a;">
+                    <th style="padding: 1rem 1.25rem; font-weight: 700; color: #ffffff; width: 40%; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em; font-family: 'Outfit', sans-serif;">{key_clean}</th>
+                    <th style="padding: 1rem 1.25rem; font-weight: 700; color: #ffffff; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em; font-family: 'Outfit', sans-serif;">{value}</th>
                 </tr>''')
                 is_first = False
                 continue
 
-            # Alternate row backgrounds
-            bg_color = "#ffffff" # Transparent or white
-            
             rows.append(f'''
-            <tr style="border-bottom: 2px solid #f8fafc; transition: all 0.2s ease;">
-                <td style="padding: 1.25rem 1.5rem; font-weight: 700; color: #1e3a8a; background: #fbfcfe; width: 38%; font-size: 0.95rem;">
+            <tr style="border-bottom: 1px solid #e2e8f0;">
+                <td style="padding: 1rem 1.25rem; font-weight: 600; color: #1e3a8a; background: #ffffff; width: 40%; font-size: 0.95rem; font-family: 'Outfit', sans-serif;">
                     {key_clean}
                 </td>
-                <td style="padding: 1.25rem 1.5rem; color: #334155; font-size: 0.95rem; line-height: 1.6; background: #ffffff;">
+                <td style="padding: 1rem 1.25rem; color: #334155; font-size: 0.95rem; line-height: 1.5; background: #ffffff; font-family: 'Outfit', sans-serif;">
                     {value}
                 </td>
             </tr>''')
             is_first = False
         else:
-            # Full width row for descriptive lines
             rows.append(f'''
             <tr style="border-bottom: 1px solid #f1f5f9;">
-                <td colspan="2" style="padding: 1.1rem 1.5rem; color: #64748b; font-style: italic; background: #fefeff; font-size: 0.9rem;">
+                <td colspan="2" style="padding: 1.1rem 1.5rem; color: #64748b; font-style: italic; background: #f8fafc; font-size: 0.95rem; font-family: 'Outfit', sans-serif;">
                     {clean_item}
                 </td>
             </tr>''')
@@ -220,18 +224,13 @@ def format_market_coverage(content):
         return mark_safe(content)
         
     table_html = f'''
-    <div class="market-coverage-wrapper" style="margin: 2.5rem 0; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02); background: white;">
+    <div class="market-coverage-wrapper" style="margin: 1rem 0 2rem 0; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; background: white;">
         <table style="width: 100%; border-collapse: collapse; text-align: left;">
             <tbody>
                 {''.join(rows)}
             </tbody>
         </table>
     </div>
-    <style>
-        .market-coverage-wrapper tr:hover {{
-            background-color: #f0f7ff !important;
-        }}
-    </style>
     '''
     return mark_safe(table_html)
 

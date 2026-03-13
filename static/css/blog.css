@@ -62,18 +62,20 @@
 /* Content Box overlaps the header */
 .blog-content-container {
     max-width: 900px;
-    margin: 30px auto 0;
-    /* Positive margin for gap between header and image */
+    margin: 4.5rem auto 0;
+    /* Balanced gap between header and image */
     position: relative;
     z-index: 10;
     padding: 0 1rem;
 }
 
 .blog-featured-image {
-    width: 50%;
+    width: 100%;
     display: block;
-    margin: 0 auto 3rem;
-    height: 500px;
+    margin: 0 auto 4.5rem;
+    height: auto;
+    max-height: 600px;
+    object-fit: cover;
     /* Removed max-height/object-fit to show full original image */
     border-radius: 16px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
@@ -168,7 +170,7 @@
     }
 
     .blog-content-container {
-        margin-top: 20px;
+        margin-top: 2.5rem;
     }
 
     .blog-article-body {
@@ -177,7 +179,8 @@
     }
 
     .blog-featured-image {
-        max-height: 300px;
+        max-height: 350px;
+        margin-bottom: 2.5rem;
     }
 }
 

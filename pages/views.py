@@ -112,3 +112,48 @@ class ResearchDisclaimersView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['meta_title'] = 'Research Disclaimers & Citations - Markets NXT'
         return context
+
+class PricingView(TemplateView):
+    template_name = 'pages/pricing.html'
+    
+    def get_context_data(self, **kwargs):
+        from reports.models import Report
+        from django.db.models import Avg
+        context = super().get_context_data(**kwargs)
+        
+        # Get actual averages from the database
+        global_stats = Report.objects.filter(region__icontains='Global').aggregate(
+            single=Avg('single_user_price'),
+            multi=Avg('multi_user_price'),
+            enterprise=Avg('enterprise_price'),
+            datapack=Avg('data_pack_price')
+        )
+        
+        country_stats = Report.objects.exclude(region__icontains='Global').aggregate(
+            single=Avg('single_user_price'),
+            multi=Avg('multi_user_price'),
+            enterprise=Avg('enterprise_price'),
+            datapack=Avg('data_pack_price')
+        )
+        
+        # Default fallbacks only if no data exists
+        context['global_prices'] = {
+            'single': int(global_stats['single'] or 4550),
+            'multi': int(global_stats['multi'] or 5450),
+            'enterprise': int(global_stats['enterprise'] or 6950),
+            'datapack': int(global_stats['datapack'] or 3150)
+        }
+        
+        context['country_prices'] = {
+            'single': int(country_stats['single'] or 1850),
+            'multi': int(country_stats['multi'] or 2450),
+            'enterprise': int(country_stats['enterprise'] or 3150),
+            'datapack': int(country_stats['datapack'] or 1050)
+        }
+        
+        # We'll pass global_prices as 'prices' for the initial load
+        context['prices'] = context['global_prices']
+        
+        context['meta_title'] = 'Pricing & Licensing Options - Markets NXT'
+        context['meta_description'] = 'Explore flexible licensing options for Markets NXT research reports including Single User, Multi-User, and Enterprise licenses.'
+        return context

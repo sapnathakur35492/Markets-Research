@@ -19,4 +19,5 @@ urlpatterns = [
     path('disclaimer/', views.DisclaimerView.as_view(), name='disclaimer'),
     path('governance/', views.GovernanceView.as_view(), name='governance'),
     path('research-disclaimers/', views.ResearchDisclaimersView.as_view(), name='research_disclaimers'),
+    path('pricing/', views.PricingView.as_view(), name='pricing'),
 ]

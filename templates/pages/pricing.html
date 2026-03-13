@@ -1,0 +1,429 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ meta_title }}{% endblock %}
+
+{% block extra_head %}
+<style>
+    :root {
+        --pricing-primary: #01206f;
+        --pricing-secondary: #00c2cb;
+        --pricing-accent: #f97316;
+        --pricing-bg: #f0f9ff;
+        --card-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    .pricing-hero {
+        background: radial-gradient(circle at top right, #f0f9ff, #e0f2fe);
+        padding: 4rem 0 3rem;
+        text-align: center;
+    }
+
+    .pricing-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--pricing-primary);
+        margin-bottom: 1rem;
+        letter-spacing: -0.02em;
+    }
+
+    .pricing-subtitle {
+        font-size: 1.1rem;
+        color: #475569;
+        max-width: 800px;
+        margin: 0 auto 2.5rem;
+        line-height: 1.6;
+    }
+
+    /* License Toggle */
+    .pricing-toggle-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 4rem;
+    }
+
+    .pricing-toggle {
+        background: white;
+        padding: 6px;
+        border-radius: 99px;
+        display: flex;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e2e8f0;
+    }
+
+    .toggle-btn {
+        padding: 10px 24px;
+        border-radius: 99px;
+        font-weight: 700;
+        font-size: 1.05rem;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: none;
+        background: transparent;
+        color: #64748b;
+    }
+
+    .toggle-btn.active {
+        background: var(--pricing-secondary);
+        color: white;
+        box-shadow: 0 4px 12px rgba(0, 194, 203, 0.3);
+    }
+
+    /* Pricing Grid */
+    .pricing-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+        margin-bottom: 5rem;
+    }
+
+    .pricing-card {
+        background: white;
+        border-radius: 20px;
+        padding: 1rem 0.75rem;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    }
+
+    .pricing-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        border-color: transparent;
+        background: linear-gradient(135deg, #00C696 0%, #2367B1 100%);
+    }
+
+    .pricing-card:hover .card-title,
+    .pricing-card:hover .price-currency,
+    .pricing-card:hover .price-amount,
+    .pricing-card:hover .card-features li,
+    .pricing-card:hover .card-features li i,
+    .pricing-card:hover p {
+        color: white !important;
+    }
+
+    .pricing-card:hover .card-action-btn.btn-buy-now {
+        background: white;
+        color: var(--pricing-primary);
+    }
+
+    .pricing-card:hover .card-popular-badge {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .card-popular-badge {
+        position: absolute;
+        top: 15px;
+        right: -10px;
+        background: var(--pricing-primary);
+        color: white;
+        padding: 4px 10px;
+        font-size: 0.6rem;
+        font-weight: 800;
+        border-radius: 4px;
+        transform: rotate(45deg);
+        box-shadow: 0 4px 10px rgba(1, 32, 111, 0.3);
+        z-index: 10;
+        text-transform: uppercase;
+        white-space: nowrap;
+        transition: all 0.3s;
+    }
+
+    .card-title {
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 0.25rem;
+        transition: color 0.3s;
+    }
+
+    .card-price-container {
+        margin: 0.25rem 0 0.75rem;
+        display: flex;
+        align-items: baseline;
+        gap: 2px;
+    }
+
+    .price-currency {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--pricing-primary);
+        transition: color 0.3s;
+    }
+
+    .price-amount {
+        font-size: 2.75rem;
+        font-weight: 800;
+        color: var(--pricing-primary);
+        letter-spacing: -0.05em;
+        transition: color 0.3s;
+    }
+
+    .card-features {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 1rem;
+        flex-grow: 1;
+    }
+
+    .card-features li {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 0.75rem;
+        font-size: 0.9rem;
+        color: #334155;
+        line-height: 1.4;
+        text-align: left;
+        transition: color 0.3s;
+    }
+
+    .card-features li i {
+        color: #10b981;
+        font-size: 1rem;
+        margin-top: 3px;
+        flex-shrink: 0;
+        transition: color 0.3s;
+    }
+
+    .card-action-btn {
+        width: 100%;
+        padding: 10px;
+        border-radius: 10px;
+        font-weight: 700;
+        text-align: center;
+        text-decoration: none;
+        transition: all 0.3s;
+        font-size: 0.95rem;
+        display: block;
+        border: none;
+        cursor: pointer;
+        margin-bottom: 0.25rem;
+    }
+
+    .btn-buy-now {
+        background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+        color: white;
+    }
+
+    .btn-buy-now:hover {
+        background: linear-gradient(135deg, #22d3ee 0%, #06b6d4 100%);
+        transform: scale(1.02);
+    }
+
+    /* Help Section */
+    .help-banner {
+        background: linear-gradient(135deg, #01206f 0%, #000428 100%);
+        border-radius: 20px;
+        padding: 3rem;
+        color: white;
+        text-align: center;
+        margin-bottom: 5rem;
+        box-shadow: 0 10px 30px rgba(1, 32, 111, 0.2);
+    }
+
+    .help-banner h2 {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    .help-banner p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        max-width: 600px;
+        margin: 0 auto 2rem;
+    }
+
+    .btn-help-contact {
+        display: inline-block;
+        background: #00c2cb;
+        color: white;
+        padding: 12px 35px;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 700;
+        transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(0, 194, 203, 0.4);
+    }
+
+    .btn-help-contact:hover {
+        background: #00e5f0;
+        transform: translateY(-2px);
+    }
+
+    @media (max-width: 1200px) {
+        .pricing-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .pricing-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hidden data for JavaScript -->
+<div id="pricing-data" style="display: none;" data-g-s="{{ global_prices.single }}" data-g-m="{{ global_prices.multi }}"
+    data-g-e="{{ global_prices.enterprise }}" data-g-d="{{ global_prices.datapack }}"
+    data-c-s="{{ country_prices.single }}" data-c-m="{{ country_prices.multi }}"
+    data-c-e="{{ country_prices.enterprise }}" data-c-d="{{ country_prices.datapack }}">
+</div>
+
+<section class="pricing-hero">
+    <div class="container">
+        <div
+            style="margin-bottom: 1rem; font-weight: 700; color: var(--pricing-secondary); text-transform: uppercase; letter-spacing: 2px;">
+            Pricing & Plans
+        </div>
+        <h1 class="pricing-title">Report Access & Licensing Options</h1>
+        <p class="pricing-subtitle">
+            Choose the access plan that fits your team. All reports are available at <strong>global, regional, and
+                country</strong> level.
+        </p>
+
+        <!-- Category Toggle -->
+        <div class="pricing-toggle-container">
+            <div class="pricing-toggle">
+                <button class="toggle-btn active" onclick="updatePricing('global', this)">Global</button>
+                <button class="toggle-btn" onclick="updatePricing('country', this)">Country (-60%)</button>
+            </div>
+        </div>
+
+        <div class="pricing-grid">
+            <!-- Single User -->
+            <div class="pricing-card">
+                <h2 class="card-title">Single User License</h2>
+                <p
+                    style="font-size: 0.9rem; color: #64748b; text-align: left; margin-bottom: 0.5rem; line-height: 1.4; transition: color 0.3s;">
+                    Designed for individual researchers and analysts who need exclusive personal access to a report.
+                </p>
+                <div class="card-price-container">
+                    <span class="price-currency">$</span>
+                    <span class="price-amount" id="price-single">{{ prices.single|floatformat:0 }}</span>
+                </div>
+                <ul class="card-features">
+                    <li><i class="fas fa-check-circle"></i> Access limited to one named user</li>
+                    <li><i class="fas fa-check-circle"></i> Report delivered in PDF format</li>
+                    <li><i class="fas fa-check-circle"></i> Includes up to 10% customisation on report content</li>
+                    <li><i class="fas fa-check-circle"></i> 15 days of complimentary analyst support post-purchase</li>
+                </ul>
+                <a href="{% url 'pages:contact' %}" class="card-action-btn btn-buy-now">Contact our team</a>
+            </div>
+
+            <!-- Multi User -->
+            <div class="pricing-card" style="border-color: var(--pricing-secondary); border-width: 2px;">
+                <div class="card-popular-badge" style="top: 10px; right: -12px;">⭐ Most Popular</div>
+                <h2 class="card-title" style="padding-right: 2rem; font-size: 1.25rem;">Multi-User License</h2>
+                <p
+                    style="font-size: 0.9rem; color: #64748b; text-align: left; margin-bottom: 0.5rem; line-height: 1.4; transition: color 0.3s;">
+                    Ideal for teams and departments that need to collaborate around shared market intelligence.
+                </p>
+                <div class="card-price-container">
+                    <span class="price-currency">$</span>
+                    <span class="price-amount" id="price-multi">{{ prices.multi|floatformat:0 }}</span>
+                </div>
+                <ul class="card-features">
+                    <li><i class="fas fa-check-circle"></i> Access extended to up to 5 users</li>
+                    <li><i class="fas fa-check-circle"></i> Report delivered in PDF and Excel formats</li>
+                    <li><i class="fas fa-check-circle"></i> Includes up to 20% customisation on report content</li>
+                    <li><i class="fas fa-check-circle"></i> 30 days of complimentary analyst support post-purchase</li>
+                </ul>
+                <a href="{% url 'pages:contact' %}" class="card-action-btn btn-buy-now">Contact our team</a>
+            </div>
+
+            <!-- Enterprise -->
+            <div class="pricing-card">
+                <h2 class="card-title">Enterprise License</h2>
+                <p
+                    style="font-size: 0.9rem; color: #64748b; text-align: left; margin-bottom: 0.5rem; line-height: 1.4; transition: color 0.3s;">
+                    Built for organisations that require unrestricted internal access and the highest degree of report
+                    flexibility.
+                </p>
+                <div class="card-price-container">
+                    <span class="price-currency">$</span>
+                    <span class="price-amount" id="price-enterprise">{{ prices.enterprise|floatformat:0 }}</span>
+                </div>
+                <ul class="card-features">
+                    <li><i class="fas fa-check-circle"></i> Unlimited users across your organisation</li>
+                    <li><i class="fas fa-check-circle"></i> Report delivered in PDF and Excel formats</li>
+                    <li><i class="fas fa-check-circle"></i> Includes up to 30% customisation on report content</li>
+                    <li><i class="fas fa-check-circle"></i> 45 days of complimentary analyst support post-purchase</li>
+                </ul>
+                <a href="{% url 'pages:contact' %}" class="card-action-btn btn-buy-now">Contact our team</a>
+            </div>
+
+            <!-- Data Pack -->
+            <div class="pricing-card">
+                <h2 class="card-title">Data Pack</h2>
+                <p
+                    style="font-size: 0.9rem; color: #64748b; text-align: left; margin-bottom: 0.5rem; line-height: 1.4;">
+                    For clients who need the underlying data sets without the full report narrative — ideal for
+                    modelling, benchmarking, and internal analysis workflows.
+                </p>
+                <div class="card-price-container">
+                    <span class="price-currency">$</span>
+                    <span class="price-amount" id="price-datapack">{{ prices.datapack|floatformat:0 }}</span>
+                </div>
+                <ul class="card-features">
+                    <li><i class="fas fa-check-circle"></i> Raw quantitative data sets (Excel)</li>
+                    <li><i class="fas fa-check-circle"></i> Detailed market sizing and forecasts</li>
+                    <li><i class="fas fa-check-circle"></i> Market share analysis figures</li>
+                    <li><i class="fas fa-check-circle"></i> Growth analysis data points</li>
+                </ul>
+                <a href="{% url 'pages:contact' %}" class="card-action-btn btn-buy-now">Contact our team</a>
+            </div>
+        </div>
+
+        <!-- Help Banner -->
+        <div class="help-banner">
+            <h2>Not sure which license fits your needs?</h2>
+            <p>Contact our sales team and we'll help you find the right option.</p>
+            <a href="{% url 'pages:contact' %}" class="btn-help-contact">Contact Us</a>
+        </div>
+    </div>
+</section>
+
+<script>
+    (function () {
+        const data = document.getElementById('pricing-data').dataset;
+        const pricesMap = {
+            global: {
+                single: data.gS,
+                multi: data.gM,
+                enterprise: data.gE,
+                datapack: data.gD
+            },
+            country: {
+                single: data.cS,
+                multi: data.cM,
+                enterprise: data.cE,
+                datapack: data.cD
+            }
+        };
+
+        window.updatePricing = function (type, btn) {
+            const p = pricesMap[type];
+            if (!p) return;
+
+            document.getElementById('price-single').innerText = Number(p.single).toLocaleString();
+            document.getElementById('price-multi').innerText = Number(p.multi).toLocaleString();
+            document.getElementById('price-enterprise').innerText = Number(p.enterprise).toLocaleString();
+            document.getElementById('price-datapack').innerText = Number(p.datapack).toLocaleString();
+
+            document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        };
+    })();
+</script>
+{% endblock %}

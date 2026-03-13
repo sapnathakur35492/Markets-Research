@@ -1,11 +1,8 @@
 {% extends 'admin/change_list.html' %}
 
 {% block object-tools %}
-<div>
-    <form action="import-excel/" method="POST">
-        {% csrf_token %}
-        <a href="import-excel/" class="addlink">Import Reports via Excel</a>
-    </form>
+<div style="margin-bottom: 10px;">
+    <a href="import-excel/" class="addlink">Import Reports via Excel</a>
 </div>
 {{ block.super }}
 {% endblock %}

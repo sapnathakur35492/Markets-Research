@@ -60,20 +60,55 @@
 
     .vmr-cat-link {
         display: block;
-        padding: 0.75rem 0.5rem;
-        color: #64748b;
+        padding: 0.75rem 1rem;
+        color: #475569;
         text-decoration: none;
         font-size: 0.95rem;
-        border-bottom: 1px solid #f1f5f9;
-        transition: 0.2s;
+        transition: 0.3s;
+        border-radius: 4px;
+        margin-bottom: 2px;
+        font-weight: 500;
+        border-left: 3px solid transparent;
     }
 
-    .vmr-cat-link:hover,
+    .vmr-cat-link:hover {
+        color: #2563eb;
+        background-color: #eff6ff;
+        transform: translateX(5px);
+    }
+
     .vmr-cat-link.active {
         color: #2563eb;
-        background-color: #f8fafc;
+        background-color: #eff6ff;
+        border-left: 3px solid #2563eb;
+        font-weight: 700;
         transform: translateX(5px);
-        font-weight: 600;
+    }
+
+    /* Custom Scrollbar for Country List */
+    .country-nav-scroll {
+        max-height: 250px;
+        overflow-y: auto;
+        margin-bottom: 2rem;
+        padding-right: 5px;
+    }
+
+    .country-nav-scroll::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .country-nav-scroll::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 10px;
+    }
+
+    .country-nav-scroll::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 10px;
+    }
+
+    .country-nav-scroll::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
     }
 
     /* Mobile Category Filter (Hidden on Desktop) */
@@ -411,7 +446,38 @@
     <!-- Sidebar (Desktop) -->
     <aside class="vmr-sidebar">
         <div class="vmr-sticky-content">
-            <h3>Browse by Categories</h3>
+            <h3
+                style="margin-bottom: 1rem; color: #1e40af; border-bottom: 2px solid #bfdbfe; padding-bottom: 5px; font-size: 1rem; display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-globe-americas"></i> Browse by Country
+            </h3>
+
+            <!-- Sidebar Country Search -->
+            <div style="margin-bottom: 12px; position: relative; padding: 0 5px;">
+                <input type="text" id="sidebarCountrySearch" onkeyup="filterSidebarCountries()"
+                    placeholder="Search country..."
+                    style="width: 100%; padding: 8px 10px 8px 30px; border: 1px solid #bfdbfe; border-radius: 4px; font-size: 0.85rem; outline: none; background: #fff;">
+                <i class="fas fa-search"
+                    style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 0.8rem;"></i>
+            </div>
+
+            <nav class="country-nav-scroll" id="sidebarCountryList">
+                <a href="{% url 'country-reports' %}"
+                    class="vmr-cat-link {% if not selected_country %}active{% endif %}" data-country="all">
+                    All Countries
+                </a>
+                {% for country in available_countries %}
+                <a href="{% url 'country-reports' %}?country={{ country }}{% if current_category %}&category={{ current_category }}{% endif %}"
+                    class="vmr-cat-link {% if selected_country == country %}active{% endif %}"
+                    data-country="{{ country|lower }}">
+                    {{ country }}
+                </a>
+                {% endfor %}
+            </nav>
+
+            <h3
+                style="margin-bottom: 1rem; color: #1e40af; border-bottom: 2px solid #bfdbfe; padding-bottom: 5px; font-size: 1rem; display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-th-large"></i> Browse by Categories
+            </h3>
             <nav>
                 <a href="{% url 'report-list' %}" class="vmr-cat-link {% if not current_category %}active{% endif %}">
                     All Categories
@@ -444,7 +510,88 @@
 
         <!-- Header / Search -->
         <div class="vmr-header">
-            {% if current_category %}
+            {% if is_country_reports %}
+            <h2 style="font-size: 1.8rem; margin-bottom: 0.3rem; color: #000; font-weight: 800;">Country Reports —
+                Market Intelligence by Geography</h2>
+            <p style="font-weight: 700; color: #475569; margin-bottom: 1.5rem; font-size: 1.1rem;">Markets NXT — A
+                Montclaire & Stein Venture</p>
+
+            <!-- Scrollable Context Section -->
+            <div class="context-scroll-container"
+                style="max-height: 220px; overflow-y: auto; background: rgba(255, 255, 255, 0.6); padding: 1.25rem; border-radius: 8px; border: 1px solid #bfdbfe; margin-bottom: 1.5rem; position: relative; scrollbar-width: thin; scrollbar-color: #bfdbfe transparent;">
+                <div class="country-content-section" style="color: #334155; line-height: 1.7; text-align: justify;">
+                    <h2
+                        style="font-size: 1.3rem; color: #000; font-weight: 700; margin-top: 0; margin-bottom: 0.75rem;">
+                        A Century of Global Intelligence Behind Every Report</h2>
+                    <p style="margin-bottom: 1.2rem;">Markets NXT builds on a legacy dating to the early 1900s, when
+                        economists Edgar Montclaire and Johann Stein began advising enterprises across Europe and North
+                        America on industrial expansion and globalization. Over more than a century, Montclaire & Stein
+                        accumulated institutional knowledge spanning economic intelligence and market dynamics across
+                        geographies — forming the analytical foundation behind every report we publish today.</p>
+
+                    <h2
+                        style="font-size: 1.3rem; color: #000; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.75rem;">
+                        Why Country-Level Intelligence Matters</h2>
+                    <p style="margin-bottom: 0.8rem;">Global markets are not uniform. Regulatory environments, consumer
+                        behavior, industrial composition, and competitive dynamics differ significantly by country.
+                        Country-specific research helps businesses:</p>
+                    <ul
+                        style="margin-left: 1.5rem; margin-bottom: 1.2rem; display: flex; flex-direction: column; gap: 5px;">
+                        <li><i class="fas fa-check-circle" style="color: #475569; margin-right: 8px;"></i> Accurately
+                            size and forecast a market within a defined geography</li>
+                        <li><i class="fas fa-check-circle" style="color: #475569; margin-right: 8px;"></i> Understand
+                            local demand drivers, supply chains, and competition</li>
+                        <li><i class="fas fa-check-circle" style="color: #475569; margin-right: 8px;"></i> Navigate
+                            country-specific regulatory and policy frameworks</li>
+                        <li><i class="fas fa-check-circle" style="color: #475569; margin-right: 8px;"></i> Identify
+                            entry points, opportunities, and risk factors at a national level</li>
+                    </ul>
+
+                    <h2
+                        style="font-size: 1.3rem; color: #000; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.75rem;">
+                        What Our Country Reports Cover</h2>
+                    <p style="margin-bottom: 1.2rem;">Each report delivers institutional-grade intelligence across:
+                        market sizing and forecasting, industry segmentation, competitive landscape, regulatory
+                        environment, macroeconomic context, and strategic recommendations — all grounded in
+                        conservative, multi-source validated methodology.</p>
+
+                    <h2
+                        style="font-size: 1.3rem; color: #000; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.75rem;">
+                        Institutional Rigour at the Most Competitive Pricing</h2>
+                    <p style="margin-bottom: 1.2rem;">Markets NXT offers country-specific research at the most
+                        competitive pricing in the industry, without compromising analytical standards. Our reports
+                        serve growth-stage businesses, investment firms, and consulting teams that need board-level
+                        intelligence without enterprise-level costs.</p>
+
+                    <h2
+                        style="font-size: 1.3rem; color: #000; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.75rem;">
+                        Explore Reports by Country</h2>
+                    <p>Browse and filter below to find market research reports for the country of your interest.
+                        Coverage spans North America, Europe, Asia Pacific, Latin America, the Middle East, and Africa.
+                    </p>
+                </div>
+            </div>
+
+            <style>
+                .context-scroll-container::-webkit-scrollbar {
+                    width: 6px;
+                }
+
+                .context-scroll-container::-webkit-scrollbar-track {
+                    background: transparent;
+                }
+
+                .context-scroll-container::-webkit-scrollbar-thumb {
+                    background: #bfdbfe;
+                    border-radius: 10px;
+                }
+
+                .context-scroll-container::-webkit-scrollbar-thumb:hover {
+                    background: #3b82f6;
+                }
+            </style>
+
+            {% elif current_category %}
             <h2>{{ current_category|title }} Market Reports</h2>
             <p>Comprehensive industry analysis, market size, and forecast for {{ current_category }}.</p>
             {% else %}
@@ -454,6 +601,9 @@
 
             <!-- Modern Search embedded in header -->
             <form method="get" action="" style="margin-top: 1.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                {% if selected_country %}
+                <input type="hidden" name="country" value="{{ selected_country }}">
+                {% endif %}
                 <input type="text" name="q" value="{{ search_query }}" placeholder="Search market, industry..."
                     style="flex: 1; padding: 0.8rem 1rem; border: 1px solid #bfdbfe; border-radius: 4px; outline: none; min-width: 200px;">
                 <button type="submit"
@@ -508,9 +658,9 @@
             <div class="pagination-group">
                 <!-- First -->
                 {% if page_obj.has_previous %}
-                <a href="?page=1{% if search_query %}&q={{ search_query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}"
+                <a href="?page=1{% if search_query %}&q={{ search_query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if selected_country %}&country={{ selected_country }}{% endif %}"
                     class="page-item nav-btn">First</a>
-                <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}"
+                <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if selected_country %}&country={{ selected_country }}{% endif %}"
                     class="page-item nav-btn">Prev</a>
                 {% else %}
                 <span class="page-item disabled">First</span>
@@ -522,7 +672,7 @@
                 {% if page_obj.number == num %}
                 <span class="page-item active">{{ num }}</span>
                 {% elif num > page_obj.number|add:'-4' and num < page_obj.number|add:'4' %} <a
-                    href="?page={{ num }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}"
+                    href="?page={{ num }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if selected_country %}&country={{ selected_country }}{% endif %}"
                     class="page-item">
                     {{ num }}
                     </a>
@@ -531,9 +681,9 @@
 
                     <!-- Next & Last -->
                     {% if page_obj.has_next %}
-                    <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}"
+                    <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if selected_country %}&country={{ selected_country }}{% endif %}"
                         class="page-item">Next</a>
-                    <a href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}"
+                    <a href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if selected_country %}&country={{ selected_country }}{% endif %}"
                         class="page-item">Last</a>
                     {% else %}
                     <span class="page-item disabled">Next</span>
@@ -545,4 +695,20 @@
 
     </main>
 </div>
+<script>
+    function filterSidebarCountries() {
+        const input = document.getElementById('sidebarCountrySearch');
+        const filter = input.value.toLowerCase().trim();
+        const links = document.querySelectorAll('#sidebarCountryList .vmr-cat-link');
+
+        links.forEach(link => {
+            const country = link.getAttribute('data-country');
+            if (country === 'all' || country.includes(filter)) {
+                link.style.display = 'block';
+            } else {
+                link.style.display = 'none';
+            }
+        });
+    }
+</script>
 {% endblock %}

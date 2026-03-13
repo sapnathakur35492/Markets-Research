@@ -19,7 +19,8 @@ class HomeView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['categories'] = Category.objects.annotate(report_count=Count('reports')).filter(report_count__gt=0)
-        context['latest_reports'] = Report.objects.select_related('category').order_by('-publish_date')[:12]
+        # Only show Global reports on home page
+        context['latest_reports'] = Report.objects.filter(region__icontains='Global').select_related('category').order_by('-publish_date')[:12]
         return context
 
 class ReportListView(ListView):
@@ -29,7 +30,8 @@ class ReportListView(ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        queryset = Report.objects.select_related('category').all()
+        # Default to Global reports unless specified otherwise
+        queryset = Report.objects.filter(region__icontains='Global').select_related('category').all()
         # Search
         q = self.request.GET.get('q')
         if q:
@@ -47,6 +49,11 @@ class ReportListView(ListView):
         context['categories'] = Category.objects.annotate(report_count=Count('reports')).filter(report_count__gt=0)
         context['current_category'] = self.request.GET.get('category', '')
         context['search_query'] = self.request.GET.get('q', '')
+        # Get list of all unique countries available in the database (excluding Global)
+        context['available_countries'] = Report.objects.exclude(
+            region__icontains='Global'
+        ).values_list('region', flat=True).distinct().order_by('region')
+        
         # Explicitly pass count to avoid template parsing issues
         if context.get('paginator'):
             context['total_reports_count'] = context['paginator'].count
@@ -76,6 +83,39 @@ class ReportDetailView(DetailView):
         ).filter(report_count__gt=0).order_by('name')
         
         context['recaptcha_public_key'] = settings.RECAPTCHA_PUBLIC_KEY
+        return context
+
+class CountryReportListView(ReportListView):
+    """
+    View to display only Country-specific reports.
+    Now supports filtering by a specific country via dropdown.
+    """
+    def get_queryset(self):
+        # Exclude "Global" to get all country-specific reports
+        queryset = Report.objects.exclude(region__icontains='Global').select_related('category').all()
+        
+        # Filter by specific country if provided
+        selected_country = self.request.GET.get('country')
+        if selected_country:
+            queryset = queryset.filter(region=selected_country)
+            
+        # Search
+        q = self.request.GET.get('q')
+        if q:
+            queryset = queryset.filter(Q(title__icontains=q) | Q(summary__icontains=q))
+        
+        # Category
+        cat_slug = self.request.GET.get('category')
+        if cat_slug:
+            queryset = queryset.filter(category__slug=cat_slug)
+            
+        return queryset.order_by('-publish_date')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = "Country Reports"
+        context['is_country_reports'] = True
+        context['selected_country'] = self.request.GET.get('country', '')
         return context
 
 class ReportMethodologyView(DetailView):

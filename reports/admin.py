@@ -1,18 +1,19 @@
-from django.contrib import admin
+import json
+import pandas as pd
+import csv
+import os
+import traceback
+from django.contrib import admin, messages
 from django.urls import path, reverse
 from django.shortcuts import render, redirect
-from django.contrib import messages
-from django.utils.html import format_html
-from django.utils.text import slugify
-from .models import Category, Report
-import pandas as pd
+from django.http import HttpResponse
 from django import forms
 from django.conf import settings
-import os
-import csv
-from django.http import HttpResponse
+from django.utils.text import slugify
 from django_ckeditor_5.widgets import CKEditor5Widget
 from django.db import models
+from .models import Category, Report, ImportBatch
+from .utils import auto_format_content, parse_content_sections
 
 
 class ExcelImportForm(forms.Form):
@@ -38,7 +39,6 @@ class ReportAdmin(admin.ModelAdmin):
     list_display = ('title', 'category', 'publish_date', 'region', 'single_user_price')
     list_filter = ('category', 'region', 'format_type')
     search_fields = ('title', 'slug', 'summary')
-    # Removed 'slug' from readonly_fields to allow editing
     readonly_fields = ('sample_url_slug', 'discount_url_slug', 'inquiry_url_slug')
     prepopulated_fields = {'slug': ('title',)}
     change_list_template = "admin/reports_changelist.html"
@@ -48,8 +48,6 @@ class ReportAdmin(admin.ModelAdmin):
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename=Reports_Export.csv'
         writer = csv.writer(response)
-
-        # Standardized headers
         headers = ['ID', 'Title', 'Slug', 'Category', 'Publish Date', 'Region', 'Price (Single)', 'Absolute URL']
         writer.writerow(headers)
 
@@ -60,18 +58,7 @@ class ReportAdmin(admin.ModelAdmin):
                 report_url = request.build_absolute_uri(report_path)
             except:
                 pass
-                
-            writer.writerow([
-                obj.id,
-                obj.title,
-                obj.slug,
-                obj.category.name if obj.category else "N/A",
-                obj.publish_date,
-                obj.region,
-                obj.single_user_price,
-                report_url
-            ])
-
+            writer.writerow([obj.id, obj.title, obj.slug, obj.category.name if obj.category else "N/A", obj.publish_date, obj.region, obj.single_user_price, report_url])
         return response
     
     export_to_excel.short_description = "Export Selected to CSV"
@@ -96,11 +83,20 @@ class ReportAdmin(admin.ModelAdmin):
             if form.is_valid():
                 excel_file = request.FILES["excel_file"]
                 try:
-                    self.process_excel(excel_file)
-                    self.message_user(request, "Reports imported successfully")
+                    imported, skipped, duplicates = self.process_excel(excel_file, excel_file.name)
+                    
+                    if imported > 0:
+                        messages.success(request, f"Successfully imported {imported} new reports.")
+                    
+                    if duplicates:
+                        messages.warning(request, f"Skipped {skipped} reports because they already exist.")
+                    
                     return redirect("admin:reports_report_changelist")
+                    
                 except Exception as e:
-                    self.message_user(request, f"Error importing file: {e}", level=messages.ERROR)
+                    traceback.print_exc()
+                    messages.error(request, f"Error: {str(e)}")
+                    return redirect("admin:reports_report_changelist")
         else:
             form = ExcelImportForm()
         
@@ -127,7 +123,7 @@ class ReportAdmin(admin.ModelAdmin):
                     report.enterprise_price *= multiplier
                     report.save()
                     count += 1
-                self.message_user(request, f"Updated prices for {count} reports.")
+                messages.success(request, f"Updated prices for {count} reports.")
                 return redirect("admin:reports_report_changelist")
         else:
             form = PriceUpdateForm()
@@ -140,109 +136,109 @@ class ReportAdmin(admin.ModelAdmin):
         }
         return render(request, "admin/price_update.html", context)
 
-    def process_excel(self, file):
-        from .utils import auto_format_content, parse_content_sections
+    def process_excel(self, file, file_name):
+        df = pd.read_excel(file)
+        df.columns = df.columns.str.strip().str.lower()
         
-        try:
-            df = pd.read_excel(file)
-            # Normalize column names by removing whitespace
-            df.columns = df.columns.str.strip()
-            
-            for index, row in df.iterrows():
-                try:
-                    category_name = row.get('Category') or row.get('category')
-                    if not category_name:
-                        continue
-                    
-                    category, _ = Category.objects.get_or_create(name=str(category_name).strip())
-                    
-                    # Date handling
-                    publish_date = row.get('Publish') or row.get('publish_date')
-                    if pd.isna(publish_date):
-                        from django.utils import timezone
-                        publish_date = timezone.now().date()
-                    
-                    # Helper to get price
-                    def get_price(val):
-                        try:
-                            if isinstance(val, str):
-                                return float(val.replace(',', '').replace('$', '').strip())
-                            return float(val) if pd.notna(val) else 0.0
-                        except:
-                            return 0.0
-                    
-                    # Get content and auto-format it
-                    raw_content = str(row.get('content', row.get('Content', ''))).strip()
-                    formatted_content = auto_format_content(raw_content) if raw_content else ''
-                    
-                    # Parse content sections from the formatted content
-                    # Returns: {'sections': {...}, 'toc': str, 'segmentation': str, 'faqs': str, 'cleaned_summary': str}
-                    parsed_data = parse_content_sections(formatted_content)
-                    content_sections = parsed_data.get('sections', {})
-                    parsed_toc = parsed_data.get('toc', '')
-                    parsed_segmentation = parsed_data.get('segmentation', '')
-                    parsed_faqs = parsed_data.get('faqs', '')
-                    cleaned_summary = parsed_data.get('cleaned_summary', formatted_content)
-                    
-                    # Get other content fields and auto-format them too
-                    raw_toc = str(row.get('TOC', row.get('toc', ''))).strip()
-                    formatted_toc = auto_format_content(raw_toc) if raw_toc else ''
-                    
-                    raw_methodology = str(row.get('Methodology', row.get('methodology', ''))).strip()
-                    formatted_methodology = auto_format_content(raw_methodology) if raw_methodology else ''
-                    
-                    raw_faqs = str(row.get("FAQ's", row.get('faqs', ''))).strip()
-                    formatted_faqs = auto_format_content(raw_faqs) if raw_faqs else ''
+        imported_count = 0
+        skipped_count = 0
+        duplicate_titles = []
+        rows_to_import = []
+        
+        for index, row in df.iterrows():
+            report_title = str(row.get('title', '')).strip()
+            if not report_title or report_title == 'nan':
+                skipped_count += 1
+                continue
+            if Report.objects.filter(title=report_title).exists():
+                duplicate_titles.append(report_title)
+                skipped_count += 1
+                continue
+            rows_to_import.append(row)
 
-                    raw_segmentation = str(row.get('Segment', row.get('segmentation', ''))).strip()
-                    formatted_segmentation = auto_format_content(raw_segmentation) if raw_segmentation else ''
+        if not rows_to_import:
+            return 0, skipped_count, duplicate_titles
 
-                    report, created = Report.objects.update_or_create(
-                        title=str(row.get('Title', row.get('title'))).strip(),
-                        defaults={
-                            'slug': slugify(row.get('Slug', row.get('slug'))) if row.get('Slug') or row.get('slug') else slugify(row.get('Title', row.get('title'))),
-                            'category': category,
-                            'sub_category': str(row.get('Sub Cate', row.get('sub_category', ''))).strip(),
-                            'meta_title': str(row.get('Meta Title', row.get('meta_title', ''))).strip(),
-                            'meta_description': str(row.get('Meta Des', row.get('meta_description', ''))).strip(),
-                            'meta_keywords': str(row.get('Meta Key', row.get('meta_keywords', ''))).strip(),
-                            # Use cleaned summary (with TOC and Segmentation removed)
-                            'summary': cleaned_summary if cleaned_summary else str(row.get('Summary', row.get('summary', ''))).strip(),
-                            # Use parsed TOC if available, otherwise use formatted TOC from Excel column
-                            'toc': parsed_toc if parsed_toc else formatted_toc,
-                            # Use parsed segmentation if available, otherwise use formatted segmentation from Excel column
-                            'segmentation': parsed_segmentation if parsed_segmentation else formatted_segmentation,
-                            'methodology': formatted_methodology,  # Auto-formatted methodology
-                            # Use parsed FAQs if available, otherwise use formatted FAQs from Excel column
-                            'faqs': parsed_faqs if parsed_faqs else formatted_faqs,
-                            # New content section fields parsed from Content column
-                            'report_highlights': content_sections.get('report_highlights', ''),
-                            'industry_snapshot': content_sections.get('industry_snapshot', ''),
-                            'market_growth_catalysts': content_sections.get('market_growth_catalysts', ''),
-                            'market_challenges': content_sections.get('market_challenges', ''),
-                            'strategic_opportunities': content_sections.get('strategic_opportunities', ''),
-                            'market_coverage': content_sections.get('market_coverage', ''),
-                            'geographic_analysis': content_sections.get('geographic_analysis', ''),
-                            'competitive_environment': content_sections.get('competitive_environment', ''),
-                            'leading_participants': content_sections.get('leading_participants', ''),
-                            'long_term_perspective': content_sections.get('long_term_perspective', ''),
-                            'pages_count': int(row.get('Pages', row.get('pages', 0))) if pd.notna(row.get('Pages', row.get('pages'))) else 0,
-                            'region': str(row.get('Region', row.get('region', 'Global'))).strip(),
-                            'format_type': str(row.get('Format', row.get('format_type', 'PDF'))).strip(),
-                            'publish_date': publish_date,
-                            'base_year': str(row.get('Base Year', row.get('base_year', ''))).strip(),
-                            'author': str(row.get('Author', row.get('author', ''))).strip(),
-                            'single_user_price': get_price(row.get('Single User License', row.get('Single User', row.get('single_user_price')))),
-                            'multi_user_price': get_price(row.get('Multi User License', row.get('Multi User', row.get('multi_user_price')))),
-                            'enterprise_price': get_price(row.get('Corporate License', row.get('Corporate', row.get('enterprise_price')))),
-                            'data_pack_price': get_price(row.get('Data Pack Excel License', row.get('Data Pack', row.get('data_pack_price')))),
-                        }
-                    )
-                except Exception as row_error:
-                    print(f"Error processing row {index}: {row_error}")
-                    continue
-        except Exception as e:
-            raise Exception(f"Failed to parse Excel file: {str(e)}")
+        batch = ImportBatch.objects.create(file_name=file_name)
+
+        for row in rows_to_import:
+            try:
+                category_name = row.get('category')
+                category, _ = Category.objects.get_or_create(name=str(category_name).strip())
+                
+                publish_date = row.get('publish') or row.get('publish_date') or row.get('publish d')
+                if pd.isna(publish_date):
+                    from django.utils import timezone
+                    publish_date = timezone.now().date()
+                
+                def get_price(val):
+                    try:
+                        if isinstance(val, str):
+                            return float(val.replace(',', '').replace('$', '').strip())
+                        return float(val) if pd.notna(val) else 0.0
+                    except:
+                        return 0.0
+                
+                raw_content = str(row.get('content', '')).strip()
+                formatted_content = auto_format_content(raw_content) if raw_content else ''
+                parsed_data = parse_content_sections(formatted_content)
+                content_sections = parsed_data.get('sections', {})
+                
+                report_title = str(row.get('title')).strip()
+                Report.objects.create(
+                    title=report_title,
+                    slug=slugify(row.get('slug')) if row.get('slug') else slugify(report_title),
+                    category=category,
+                    import_batch=batch,
+                    sub_category=str(row.get('sub cate', row.get('sub_category', ''))).strip(),
+                    meta_title=str(row.get('meta tit', row.get('meta title', row.get('meta_title', '')))).strip(),
+                    meta_description=str(row.get('meta de', row.get('meta des', row.get('meta_description', '')))).strip(),
+                    meta_keywords=str(row.get('meta ke', row.get('meta key', row.get('meta_keywords', '')))).strip(),
+                    summary=parsed_data.get('cleaned_summary', formatted_content) if parsed_data.get('cleaned_summary') else str(row.get('summary', '')).strip(),
+                    toc=parsed_data.get('toc', '') if parsed_data.get('toc') else auto_format_content(str(row.get('toc', '')).strip()),
+                    segmentation=parsed_data.get('segmentation', '') if parsed_data.get('segmentation') else auto_format_content(str(row.get('segmentation', '')).strip()),
+                    methodology=auto_format_content(str(row.get('methodology', '')).strip()),
+                    faqs=parsed_data.get('faqs', '') if parsed_data.get('faqs') else auto_format_content(str(row.get("faq's", row.get('faqs', ''))).strip()),
+                    report_highlights=content_sections.get('report_highlights', ''),
+                    industry_snapshot=content_sections.get('industry_snapshot', ''),
+                    market_growth_catalysts=content_sections.get('market_growth_catalysts', ''),
+                    market_challenges=content_sections.get('market_challenges', ''),
+                    strategic_opportunities=content_sections.get('strategic_opportunities', ''),
+                    market_coverage=content_sections.get('market_coverage', ''),
+                    geographic_analysis=content_sections.get('geographic_analysis', ''),
+                    competitive_environment=content_sections.get('competitive_environment', ''),
+                    leading_participants=content_sections.get('leading_participants', ''),
+                    long_term_perspective=content_sections.get('long_term_perspective', ''),
+                    pages_count=int(row.get('pages', 0)) if pd.notna(row.get('pages')) else 0,
+                    region=str(row.get('region', 'Global')).strip(),
+                    format_type=str(row.get('format', row.get('format_type', 'PDF'))).strip(),
+                    publish_date=publish_date,
+                    base_year=str(row.get('base yea', row.get('base year', ''))).strip(),
+                    author=str(row.get('author', '')).strip(),
+                    single_user_price=get_price(row.get('single u', row.get('single user license', 0))),
+                    multi_user_price=get_price(row.get('multi u', row.get('multi user license', 0))),
+                    enterprise_price=get_price(row.get('corporat', row.get('corporate license', 0))),
+                    data_pack_price=get_price(row.get('data pac', row.get('data pack excel license', 0))),
+                )
+                imported_count += 1
+            except Exception:
+                skipped_count += 1
+
+        batch.report_count = imported_count
+        batch.save()
+        return imported_count, skipped_count, duplicate_titles
+
+@admin.register(ImportBatch)
+class ImportBatchAdmin(admin.ModelAdmin):
+    list_display = ('file_name', 'import_date', 'report_count')
+    readonly_fields = ('file_name', 'import_date', 'report_count')
+    def has_add_permission(self, request): return False
+    def delete_model(self, request, obj):
+        obj.reports.all().delete()
+        super().delete_model(request, obj)
+    def delete_queryset(self, request, queryset):
+        for obj in queryset: obj.reports.all().delete()
+        super().delete_queryset(request, queryset)
 
 admin.site.site_header = "Markets NXT Admin"
 admin.site.site_title = "Markets NXT Admin Portal"

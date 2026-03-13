@@ -17,11 +17,25 @@ class Category(models.Model):
         verbose_name_plural = "Categories"
 
 
+class ImportBatch(models.Model):
+    file_name = models.CharField(max_length=255)
+    import_date = models.DateTimeField(auto_now_add=True)
+    report_count = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.file_name} ({self.import_date.strftime('%Y-%m-%d %H:%M')})"
+
+    class Meta:
+        verbose_name_plural = "Import Batches"
+        ordering = ['-import_date']
+
+
 class Report(models.Model):
     # Metadata
     title = models.CharField(max_length=500)
     slug = models.SlugField(max_length=500, unique=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="reports")
+    import_batch = models.ForeignKey(ImportBatch, on_delete=models.SET_NULL, null=True, blank=True, related_name="reports")
     sub_category = models.CharField(max_length=255, blank=True, null=True)
     
     # Content

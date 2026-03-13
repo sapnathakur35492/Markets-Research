@@ -8,9 +8,15 @@
     <!-- Premium Header Section -->
     <header class="blog-header-section">
         <div class="blog-meta-header">
-            <span class="blog-date-badge">
-                {{ post.publish_date|date:"F d, Y" }}
-            </span>
+            <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 1rem;">
+                <span class="blog-date-badge">
+                    {{ post.publish_date|date:"F d, Y" }}
+                </span>
+                <span
+                    style="background: rgba(0, 194, 203, 0.2); color: #008985; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">
+                    {{ post.category.name|default:"Uncategorized" }}
+                </span>
+            </div>
             <h1 class="blog-title">{{ post.title }}</h1>
 
             <div class="blog-author-info">
