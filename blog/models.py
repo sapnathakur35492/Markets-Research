@@ -18,11 +18,26 @@ class BlogCategory(models.Model):
     class Meta:
         verbose_name_plural = "Blog Categories"
 
+class BlogImportBatch(models.Model):
+    file_name = models.CharField(max_length=255)
+    import_date = models.DateTimeField(auto_now_add=True)
+    post_count = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.file_name} ({self.import_date.strftime('%Y-%m-%d %H:%M')})"
+
+    class Meta:
+        verbose_name_plural = "Blog Import Batches"
+        ordering = ['-import_date']
+
+
 class BlogPost(models.Model):
     title = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255, unique=True, blank=True)
     category = models.ForeignKey(BlogCategory, on_delete=models.SET_NULL, null=True, blank=True, related_name='posts')
+    import_batch = models.ForeignKey(BlogImportBatch, on_delete=models.SET_NULL, null=True, blank=True, related_name='posts')
     content = models.TextField(help_text="HTML Content")
+
     image = models.ImageField(upload_to='blog_images/', blank=True, null=True)
     author = models.CharField(max_length=100, default="Admin")
     
@@ -57,3 +72,11 @@ class BlogPost(models.Model):
 
     def __str__(self):
         return self.title
+
+class BlogPostImage(models.Model):
+    post = models.ForeignKey(BlogPost, related_name='additional_images', on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='blog_images/')
+    caption = models.CharField(max_length=200, blank=True)
+
+    def __str__(self):
+        return f"Image for {self.post.title}"

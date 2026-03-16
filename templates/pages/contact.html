@@ -2,7 +2,23 @@
 {% load static %}
 {% load static %}
 
-{% block title %}Contact Us - MarketsNXT{% endblock %}
+{% block title %}Contact Us - Markets NXT{% endblock %}
+
+{% block meta %}
+<meta name="robots" content="index, follow">
+<meta name="description"
+    content="Get in touch with Markets NXT analysts and experts for market research inquiries, custom research requests, and consulting services.">
+<meta name="keywords" content="contact market research, custom research request, consult analyst">
+{% endblock %}
+
+{% block extra_head %}
+<!-- Open Graph / Social Media -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
+<meta property="og:title" content="Contact Us - Markets NXT">
+<meta property="og:description"
+    content="Get in touch with Markets NXT analysts and experts for market research inquiries and custom research requests.">
+{% endblock %}
 
 {% block content %}
 <style>

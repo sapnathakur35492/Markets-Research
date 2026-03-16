@@ -1,7 +1,26 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{{ post.title }} - Markets NXT{% endblock %}
+{% block title %}{{ post.meta_title|default:post.title }} - Markets NXT{% endblock %}
+
+{% block meta %}
+<meta name="robots" content="index, follow">
+<meta name="description" content="{{ post.meta_description|default:post.content|striptags|truncatewords:30 }}">
+<meta name="keywords" content="{{ post.meta_keywords }}">
+{% endblock %}
+
+{% block extra_head %}
+<!-- Open Graph / Social Media -->
+<meta property="og:type" content="article">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
+<meta property="og:title" content="{{ post.meta_title|default:post.title }}">
+<meta property="og:description" content="{{ post.meta_description|default:post.content|striptags|truncatewords:30 }}">
+{% if post.image %}
+<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ post.image.url }}">
+{% endif %}
+<meta property="article:published_time" content="{{ post.publish_date|date:'c' }}">
+<meta property="article:author" content="{{ post.author }}">
+{% endblock %}
 
 {% block content %}
 <article class="blog-post-wrapper">
@@ -57,9 +76,110 @@
         });
     </script>
     <div class="container blog-content-container">
-        {% if post.image %}
-        <img src="{{ post.image.url }}" alt="{{ post.title }}" class="blog-featured-image">
-        {% endif %}
+        <!-- Blog Image Slider -->
+        <div class="blog-slider-wrapper">
+            <div class="blog-slider" id="blogSlider">
+                {% if post.image %}
+                <div class="slider-item">
+                    <img src="{{ post.image.url }}" alt="{{ post.title }}" class="blog-featured-image">
+                </div>
+                {% endif %}
+
+                {% for img in post.additional_images.all %}
+                <div class="slider-item">
+                    <img src="{{ img.image.url }}" alt="{{ img.caption|default:post.title }}"
+                        class="blog-featured-image">
+                    {% if img.caption %}
+                    <p class="slider-caption">{{ img.caption }}</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            {% if post.additional_images.all %}
+            <button class="slider-btn prev" onclick="moveSlider(-1)">&#10094;</button>
+            <button class="slider-btn next" onclick="moveSlider(1)">&#10095;</button>
+            <div class="slider-dots" id="sliderDots"></div>
+            {% endif %}
+        </div>
+
+
+        <script>
+            function openImage(src) {
+                const modal = document.getElementById('imageModal');
+                const modalImg = document.getElementById('imgFull');
+                const header = document.querySelector('header');
+                const blogHeader = document.querySelector('.blog-header');
+
+                modal.classList.add('active');
+                modalImg.src = src;
+                document.body.style.overflow = 'hidden';
+                if (header) header.style.visibility = 'hidden';
+                if (blogHeader) blogHeader.style.visibility = 'hidden';
+            }
+
+            function closeImage() {
+                const modal = document.getElementById('imageModal');
+                const header = document.querySelector('header');
+                const blogHeader = document.querySelector('.blog-header');
+
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+                if (header) header.style.visibility = 'visible';
+                if (blogHeader) blogHeader.style.visibility = 'visible';
+            }
+
+            // Slider Logic
+            let currentSlide = 0;
+            const slider = document.getElementById('blogSlider');
+            const slides = document.querySelectorAll('.slider-item');
+            const dotsContainer = document.getElementById('sliderDots');
+            const slidesToShow = 3;
+
+            // Add click listeners to images for zoom
+            document.querySelectorAll('.blog-featured-image').forEach(img => {
+                img.onclick = () => openImage(img.src);
+            });
+
+            // Handle alignment if items < slidesToShow
+            if (slides.length < slidesToShow) {
+                slider.style.justifyContent = 'center';
+            }
+
+            if (slides.length > slidesToShow) {
+                const totalSteps = slides.length - slidesToShow + 1;
+                for (let i = 0; i < totalSteps; i++) {
+                    const dot = document.createElement('div');
+                    dot.classList.add('dot');
+                    if (i === 0) dot.classList.add('active');
+                    dot.onclick = () => goToSlide(i);
+                    dotsContainer.appendChild(dot);
+                }
+
+                function updateDots() {
+                    const dots = document.querySelectorAll('.dot');
+                    dots.forEach((dot, i) => {
+                        dot.classList.toggle('active', i === currentSlide);
+                    });
+                }
+
+                function moveSlider(direction) {
+                    const totalSteps = slides.length - slidesToShow + 1;
+                    currentSlide = (currentSlide + direction + totalSteps) % totalSteps;
+                    goToSlide(currentSlide);
+                }
+
+                function goToSlide(index) {
+                    currentSlide = index;
+                    const itemWidth = 100 / slidesToShow;
+                    const offset = -currentSlide * itemWidth;
+                    slider.style.transform = `translateX(${offset}%)`;
+                    updateDots();
+                }
+            } else {
+                document.querySelectorAll('.slider-btn').forEach(btn => btn.style.display = 'none');
+            }
+        </script>
 
         <div class="blog-article-body">
             {{ post.content|safe }}
@@ -72,4 +192,10 @@
         </div>
     </div>
 </article>
+
+<!-- Image Zoom Modal - Moved to root for better coverage -->
+<div id="imageModal" class="image-modal" onclick="closeImage()">
+    <span class="close-modal">&times;</span>
+    <img class="modal-content" id="imgFull">
+</div>
 {% endblock %}
