@@ -6,10 +6,22 @@ class BlogPostListView(ListView):
     model = BlogPost
     template_name = "blog/post_list.html"
     context_object_name = "posts"
-    paginate_by = 10
     
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        all_posts = BlogPost.objects.filter(is_published=True).order_by('-publish_date')
+        
+        # Section 1: Latest 5
+        context['latest_posts'] = all_posts[:5]
+        
+        # Section 2: Previous up to 10 (Only those older than the latest)
+        context['previous_posts'] = all_posts[5:15]
+        
+        return context
+
     def get_queryset(self):
-        return BlogPost.objects.filter(is_published=True).order_by('-publish_date')
+        # Limit total to 15 (5 latest + 10 previous) to match user preference
+        return BlogPost.objects.filter(is_published=True).order_by('-publish_date')[:15]
 
 class BlogPostDetailView(DetailView):
     model = BlogPost

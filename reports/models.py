@@ -10,6 +10,10 @@ class Category(models.Model):
             self.slug = slugify(self.name)
         super().save(*args, **kwargs)
 
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('category-report-list', kwargs={'category_slug': self.slug})
+
     def __str__(self):
         return self.name
 
@@ -98,6 +102,36 @@ class Report(models.Model):
             self.inquiry_url_slug = f"speak-to-analyst-{self.slug}"
             
         super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        from django.urls import reverse
+        from django.utils.text import slugify
+        if self.region and self.region.lower() == 'global':
+            return reverse('report-detail-global', kwargs={
+                'category_slug': self.category.slug,
+                'slug': self.slug
+            })
+        else:
+            return reverse('report-detail-country', kwargs={
+                'country_slug': slugify(self.region or 'country'),
+                'category_slug': self.category.slug,
+                'slug': self.slug
+            })
+
+    def get_methodology_url(self):
+        from django.urls import reverse
+        from django.utils.text import slugify
+        if self.region and self.region.lower() == 'global':
+            return reverse('report-methodology-global', kwargs={
+                'category_slug': self.category.slug,
+                'slug': self.slug
+            })
+        else:
+            return reverse('report-methodology-country', kwargs={
+                'country_slug': slugify(self.region or 'country'),
+                'category_slug': self.category.slug,
+                'slug': self.slug
+            })
 
     def __str__(self):
         return self.title

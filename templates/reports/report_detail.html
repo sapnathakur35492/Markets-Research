@@ -1793,7 +1793,8 @@
                 style="margin-bottom: 1rem; color: #1e3a8a; font-size: 1.1rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem;">
                 Select License Type</h1>
 
-            <form action="/reports/checkout/{{ report.slug }}/single/" id="buyForm">
+            <form action="/checkout/{{ report.slug }}/single/" id="buyForm"
+                onsubmit="event.preventDefault(); window.location.href = this.action;">
                 <label class="license-option">
                     <input type="radio" name="license" value="single" checked
                         onchange="updateBuyLink(this, '{{ report.slug }}')">
@@ -1816,8 +1817,8 @@
                 </label>
 
                 <label class="license-option">
-                    <input type="radio" name="license" value="data" onchang
-                        e="updateBuyLink(this, '{{ report.slug }}')">
+                    <input type="radio" name="license" value="datapack"
+                        onchange="updateBuyLink(this, '{{ report.slug }}')">
                     <span class="license-label">Data Pack License</span>
                     <span class="license-price">${{ report.data_pack_price }}</span>
                 </label>
@@ -1835,7 +1836,7 @@
                 style="margin: 0 0 1rem 0 !important; font-size: 1.15rem !important;">Related Reports</h1>
             <div class="related-reports-list">
                 {% for related in related_reports %}
-                <a href="{% url 'report-detail' related.slug %}" class="related-report-item">
+                <a href="{{ related.get_absolute_url }}" class="related-report-item">
                     <div class="related-report-title">{{ related.title }}</div>
                     <div class="related-report-date">{{ related.publish_date|date:"M Y" }}</div>
                 </a>
@@ -1895,7 +1896,7 @@
                 style="margin: 0 0 1rem 0 !important; font-size: 1.15rem !important;">Browse by Category</h1>
             <div class="categories-list">
                 {% for cat in all_categories %}
-                <a href="{% url 'report-list' %}?category={{ cat.slug }}" class="category-link">
+                <a href="{{ cat.get_absolute_url }}" class="category-link">
                     <span>{{ cat.name }}</span>
                     <span class="cat-count">{{ cat.report_count }}</span>
                 </a>
@@ -2183,10 +2184,11 @@
     });
 
     // Buy Link Update
+    // Buy Link Update
     function updateBuyLink(radio, slug) {
-        const type = radio.value;
+        const type = radio.value; // Now this will be single, multi, enterprise, or datapack
         const form = document.getElementById('buyForm');
-        form.action = `/reports/checkout/${slug}/${type}/`;
+        form.action = `/checkout/${slug}/${type}/`;
     }
 </script>
 

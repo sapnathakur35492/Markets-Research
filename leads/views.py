@@ -277,6 +277,23 @@ class CheckoutView(View):
     def get(self, request, *args, **kwargs):
         slug = kwargs.get('slug')
         license_type = kwargs.get('license_type')
+        
+        # If accessing /checkout/slug/?license=... redirect to clean /checkout/slug/license/
+        if not license_type and request.GET.get('license'):
+            lt = request.GET.get('license')
+            if lt == 'data': lt = 'datapack'
+            return redirect('checkout', slug=slug, license_type=lt)
+            
+        # Standard lookup
+        if not license_type:
+            # Fallback if somehow they hit /checkout/slug/ with neither path nor query
+            messages.error(request, "Please select a license type.")
+            return redirect('report-detail', slug=slug)
+
+        # Mapping datapack URL slug to internal 'data' license mode
+        if license_type == 'datapack':
+            license_type = 'data'
+            
         report = get_object_or_404(Report, slug=slug)
         
         # Calculate Price
@@ -296,7 +313,8 @@ class CheckoutView(View):
             license_label = 'Data Pack License'
         
         if not price:
-            messages.error(request, "Invalid license type or price.")
+            messages.error(request, "Please select a license type.")
+            # If no price, we go back to report-detail.
             return redirect('report-detail', slug=slug)
         
         # Create form
@@ -320,7 +338,11 @@ class CheckoutView(View):
         Process checkout form submission
         """
         slug = kwargs.get('slug')
-        license_type = kwargs.get('license_type')
+        license_type = kwargs.get('license_type') or request.POST.get('license') or request.GET.get('license')
+        
+        if license_type == 'datapack':
+            license_type = 'data'
+            
         report = get_object_or_404(Report, slug=slug)
         
         # Calculate Price
@@ -371,7 +393,10 @@ class CheckoutView(View):
                 }, status=400)
             else:
                 messages.error(request, "Please correct the errors in the form.")
-                return redirect('checkout', slug=slug, license_type=license_type)
+                # Map back to URL slug
+                url_license = license_type
+                if url_license == 'data': url_license = 'datapack'
+                return redirect('checkout', slug=slug, license_type=url_license)
 
 class ContactFormView(CreateView):
     model = Lead
@@ -554,10 +579,10 @@ class PayPalReturnView(View):
             access_token = get_paypal_access_token()
             if not access_token:
                 logger.error("PayPal auth failed during capture")
-                return redirect(
-                    reverse('checkout', kwargs={'slug': lead.report.slug, 'license_type': lead.license_type})
-                    + "?payment=failed"
-                )
+                # Map back to URL slug
+                url_license = lead.license_type
+                if url_license == 'data': url_license = 'datapack'
+                return redirect(reverse('checkout', kwargs={'slug': lead.report.slug, 'license_type': url_license}) + "?payment=failed")
 
             base_url = get_paypal_base_url()
             url = f"{base_url}/v2/checkout/orders/{token}/capture"
@@ -610,10 +635,10 @@ class PayPalReturnView(View):
             # ── Any other failure → back to checkout with error flag ──
             else:
                 logger.error(f"PayPal capture failed ({response.status_code}): {response.text}")
-                return redirect(
-                    reverse('checkout', kwargs={'slug': lead.report.slug, 'license_type': lead.license_type})
-                    + "?payment=failed"
-                )
+                # Map back to URL slug
+                url_license = lead.license_type
+                if url_license == 'data': url_license = 'datapack'
+                return redirect(reverse('checkout', kwargs={'slug': lead.report.slug, 'license_type': url_license}) + "?payment=failed")
 
         except Exception as e:
             logger.error(f"PayPalReturnView unexpected error: {e}", exc_info=True)
@@ -624,10 +649,10 @@ class PayPalCancelView(View):
         lead_id = request.GET.get('lead_id')
         try:
             lead = get_object_or_404(Lead, id=lead_id)
-            return redirect(
-                reverse('checkout', kwargs={'slug': lead.report.slug, 'license_type': lead.license_type})
-                + "?payment=cancelled"
-            )
+            # Map back to URL slug
+            url_license = lead.license_type
+            if url_license == 'data': url_license = 'datapack'
+            return redirect(reverse('checkout', kwargs={'slug': lead.report.slug, 'license_type': url_license}) + "?payment=cancelled")
         except Exception:
             return redirect('/')
 

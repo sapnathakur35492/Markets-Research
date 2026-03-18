@@ -3,6 +3,7 @@
 
 
 {% block title %}Browse Reports - Markets NXT{% endblock %}
+{% block robots %}{% if noindex %}noindex, nofollow{% else %}index, follow{% endif %}{% endblock %}
 
 {% block content %}
 <style>
@@ -462,12 +463,12 @@
             </div>
 
             <nav class="country-nav-scroll" id="sidebarCountryList">
-                <a href="{% url 'country-reports' %}"
+                <a href="{% if current_category %}{{ category_obj.get_absolute_url|default:'/reports/' }}{% else %}{% url 'report-list' %}{% endif %}"
                     class="vmr-cat-link {% if not selected_country %}active{% endif %}" data-country="all">
                     All Countries
                 </a>
                 {% for country in available_countries %}
-                <a href="{% url 'country-reports' %}?country={{ country }}{% if current_category %}&category={{ current_category }}{% endif %}"
+                <a href="{% if current_category %}{% url 'country-report-list-category' country|slugify current_category %}{% else %}{% url 'country-report-list' country|slugify %}{% endif %}"
                     class="vmr-cat-link {% if selected_country == country %}active{% endif %}"
                     data-country="{{ country|lower }}">
                     {{ country }}
@@ -480,11 +481,12 @@
                 <i class="fas fa-th-large"></i> Browse by Categories
             </h3>
             <nav>
-                <a href="{% url 'report-list' %}" class="vmr-cat-link {% if not current_category %}active{% endif %}">
+                <a href="{% if country_slug %}{% url 'country-report-list' country_slug %}{% else %}{% url 'report-list' %}{% endif %}"
+                    class="vmr-cat-link {% if not current_category %}active{% endif %}">
                     All Categories
                 </a>
                 {% for cat in categories %}
-                <a href="{% url 'report-list' %}?category={{ cat.slug }}"
+                <a href="{{ cat.get_absolute_url }}"
                     class="vmr-cat-link {% if current_category == cat.slug %}active{% endif %}">
                     {{ cat.name }}
                 </a>
@@ -502,7 +504,7 @@
                 All
             </a>
             {% for cat in categories %}
-            <a href="{% url 'report-list' %}?category={{ cat.slug }}"
+            <a href="{{ cat.get_absolute_url }}"
                 class="mobile-cat-pill {% if current_category == cat.slug %}active{% endif %}">
                 {{ cat.name }}
             </a>
@@ -628,7 +630,7 @@
         <!-- Reports List -->
         <div class="vmr-list">
             {% for report in reports %}
-            <a href="{% url 'report-detail' report.slug %}" class="vmr-list-item">
+            <a href="{{ report.get_absolute_url }}" class="vmr-list-item">
                 <h3 class="vmr-title">
                     {{ report.title }}
                 </h3>
@@ -657,11 +659,14 @@
         {% if is_paginated %}
         <div class="pagination-container">
             <div class="pagination-group">
+
+
                 <!-- First -->
                 {% if page_obj.has_previous %}
-                <a href="?page=1{% if search_query %}&q={{ search_query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if selected_country %}&country={{ selected_country }}{% endif %}"
+                <a href="{% if page_url_name == 'country-report-list-category-paginated' %}{% url 'country-report-list-category' country_slug category_slug %}{% elif page_url_name == 'country-report-list-paginated' %}{% url 'country-report-list' country_slug %}{% elif page_url_name == 'country-reports-paginated' %}{% url 'country-reports' %}{% elif page_url_name == 'global-report-list-category-paginated' %}{% url 'global-report-list-category' category_slug %}{% elif page_url_name == 'global-report-list-paginated' %}{% url 'global-report-list' %}{% elif page_url_name == 'category-report-list-paginated' %}{% url 'category-report-list' category_slug %}{% else %}{% url 'report-list' %}{% endif %}{% if search_query %}?q={{ search_query }}{% endif %}"
                     class="page-item nav-btn">First</a>
-                <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if selected_country %}&country={{ selected_country }}{% endif %}"
+
+                <a href="{% if page_obj.previous_page_number == 1 %}{% if page_url_name == 'country-report-list-category-paginated' %}{% url 'country-report-list-category' country_slug category_slug %}{% elif page_url_name == 'country-report-list-paginated' %}{% url 'country-report-list' country_slug %}{% elif page_url_name == 'country-reports-paginated' %}{% url 'country-reports' %}{% elif page_url_name == 'global-report-list-category-paginated' %}{% url 'global-report-list-category' category_slug %}{% elif page_url_name == 'global-report-list-paginated' %}{% url 'global-report-list' %}{% elif page_url_name == 'category-report-list-paginated' %}{% url 'category-report-list' category_slug %}{% else %}{% url 'report-list' %}{% endif %}{% else %}{% if page_url_name == 'country-report-list-category-paginated' %}{% url 'country-report-list-category-paginated' country_slug category_slug page_obj.previous_page_number %}{% elif page_url_name == 'country-report-list-paginated' %}{% url 'country-report-list-paginated' country_slug page_obj.previous_page_number %}{% elif page_url_name == 'country-reports-paginated' %}{% url 'country-reports-paginated' page_obj.previous_page_number %}{% elif page_url_name == 'global-report-list-category-paginated' %}{% url 'global-report-list-category-paginated' category_slug page_obj.previous_page_number %}{% elif page_url_name == 'global-report-list-paginated' %}{% url 'global-report-list-paginated' page_obj.previous_page_number %}{% elif page_url_name == 'category-report-list-paginated' %}{% url 'category-report-list-paginated' category_slug page_obj.previous_page_number %}{% else %}{% url 'report-list-paginated' page_obj.previous_page_number %}{% endif %}{% endif %}{% if search_query %}?q={{ search_query }}{% endif %}"
                     class="page-item nav-btn">Prev</a>
                 {% else %}
                 <span class="page-item disabled">First</span>
@@ -672,8 +677,8 @@
                 {% for num in page_obj.paginator.page_range %}
                 {% if page_obj.number == num %}
                 <span class="page-item active">{{ num }}</span>
-                {% elif num > page_obj.number|add:'-4' and num < page_obj.number|add:'4' %} <a
-                    href="?page={{ num }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if selected_country %}&country={{ selected_country }}{% endif %}"
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %} <a
+                    href="{% if num == 1 %}{% if page_url_name == 'country-report-list-category-paginated' %}{% url 'country-report-list-category' country_slug category_slug %}{% elif page_url_name == 'country-report-list-paginated' %}{% url 'country-report-list' country_slug %}{% elif page_url_name == 'country-reports-paginated' %}{% url 'country-reports' %}{% elif page_url_name == 'global-report-list-category-paginated' %}{% url 'global-report-list-category' category_slug %}{% elif page_url_name == 'global-report-list-paginated' %}{% url 'global-report-list' %}{% elif page_url_name == 'category-report-list-paginated' %}{% url 'category-report-list' category_slug %}{% else %}{% url 'report-list' %}{% endif %}{% else %}{% if page_url_name == 'country-report-list-category-paginated' %}{% url 'country-report-list-category-paginated' country_slug category_slug num %}{% elif page_url_name == 'country-report-list-paginated' %}{% url 'country-report-list-paginated' country_slug num %}{% elif page_url_name == 'country-reports-paginated' %}{% url 'country-reports-paginated' num %}{% elif page_url_name == 'global-report-list-category-paginated' %}{% url 'global-report-list-category-paginated' category_slug num %}{% elif page_url_name == 'global-report-list-paginated' %}{% url 'global-report-list-paginated' num %}{% elif page_url_name == 'category-report-list-paginated' %}{% url 'category-report-list-paginated' category_slug num %}{% else %}{% url 'report-list-paginated' num %}{% endif %}{% endif %}{% if search_query %}?q={{ search_query }}{% endif %}"
                     class="page-item">
                     {{ num }}
                     </a>
@@ -682,9 +687,9 @@
 
                     <!-- Next & Last -->
                     {% if page_obj.has_next %}
-                    <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if selected_country %}&country={{ selected_country }}{% endif %}"
+                    <a href="{% if page_url_name == 'country-report-list-category-paginated' %}{% url 'country-report-list-category-paginated' country_slug category_slug page_obj.next_page_number %}{% elif page_url_name == 'country-report-list-paginated' %}{% url 'country-report-list-paginated' country_slug page_obj.next_page_number %}{% elif page_url_name == 'country-reports-paginated' %}{% url 'country-reports-paginated' page_obj.next_page_number %}{% elif page_url_name == 'global-report-list-category-paginated' %}{% url 'global-report-list-category-paginated' category_slug page_obj.next_page_number %}{% elif page_url_name == 'global-report-list-paginated' %}{% url 'global-report-list-paginated' page_obj.next_page_number %}{% elif page_url_name == 'category-report-list-paginated' %}{% url 'category-report-list-paginated' category_slug page_obj.next_page_number %}{% else %}{% url 'report-list-paginated' page_obj.next_page_number %}{% endif %}{% if search_query %}?q={{ search_query }}{% endif %}"
                         class="page-item">Next</a>
-                    <a href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if selected_country %}&country={{ selected_country }}{% endif %}"
+                    <a href="{% if page_url_name == 'country-report-list-category-paginated' %}{% url 'country-report-list-category-paginated' country_slug category_slug page_obj.paginator.num_pages %}{% elif page_url_name == 'country-report-list-paginated' %}{% url 'country-report-list-paginated' country_slug page_obj.paginator.num_pages %}{% elif page_url_name == 'country-reports-paginated' %}{% url 'country-reports-paginated' page_obj.paginator.num_pages %}{% elif page_url_name == 'global-report-list-category-paginated' %}{% url 'global-report-list-category-paginated' category_slug page_obj.paginator.num_pages %}{% elif page_url_name == 'global-report-list-paginated' %}{% url 'global-report-list-paginated' page_obj.paginator.num_pages %}{% elif page_url_name == 'category-report-list-paginated' %}{% url 'category-report-list-paginated' category_slug page_obj.paginator.num_pages %}{% else %}{% url 'report-list-paginated' page_obj.paginator.num_pages %}{% endif %}{% if search_query %}?q={{ search_query }}{% endif %}"
                         class="page-item">Last</a>
                     {% else %}
                     <span class="page-item disabled">Next</span>

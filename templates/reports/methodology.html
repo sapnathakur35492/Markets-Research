@@ -238,7 +238,7 @@
 <!-- Hero Section -->
 <div class="methodology-hero">
     <div class="container">
-        <a href="{% url 'report-detail' report.slug %}" class="report-title-link">
+        <a href="{{ report.get_absolute_url }}" class="report-title-link">
             <i class="fas fa-arrow-left"></i> Back to Report: {{ report.title }}
         </a>
         <h1 class="page-title">Research Methodology</h1>
@@ -790,7 +790,7 @@
                 <i class="far fa-calendar-alt"></i> {{ report.publish_date|date:"F Y" }} |
                 <i class="far fa-file-alt"></i> {{ report.pages_count }} Pages
             </div>
-            <a href="{% url 'report-detail' report.slug %}" class="sidebar-btn btn-green-buy">
+            <a href="{{ report.get_absolute_url }}" class="sidebar-btn btn-green-buy">
                 View Report Details
             </a>
         </div>

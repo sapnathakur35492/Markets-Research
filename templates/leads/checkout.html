@@ -320,7 +320,7 @@
                 <div class="summary-item">
                     <span style="color: #64748b;">Report</span>
                     <span style="font-weight: 600; text-align: right; flex: 1; margin-left: 1rem;">
-                        <a href="{% url 'report-detail' report.slug %}" style="color: #2563eb; text-decoration: none;">
+                        <a href="{{ report.get_absolute_url }}" style="color: #2563eb; text-decoration: none;">
                             {{ report.title|truncatewords:4 }}
                         </a>
                     </span>

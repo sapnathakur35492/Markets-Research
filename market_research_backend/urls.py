@@ -6,6 +6,7 @@ from django.contrib.sitemaps.views import sitemap
 from .sitemaps import ReportSitemap, CategorySitemap, BlogSitemap, StaticViewSitemap
 from django.views.generic import RedirectView, TemplateView
 from reports.views import HomeView
+from leads.views import CheckoutView
 
 sitemaps = {
     'reports': ReportSitemap,
@@ -17,6 +18,8 @@ sitemaps = {
 urlpatterns = [
     path('', HomeView.as_view(), name='home'), # Homepage
     path('admin/', admin.site.urls),
+    path('checkout/<slug:slug>/<str:license_type>/', CheckoutView.as_view(), name='checkout'), 
+    path('checkout/<slug:slug>/', CheckoutView.as_view(), name='checkout_default'), # Fallback for indexer or manual entry
     path('reports/', include('reports.frontend_urls')), # Frontend Reports
     path('api/', include('reports.urls')),
     path('api/leads/', include('leads.urls')),

@@ -216,7 +216,7 @@
     }
 
     .form-label {
-        flex: 0 0 85px;
+        flex: 0 0 100px;
         font-weight: 600;
         font-size: 0.63rem;
         color: #cbd5e1;
@@ -224,6 +224,8 @@
         display: block;
         text-transform: uppercase;
         letter-spacing: 0.04em;
+        white-space: nowrap;
+        /* Prevent label from wrapping to next line */
     }
 
     /* Message label stays slightly larger since it's beside a tall textarea */
@@ -290,9 +292,23 @@
         opacity: 1;
     }
 
-    /* Special padding for phone since it has its own flag container */
-    .form-control#id_phone {
-        padding-left: 90px !important;
+    /* Phone field: Re-apply padding-left to prevent dial code overlap */
+    /* Needs to be large enough for wide codes like +355 */
+    #phone-iti-wrap .form-control {
+        padding-left: 80px !important;
+    }
+
+    /* Add gap and separator between dial code and number */
+    #phone-iti-wrap .iti__selected-dial-code {
+        padding-right: 8px !important;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #0f172a !important;
+    }
+
+    /* Country input: add padding-left so text doesn't overlap the flag */
+    #country-iti-wrap .form-control {
+        padding-left: 50px !important;
     }
 
     /* Submit Button */
@@ -367,6 +383,36 @@
     /* Hiding Elements */
     #id_country_code_wrapper {
         display: none !important;
+    }
+
+    /* Phone field: hide flag image + arrow, keep only dial code (+1) */
+    #phone-iti-wrap .iti__flag-container {
+        pointer-events: none;
+    }
+
+    #phone-iti-wrap .iti__flag {
+        display: none !important;
+    }
+
+    #phone-iti-wrap .iti__arrow {
+        display: none !important;
+    }
+
+    #phone-iti-wrap .iti__selected-flag {
+        background: transparent !important;
+        border-right: 1px solid #e2e8f0;
+        padding: 0 10px !important;
+        cursor: default !important;
+    }
+
+    /* Country ITI - full width */
+    #country-iti-wrap .iti {
+        width: 400px !important;
+        flex: 0 0 400px;
+    }
+
+    #country-iti-wrap .form-control {
+        cursor: pointer;
     }
 
     /* Sidebar Styling */
@@ -606,7 +652,8 @@
 <header class="detail-hero">
     <div class="container">
         <span class="hero-badge"><i class="fas fa-chart-line"></i> Markets NXT Report</span>
-        <h1 class="detail-title"><a href="{% url 'report-detail' report.slug %}" class="hero-title-link">{{ short_title }}</a></h1>
+        <h1 class="detail-title"><a href="{{ report.get_absolute_url }}" class="hero-title-link">{{ short_title }}</a>
+        </h1>
         <div class="hero-divider"></div>
     </div>
 </header>
@@ -663,7 +710,9 @@
             <!-- Country -->
             <div class="form-group">
                 <label class="form-label">Country</label>
-                {{ form.country }}
+                <div id="country-iti-wrap" style="flex: 0 0 400px; width: 400px;">
+                    {{ form.country }}
+                </div>
             </div>
             <!-- Inline Error -->
             <div id="error_id_country" class="field-error"
@@ -674,7 +723,9 @@
             <!-- Phone -->
             <div class="form-group">
                 <label class="form-label">Work Phone</label>
-                {{ form.phone }}
+                <div id="phone-iti-wrap" style="flex: 0 0 400px; width: 400px;">
+                    {{ form.phone }}
+                </div>
             </div>
             <!-- Inline Error -->
             <div id="phone-error"
@@ -730,7 +781,8 @@
                 Select License Type
             </h3>
 
-            <form action="/reports/checkout/{{ report.slug }}/single/" id="buyFormSidebar" method="get">
+            <form action="/checkout/{{ report.slug }}/single/" id="buyFormSidebar"
+                onsubmit="event.preventDefault(); window.location.href = this.action;">
                 <label class="license-option">
                     <div style="display:flex; align-items:center;">
                         <input type="radio" name="license" value="single" checked
@@ -760,7 +812,7 @@
 
                 <label class="license-option">
                     <div style="display:flex; align-items:center;">
-                        <input type="radio" name="license" value="data"
+                        <input type="radio" name="license" value="datapack"
                             onchange="updateBuyLinkSidebar(this, '{{ report.slug }}')">
                         <span class="license-label">Data Pack License</span>
                     </div>
@@ -831,9 +883,45 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const phoneInput = document.querySelector("#id_phone");
+        const countryInput = document.querySelector("#id_country");
         const countryCodeInput = document.querySelector("#id_country_code");
         const phoneError = document.querySelector("#phone-error");
 
+        // ── 1. Country field: flag dropdown to pick country name ──────────────
+        const itiCountry = window.intlTelInput(countryInput, {
+            initialCountry: "auto",
+            geoIpLookup: callback => {
+                fetch("https://ipapi.co/json")
+                    .then(res => res.json())
+                    .then(data => callback(data.country_code))
+                    .catch(() => callback("us"));
+            },
+            utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@23.0.11/build/js/utils.js",
+            separateDialCode: false,
+            autoPlaceholder: "off",
+            onlyCountries: [],           // all countries
+        });
+
+        // After a country is chosen, write its name into the input value
+        const syncCountryName = () => {
+            const data = itiCountry.getSelectedCountryData();
+            if (data && data.name) {
+                countryInput.value = data.name;
+                // Keep phone ITI in sync so number validation knows the country
+                iti.setCountry(data.iso2);
+                countryCodeInput.value = '+' + data.dialCode;
+            }
+        };
+        countryInput.addEventListener('countrychange', syncCountryName);
+        setTimeout(syncCountryName, 1200);  // set initial value after geo lookup
+
+        // Prevent user from manually typing random text in country field
+        countryInput.addEventListener('keydown', e => {
+            // Allow Tab, Escape, Delete, Backspace
+            if (![9, 27, 8, 46].includes(e.keyCode)) e.preventDefault();
+        });
+
+        // ── 2. Phone field: dial code shown, flag dropdown hidden ─────────────
         const iti = window.intlTelInput(phoneInput, {
             initialCountry: "auto",
             geoIpLookup: callback => {
@@ -844,13 +932,14 @@
             },
             utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@23.0.11/build/js/utils.js",
             separateDialCode: true,
+            allowDropdown: false,        // hide nationality picker on phone field
             autoPlaceholder: "aggressive",
         });
 
-        // Strict 10-digit validation logic for India
+        // Strict 10-digit validation for India
         const validateIndiaPhone = () => {
             const countryData = iti.getSelectedCountryData();
-            if (countryData.iso2 === 'in') {
+            if (countryData && countryData.iso2 === 'in') {
                 phoneInput.setAttribute('maxlength', '10');
                 phoneInput.setAttribute('minlength', '10');
                 phoneInput.value = phoneInput.value.replace(/\D/g, '').slice(0, 10);
@@ -864,123 +953,76 @@
             }
         };
 
-        // Strict India Phone Validation - Multiple Event Handlers
-        const enforceIndiaLimit = function () {
-            const countryData = iti.getSelectedCountryData();
-            if (countryData && countryData.iso2 === 'in') {
-                let val = phoneInput.value.replace(/\D/g, '');
-                if (val.length > 10) {
-                    val = val.slice(0, 10);
-                }
-                phoneInput.value = val;
-            }
-        };
-
-        // Input event - fires on any value change
-        phoneInput.addEventListener('input', function (e) {
+        phoneInput.addEventListener('input', function () {
             phoneError.style.display = 'none';
             const countryData = iti.getSelectedCountryData();
-
             if (countryData && countryData.iso2 === 'in') {
                 let val = this.value.replace(/\D/g, '');
-                if (val.length > 10) {
-                    val = val.slice(0, 10);
-                }
+                if (val.length > 10) val = val.slice(0, 10);
                 this.value = val;
             } else {
                 let digits = this.value.replace(/\D/g, '');
                 const placeholder = phoneInput.getAttribute('placeholder') || '';
                 const maxDigits = placeholder.replace(/\D/g, '').length;
-                if (maxDigits > 0 && digits.length > maxDigits + 2) {
+                if (maxDigits > 0 && digits.length > maxDigits + 2)
                     digits = digits.substring(0, maxDigits + 2);
-                }
                 this.value = digits;
             }
         });
 
-        // Keydown event - prevent typing beyond 10 digits
         phoneInput.addEventListener('keydown', function (e) {
             const countryData = iti.getSelectedCountryData();
             if (countryData && countryData.iso2 === 'in') {
                 const currentLength = this.value.replace(/\D/g, '').length;
-                // Allow: backspace, delete, tab, escape, enter
                 if ([8, 9, 27, 13, 46].indexOf(e.keyCode) !== -1 ||
-                    // Allow: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
-                    (e.keyCode === 65 && e.ctrlKey === true) ||
-                    (e.keyCode === 67 && e.ctrlKey === true) ||
-                    (e.keyCode === 86 && e.ctrlKey === true) ||
-                    (e.keyCode === 88 && e.ctrlKey === true) ||
-                    // Allow: home, end, left, right
-                    (e.keyCode >= 35 && e.keyCode <= 39)) {
-                    return;
-                }
-                // Block if already 10 digits
-                if (currentLength >= 10) {
-                    e.preventDefault();
-                }
+                    (e.ctrlKey && [65, 67, 86, 88].includes(e.keyCode)) ||
+                    (e.keyCode >= 35 && e.keyCode <= 39)) return;
+                if (currentLength >= 10) e.preventDefault();
             }
         });
 
-        // Paste event - trim to 10 digits
-        phoneInput.addEventListener('paste', function (e) {
+        phoneInput.addEventListener('paste', function () {
             const countryData = iti.getSelectedCountryData();
             if (countryData && countryData.iso2 === 'in') {
                 setTimeout(() => {
                     let val = phoneInput.value.replace(/\D/g, '');
-                    if (val.length > 10) {
-                        val = val.slice(0, 10);
-                    }
+                    if (val.length > 10) val = val.slice(0, 10);
                     phoneInput.value = val;
                 }, 10);
             }
         });
 
-        phoneInput.addEventListener('countrychange', function () {
-            phoneInput.value = '';
-            validateIndiaPhone();
-        });
-
+        phoneInput.addEventListener('countrychange', () => { phoneInput.value = ''; validateIndiaPhone(); });
         setTimeout(validateIndiaPhone, 1000);
 
-        // General Form Validation
+        // ── 3. Form Validation ─────────────────────────────────────────────────
+        // COMPULSORY: First Name, Work Email, Country, Work Phone (per client)
         const validateForm = (e) => {
             let isValid = true;
             let firstErrorField = null;
 
-            const showError = (fieldId, msg) => {
-                const field = document.querySelector('[name="' + fieldId + '"]') || document.getElementById('id_' + fieldId);
-                const errorDiv = document.getElementById('error_id_' + fieldId) || document.getElementById('phone-error');
-
+            const showError = (fieldId, msg, customEl) => {
+                const field = customEl || document.querySelector('[name="' + fieldId + '"]');
+                const errorDiv = document.getElementById('error_id_' + fieldId);
                 if (field) {
                     field.style.borderColor = "#ef4444";
-                    if (errorDiv) {
-                        errorDiv.textContent = msg;
-                        errorDiv.style.display = 'block';
-                    }
                     if (!firstErrorField) firstErrorField = field;
                 }
+                if (errorDiv) { errorDiv.textContent = msg; errorDiv.style.display = 'block'; }
             };
 
             const hideError = (fieldId) => {
-                const field = document.querySelector('[name="' + fieldId + '"]') || document.getElementById('id_' + fieldId);
-                const errorDiv = document.getElementById('error_id_' + fieldId) || document.getElementById('phone-error');
-
-                if (field) {
-                    field.style.borderColor = "#e2e8f0";
-                    if (errorDiv) {
-                        errorDiv.style.display = 'none';
-                    }
-                }
+                const field = document.querySelector('[name="' + fieldId + '"]');
+                const errorDiv = document.getElementById('error_id_' + fieldId);
+                if (field) field.style.borderColor = "#e2e8f0";
+                if (errorDiv) errorDiv.style.display = 'none';
             };
 
-            // Fields to validate
+            // Required fields — only the 4 client-specified compulsory ones
             const requiredFields = [
-                { id: 'first_name', msg: 'First Name is required' },
-                { id: 'last_name', msg: 'Last Name is required' },
-                { id: 'email', msg: 'Email is required' },
-                { id: 'country', msg: 'Country is required' },
-                { id: 'company_name', msg: 'Company Name is required' },
-                { id: 'message', msg: 'Message is required' }
+                { id: 'first_name', msg: 'First Name is required.' },
+                { id: 'email', msg: 'Work Email is required.' },
+                { id: 'country', msg: 'Please select a country.' },
             ];
 
             requiredFields.forEach(item => {
@@ -988,45 +1030,40 @@
                 const field = document.querySelector('[name="' + item.id + '"]');
                 if (field && !field.value.trim()) {
                     isValid = false;
-                    showError(item.id, "This field is required.");
+                    showError(item.id, item.msg);
                 }
             });
 
-            // Specific: Email
+            // Email format check
             const emailField = document.querySelector('[name="email"]');
             if (emailField && emailField.value.trim()) {
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 if (!emailRegex.test(emailField.value.trim())) {
                     isValid = false;
-                    showError('email', "Please enter a valid email address.");
+                    showError('email', 'Please enter a valid email address.');
                 }
             }
 
-            // Specific: Phone
+            // Phone — required + format check
             const phoneVal = phoneInput.value.trim();
             const countryData = iti.getSelectedCountryData();
-
             phoneInput.style.borderColor = "#e2e8f0";
             phoneError.style.display = 'none';
 
             if (!phoneVal) {
                 isValid = false;
                 phoneInput.style.borderColor = "#ef4444";
-                phoneError.textContent = "This field is required.";
+                phoneError.textContent = "Work Phone is required.";
                 phoneError.style.display = 'block';
                 if (!firstErrorField) firstErrorField = phoneInput;
             } else {
-                if (countryData.iso2 === 'in') {
-                    if (phoneVal.length !== 10) {
-                        isValid = false;
-                        phoneInput.style.borderColor = "#ef4444";
-                        phoneError.textContent = "Phone number must be exactly 10 digits.";
-                        phoneError.style.display = 'block';
-                        if (!firstErrorField) firstErrorField = phoneInput;
-                    }
-                }
-
-                if ((countryData.iso2 !== 'in' || phoneVal.length === 10) && !iti.isValidNumber()) {
+                if (countryData.iso2 === 'in' && phoneVal.length !== 10) {
+                    isValid = false;
+                    phoneInput.style.borderColor = "#ef4444";
+                    phoneError.textContent = "Phone number must be exactly 10 digits.";
+                    phoneError.style.display = 'block';
+                    if (!firstErrorField) firstErrorField = phoneInput;
+                } else if ((countryData.iso2 !== 'in' || phoneVal.length === 10) && !iti.isValidNumber()) {
                     isValid = false;
                     phoneInput.style.borderColor = "#ef4444";
                     phoneError.textContent = "Please enter a valid phone number.";
@@ -1046,14 +1083,9 @@
 
         const form = document.querySelector("#leadForm");
         form.addEventListener('submit', function (e) {
-            if (!validateForm(e)) {
-                return false;
-            }
-            // Valid
-            if (iti) {
-                const dialCode = iti.getSelectedCountryData().dialCode;
-                countryCodeInput.value = "+" + dialCode;
-            }
+            if (!validateForm(e)) return false;
+            // On success: save dial code then show spinner
+            if (iti) countryCodeInput.value = "+" + iti.getSelectedCountryData().dialCode;
             const btn = document.getElementById('submitBtn');
             btn.innerHTML = 'Processing... <i class="fas fa-spinner fa-spin"></i>';
             btn.disabled = true;
@@ -1064,7 +1096,7 @@
     function updateBuyLinkSidebar(radio, slug) {
         const type = radio.value;
         const form = document.getElementById('buyFormSidebar');
-        form.action = `/reports/checkout/${slug}/${type}/`;
+        form.action = `/checkout/${slug}/${type}/`;
     }
 </script>
 {% endblock %}

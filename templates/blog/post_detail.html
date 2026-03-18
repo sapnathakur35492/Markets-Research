@@ -20,6 +20,54 @@
 {% endif %}
 <meta property="article:published_time" content="{{ post.publish_date|date:'c' }}">
 <meta property="article:author" content="{{ post.author }}">
+
+<style>
+    /* Premium Heading Styles for Blog Content */
+    .blog-article-body h1,
+    .blog-article-body h2,
+    .blog-article-body h3,
+    .blog-article-body h4,
+    .blog-article-body h5,
+    .blog-article-body h6 {
+        font-family: 'Inter', sans-serif !important;
+        font-weight: 700 !important;
+        color: #1e3a8a !important;
+        /* Bold Blue */
+        margin-top: 2.5rem !important;
+        margin-bottom: 1.5rem !important;
+        padding: 0.75rem 1rem 0.75rem 1.25rem !important;
+        border-left: 5px solid #1e3a8a !important;
+        background: linear-gradient(to right, #f8fafc, transparent) !important;
+        border-radius: 0 8px 8px 0 !important;
+        line-height: 1.4 !important;
+        display: block !important;
+    }
+
+    .blog-article-body h1 {
+        font-size: 1.8rem !important;
+    }
+
+    .blog-article-body h2 {
+        font-size: 1.6rem !important;
+    }
+
+    .blog-article-body h3 {
+        font-size: 1.4rem !important;
+    }
+
+    .blog-article-body h4 {
+        font-size: 1.2rem !important;
+    }
+
+    /* Ensure spans inside headings inherit the style */
+    .blog-article-body h1 span,
+    .blog-article-body h2 span,
+    .blog-article-body h3 span {
+        color: inherit !important;
+        font-weight: inherit !important;
+        font-size: inherit !important;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -27,12 +75,12 @@
     <!-- Premium Header Section -->
     <header class="blog-header-section">
         <div class="blog-meta-header">
-            <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 1rem;">
-                <span class="blog-date-badge">
+            <div
+                style="display: flex; gap: 10px; align-items: center; justify-content: center; margin-bottom: 0.5rem; flex-wrap: nowrap;">
+                <span class="blog-date-badge" style="margin-bottom: 0;">
                     {{ post.publish_date|date:"F d, Y" }}
                 </span>
-                <span
-                    style="background: rgba(0, 194, 203, 0.2); color: #008985; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">
+                <span class="blog-category-badge" style="margin-bottom: 0;">
                     {{ post.category.name|default:"Uncategorized" }}
                 </span>
             </div>
@@ -71,6 +119,20 @@
                     Array.from(node.childNodes).forEach(linkify);
                 }
             }
+
+            // Convert <p><strong>Heading</strong></p> to <h2>Heading</h2>
+            // This handles cases where headings are formatted as bold paragraphs instead of real heading tags
+            contentBody.querySelectorAll('p').forEach(p => {
+                const hasOnlyStrong = p.children.length === 1 && p.firstElementChild.tagName === 'STRONG';
+                const textMatchesValue = p.textContent.trim() === p.firstElementChild?.textContent?.trim();
+
+                if (hasOnlyStrong && textMatchesValue) {
+                    const h2 = document.createElement('h2');
+                    h2.innerHTML = p.firstElementChild.innerHTML;
+                    // Add a special class if needed, but the base h2 style in blog.css is already correct
+                    p.parentNode.replaceChild(h2, p);
+                }
+            });
 
             linkify(contentBody);
         });

@@ -142,6 +142,23 @@
         color: #0f172a;
         margin-bottom: 0.25rem;
         transition: color 0.3s;
+        min-height: 2.8rem;
+        /* Align titles to same height */
+    }
+
+    .card-desc {
+        font-size: 0.9rem;
+        color: #64748b;
+        text-align: left;
+        margin-bottom: 0.5rem;
+        line-height: 1.4;
+        transition: color 0.3s;
+        min-height: 5rem;
+        /* Ensure prices start at same position */
+    }
+
+    .pricing-card:hover .card-desc {
+        color: white !important;
     }
 
     .card-price-container {
@@ -304,8 +321,7 @@
             <!-- Single User -->
             <div class="pricing-card">
                 <h2 class="card-title">Single User License</h2>
-                <p
-                    style="font-size: 0.9rem; color: #64748b; text-align: left; margin-bottom: 0.5rem; line-height: 1.4; transition: color 0.3s;">
+                <p class="card-desc">
                     Designed for individual researchers and analysts who need exclusive personal access to a report.
                 </p>
                 <div class="card-price-container">
@@ -325,8 +341,7 @@
             <div class="pricing-card" style="border-color: var(--pricing-secondary); border-width: 2px;">
                 <div class="card-popular-badge" style="top: 10px; right: -12px;">⭐ Most Popular</div>
                 <h2 class="card-title" style="padding-right: 2rem; font-size: 1.25rem;">Multi-User License</h2>
-                <p
-                    style="font-size: 0.9rem; color: #64748b; text-align: left; margin-bottom: 0.5rem; line-height: 1.4; transition: color 0.3s;">
+                <p class="card-desc">
                     Ideal for teams and departments that need to collaborate around shared market intelligence.
                 </p>
                 <div class="card-price-container">
@@ -345,8 +360,7 @@
             <!-- Enterprise -->
             <div class="pricing-card">
                 <h2 class="card-title">Enterprise License</h2>
-                <p
-                    style="font-size: 0.9rem; color: #64748b; text-align: left; margin-bottom: 0.5rem; line-height: 1.4; transition: color 0.3s;">
+                <p class="card-desc">
                     Built for organisations that require unrestricted internal access and the highest degree of report
                     flexibility.
                 </p>
@@ -366,8 +380,7 @@
             <!-- Data Pack -->
             <div class="pricing-card">
                 <h2 class="card-title">Data Pack</h2>
-                <p
-                    style="font-size: 0.9rem; color: #64748b; text-align: left; margin-bottom: 0.5rem; line-height: 1.4;">
+                <p class="card-desc">
                     For clients who need the underlying data sets without the full report narrative — ideal for
                     modelling, benchmarking, and internal analysis workflows.
                 </p>

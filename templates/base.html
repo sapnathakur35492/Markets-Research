@@ -782,18 +782,113 @@
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <style>
+        /* Unique Premium Success Modal styling */
+        .premium-swal-popup {
+            border-radius: 32px !important;
+            padding: 3rem 2rem !important;
+            background: rgba(255, 255, 255, 0.9) !important;
+            backdrop-filter: blur(20px) !important;
+            -webkit-backdrop-filter: blur(20px) !important;
+            box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.15),
+                0 0 0 1px rgba(255, 255, 255, 0.4) inset !important;
+            border: none !important;
+            overflow: visible !important;
+        }
+
+        .premium-swal-title {
+            color: #0f172a !important;
+            font-size: 2rem !important;
+            font-weight: 900 !important;
+            letter-spacing: -0.04em !important;
+            margin-top: 1.5rem !important;
+            margin-bottom: 0.75rem !important;
+            line-height: 1.1 !important;
+        }
+
+        .premium-swal-html {
+            color: #475569 !important;
+            font-size: 1.1rem !important;
+            line-height: 1.6 !important;
+            font-weight: 500 !important;
+        }
+
+        .premium-swal-confirm {
+            background: #0f172a !important;
+            color: #ffffff !important;
+            padding: 1rem 3rem !important;
+            border-radius: 100px !important;
+            font-weight: 700 !important;
+            font-size: 1rem !important;
+            margin-top: 2rem !important;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+            box-shadow: 0 10px 20px -5px rgba(15, 23, 42, 0.3) !important;
+            border: none !important;
+        }
+
+        .premium-swal-confirm:hover {
+            transform: scale(1.05) translateY(-3px) !important;
+            box-shadow: 0 20px 30px -10px rgba(15, 23, 42, 0.4) !important;
+            background: #1e293b !important;
+        }
+
+        /* Success Icon Enhancement */
+        .swal2-icon.swal2-success {
+            border-color: #10b981 !important;
+            transform: scale(1.2);
+            margin-top: -1rem !important;
+        }
+
+        .swal2-icon.swal2-success .swal2-success-ring {
+            border: 4px solid rgba(16, 185, 129, 0.2) !important;
+        }
+
+        .swal2-icon.swal2-success [class^='swal2-success-line'] {
+            background-color: #10b981 !important;
+        }
+
+        /* Entrance Animation */
+        @keyframes customBounceIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8) translateY(40px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .premium-swal-show {
+            animation: customBounceIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+    </style>
+
     <script>
-        // Check for Django messages and display them with SweetAlert
         document.addEventListener('DOMContentLoaded', function () {
             {% if messages %}
             {% for message in messages %}
             Swal.fire({
-                title: "{% if message.tags == 'success' %}Success!{% elif message.tags == 'error' %}Error!{% else %}Notification{% endif %}",
-                text: "{{ message }}",
+                title: "{% if message.tags == 'success' %}Thank You!{% elif message.tags == 'error' %}Oops...{% else %}Notification{% endif %}",
+                html: "<div style='margin-top: 5px;'>{{ message }}</div>",
                 icon: "{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% else %}info{% endif %}",
-                confirmButtonText: 'OK',
-                confirmButtonColor: '#3b82f6',
-                timer: 5000,
+                showConfirmButton: true,
+                confirmButtonText: 'Done',
+                customClass: {
+                    popup: 'premium-swal-popup',
+                    title: 'premium-swal-title',
+                    htmlContainer: 'premium-swal-html',
+                    confirmButton: 'premium-swal-confirm'
+                },
+                buttonsStyling: false,
+                showClass: {
+                    popup: 'premium-swal-show'
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__fadeOut animate__faster'
+                },
+                timer: 8000,
                 timerProgressBar: true
             });
             {% endfor %}

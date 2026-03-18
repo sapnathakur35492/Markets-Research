@@ -890,7 +890,7 @@
 
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
             {% for category in categories|slice:":7" %}
-            <a href="{% url 'report-list' %}?category={{ category.slug }}"
+            <a href="{{ category.get_absolute_url }}"
                 style="display: flex; align-items: center; gap: 1rem; padding: 1.5rem; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; text-decoration: none; transition: all 0.2s; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
                 <div
                     style="width: 64px; height: 64px; flex-shrink: 0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border: 1px solid #f1f5f9;">
@@ -1094,7 +1094,7 @@
 
         <div class="reports-grid">
             {% for report in latest_reports %}
-            <a href="{% url 'report-detail' report.slug %}" class="micro-card">
+            <a href="{{ report.get_absolute_url }}" class="micro-card">
                 <span class="badge">{{ report.category.name }}</span>
                 <h3>{{ report.title }}</h3>
                 <div class="meta">
@@ -1106,6 +1106,8 @@
         </div>
     </div>
 </section>
+
+
 
 <!-- Start Your Growth Journey CTA -->
 <section

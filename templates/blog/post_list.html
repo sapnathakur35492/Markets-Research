@@ -1,60 +1,103 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Blog - Markets NXT{% endblock %}
 
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/blog.css' %}">
+{% endblock %}
+
 {% block content %}
 <section class="blog-header"
-    style="background: linear-gradient(135deg, #000933 0%, #1354b4 100%); padding: 4rem 0; text-align: center; color: white;">
+    style="background: linear-gradient(135deg, #000933 0%, #1354b4 100%); padding: 5rem 0; text-align: center; color: white;">
     <div class="container">
-        <h1 style="font-size: 2.5rem; color: white; margin-bottom: 1rem;">Markets NXT Blog</h1>
-        <p style="color: rgba(255,255,255,0.9); max-width: 600px; margin: 0 auto;">Latest news, trends, and analysis
-            from
-            our expert team.</p>
+        <h1 style="font-size: 2.8rem; color: white; margin-bottom: 1rem; font-weight: 800;">Markets NXT Insights</h1>
+        <p style="color: rgba(255,255,255,0.9); max-width: 650px; margin: 0 auto; font-size: 1.1rem; line-height: 1.6;">
+            The latest industry intelligence, strategic trends, and market analysis from our global team of experts.
+        </p>
     </div>
 </section>
 
-<section class="blog-list" style="padding: 4rem 0;">
+<section class="blog-list-section" style="padding: 5rem 0 0; background-color: #f8fafc;">
     <div class="container">
-        <div class="grid-3">
-            {% for post in posts %}
-            <article class="blog-card">
-                <div class="blog-card-image-wrapper">
-                    {% if post.image %}
-                    <img src="{{ post.image.url }}" alt="{{ post.title }}" class="blog-card-image">
-                    {% else %}
-                    <!-- Fallback placeholder if no image -->
-                    <div
-                        style="width: 100%; height: 100%; background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%); display: flex; align-items: center; justify-content: center; color: #64748b;">
-                        <i class="fas fa-image" style="font-size: 3rem; opacity: 0.5;"></i>
-                    </div>
-                    {% endif %}
-                </div>
-                <div class="blog-card-content">
-                    <div class="blog-card-meta"
-                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                        <span class="blog-card-category"
-                            style="background: rgba(0, 194, 203, 0.1); color: #008985; padding: 2px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700;">
-                            {{ post.category.name|default:"Uncategorized" }}
-                        </span>
-                        <div class="blog-card-date" style="font-size: 0.8rem; color: #64748b;">
-                            <i class="far fa-calendar-alt"></i> {{ post.publish_date|date:'M d, Y' }}
-                        </div>
-                    </div>
-                    <h2 class="blog-card-title">
-                        <a href="{% url 'blog-detail' post.slug %}">{{ post.title }}</a>
-                    </h2>
-                    <p class="blog-card-excerpt">{{ post.summary|truncatechars:120 }}</p>
-                    <a href="{% url 'blog-detail' post.slug %}" class="blog-read-more">
-                        Read Article <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-            </article>
-            {% empty %}
-            <div style="grid-column: 1 / -1; text-align: center; padding: 4rem;">
-                <p>No posts available yet.</p>
+        <!-- Section 1: Latest Daily Insights (Top 5) -->
+        <div style="margin-bottom: 4rem;">
+            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2.5rem;">
+                <span style="background: #2563eb; width: 4px; height: 32px; border-radius: 4px;"></span>
+                <h2 style="font-size: 1.85rem; font-weight: 800; color: #1e293b; margin: 0;">Latest Daily Insights</h2>
             </div>
-            {% endfor %}
+
+            <div class="blog-list-container">
+                {% for post in latest_posts %}
+                <a href="{% url 'blog-detail' post.slug %}" class="blog-list-row">
+                    <div class="blog-list-date">
+                        <span class="blog-list-date-day">{{ post.publish_date|date:'d' }}</span>
+                        <span class="blog-list-date-month">{{ post.publish_date|date:'M Y' }}</span>
+                    </div>
+
+                    <div class="blog-list-info">
+                        <div class="blog-list-meta">
+                            <span class="blog-list-category">{{ post.category.name|default:"Intelligence" }}</span>
+                            <span style="color: #94a3b8; font-size: 0.8rem;"><i class="far fa-clock"></i>
+                                {{post.read_time }} min read</span>
+                            <span style="color: #94a3b8; font-size: 0.8rem;"><i class="far fa-user"></i>
+                                {{ post.author}}</span>
+                        </div>
+                        <h2 class="blog-list-title">{{ post.title }}</h2>
+                        <p class="blog-list-excerpt">{{ post.summary|striptags|truncatechars:100 }}</p>
+                    </div>
+
+                    <div class="blog-list-arrow">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </a>
+                {% empty %}
+                <p
+                    style="color: #64748b; padding: 2rem; background: white; border-radius: 12px; border: 1px dashed #e2e8f0; text-align: center;">
+                    New insights are being drafted.</p>
+                {% endfor %}
+            </div>
         </div>
+
+        <!-- Section 2: Previous Analysis (Next 10) -->
+        {% if previous_posts %}
+        <div style="padding-bottom: 12rem;">
+            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2.5rem;">
+                <span style="background: #64748b; width: 4px; height: 32px; border-radius: 4px;"></span>
+                <h2 style="font-size: 1.85rem; font-weight: 800; color: #1e293b; margin: 0;">Previous Industry
+                    Intelligence</h2>
+            </div>
+
+            <div class="blog-list-container">
+                {% for p in previous_posts %}
+                <a href="{% url 'blog-detail' p.slug %}" class="blog-list-row" style="opacity: 0.9;">
+                    <div class="blog-list-date">
+                        <span class="blog-list-date-day">{{ p.publish_date|date:'d' }}</span>
+                        <span class="blog-list-date-month">{{ p.publish_date|date:'M Y' }}</span>
+                    </div>
+
+                    <div class="blog-list-info">
+                        <div class="blog-list-meta">
+                            <span class="blog-list-category"
+                                style="color: #0284c7; background: rgba(100, 116, 139, 0.05);">{{p.category.name|default:"Analysis"}}</span>
+                            <span style="color: #94a3b8; font-size: 0.8rem;"><i class="far fa-clock"></i>
+                                {{p.read_time}} min read</span>
+                            <span style="color: #94a3b8; font-size: 0.8rem;"><i class="far fa-user"></i>
+                                {{ p.author}}</span>
+                        </div>
+                        <h2 class="blog-list-title" style="font-size: 1.15rem;">{{ p.title }}</h2>
+                        <p class="blog-list-excerpt" style="max-width: 600px;">
+                            {{ p.summary|striptags|truncatechars:120}}</p>
+                    </div>
+
+                    <div class="blog-list-arrow">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
     </div>
 </section>
 {% endblock %}
