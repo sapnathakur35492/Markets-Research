@@ -73,6 +73,40 @@
 {% block content %}
 <article class="blog-post-wrapper">
     <!-- Premium Header Section -->
+    <style>
+        .blog-header-section {
+            background: linear-gradient(135deg, #000428 0%, #004e92 100%) !important;
+            padding: 40px 0 40px !important;
+            margin-top: 0 !important;
+            position: relative !important;
+            box-shadow: none !important;
+            border: none !important;
+        }
+
+        .blog-header-section::after {
+            display: none !important;
+            content: none !important;
+        }
+
+        .blog-post-wrapper {
+            background-color: #f8fafc !important;
+        }
+
+        /* Ensure the main site header doesn't push it down */
+        header:not(.blog-header-section) {
+            margin-bottom: 0 !important;
+        }
+
+        .blog-article-body p,
+        .blog-article-body li {
+            font-family: 'Inter', sans-serif !important;
+            color: #25292d !important;
+            font-weight: 500 !important;
+            font-size: 1.1rem !important;
+            line-height: 1.8 !important;
+            margin-bottom: 1.5rem !important;
+        }
+    </style>
     <header class="blog-header-section">
         <div class="blog-meta-header">
             <div
@@ -84,13 +118,23 @@
                     {{ post.category.name|default:"Uncategorized" }}
                 </span>
             </div>
-            <h1 class="blog-title">{{ post.title }}</h1>
+            <h1 class="blog-title"
+                style="white-space: nowrap !important; display: block !important; width: fit-content !important; margin-left: auto !important; margin-right: auto !important; font-size: 1.4rem; text-align: center !important; margin-bottom: 1.5rem;">
+                {{ post.title }}</h1>
 
-            <div class="blog-author-info">
-                <span><i class="fas fa-user-circle"></i> By {{ post.author }}</span>
+            <div class="blog-author-info"
+                style="display: flex !important; flex-wrap: nowrap !important; align-items: center !important; justify-content: center !important; gap: 2rem !important; white-space: nowrap !important; width: 100% !important; font-size: 0.85rem;">
+                <div class="blog-author-main"
+                    style="display: flex !important; align-items: center !important; gap: 0.8rem !important; white-space: nowrap !important;">
+                    <i class="fas fa-user-circle"></i>
+                    By {{ post.author }}
+                </div>
                 {% if post.read_time %}
-                <span style="margin: 0 10px;">•</span>
-                <span><i class="far fa-clock"></i> {{ post.read_time }} min read</span>
+                <div class="blog-read-meta"
+                    style="display: flex !important; align-items: center !important; gap: 0.5rem !important; white-space: nowrap !important; flex-shrink: 0 !important;">
+                    <i class="far fa-clock"></i>
+                    {{ post.read_time }}&nbsp;min&nbsp;read
+                </div>
                 {% endif %}
             </div>
         </div>
@@ -120,16 +164,29 @@
                 }
             }
 
-            // Convert <p><strong>Heading</strong></p> to <h2>Heading</h2>
-            // This handles cases where headings are formatted as bold paragraphs instead of real heading tags
+            // Fallback: Convert <p><strong>Heading</strong></p> to <h2>Heading</h2>
             contentBody.querySelectorAll('p').forEach(p => {
-                const hasOnlyStrong = p.children.length === 1 && p.firstElementChild.tagName === 'STRONG';
-                const textMatchesValue = p.textContent.trim() === p.firstElementChild?.textContent?.trim();
+                const text = p.textContent.trim();
+                const innerHTML = p.innerHTML.trim();
+                const isShort = text.length > 5 && text.length < 100;
 
-                if (hasOnlyStrong && textMatchesValue) {
+                // Title Case heuristic
+                const smallWords = ['the', 'of', 'is', 'in', 'a', 'not', 'but', 'for', 'with', 'on', 'at', 'to', 'from', 'by', 'an', 'and', 'or', 'nor', 'as'];
+                const words = text.split(/\s+/).filter(w => /^[a-zA-Z]+$/.test(w));
+                const isTitleCase = words.length >= 2 && words.every(word => {
+                    if (smallWords.includes(word.toLowerCase())) return true;
+                    const firstChar = word.charAt(0);
+                    return firstChar === firstChar.toUpperCase() && firstChar !== firstChar.toLowerCase();
+                });
+
+                const boldChild = p.querySelector('strong, b, span[style*="font-weight: bold"], span[style*="font-weight:bold"]');
+                const isBoldOnlyContent = boldChild && boldChild.textContent.trim() === text;
+                const startsEndsWithBold = (innerHTML.startsWith('<strong>') && innerHTML.endsWith('</strong>')) ||
+                    (innerHTML.startsWith('<b>') && innerHTML.endsWith('</b>'));
+
+                if (isShort && (isBoldOnlyContent || startsEndsWithBold || isTitleCase || text.endsWith(':'))) {
                     const h2 = document.createElement('h2');
-                    h2.innerHTML = p.firstElementChild.innerHTML;
-                    // Add a special class if needed, but the base h2 style in blog.css is already correct
+                    h2.innerHTML = p.innerHTML;
                     p.parentNode.replaceChild(h2, p);
                 }
             });

@@ -3,7 +3,10 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.sitemaps.views import sitemap
-from .sitemaps import ReportSitemap, CategorySitemap, BlogSitemap, StaticViewSitemap
+from .sitemaps import (
+    ReportSitemap, CategorySitemap, BlogSitemap,
+    StaticViewSitemap, CountrySitemap, CountryCategorySitemap
+)
 from django.views.generic import RedirectView, TemplateView
 from reports.views import HomeView
 from leads.views import CheckoutView
@@ -13,6 +16,8 @@ sitemaps = {
     'categories': CategorySitemap,
     'blog': BlogSitemap,
     'static': StaticViewSitemap,
+    'countries': CountrySitemap,
+    'country_categories': CountryCategorySitemap,
 }
 
 urlpatterns = [

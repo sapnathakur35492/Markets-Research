@@ -104,6 +104,23 @@ class CategoryOrReportView(View):
         return ReportDetailView.as_view()(request, *args, **kwargs)
 
 
+class CountryCategoryOrReportView(View):
+    """
+    Dispatcher view to handle /reports/country-reports/<country_slug>/<slug>/ pattern.
+    Checks if the slug is a Category first, then a Report.
+    """
+    def get(self, request, *args, **kwargs):
+        slug = kwargs.get('slug')
+        country_slug = kwargs.get('country_slug')
+        
+        # Check if it's a category
+        if Category.objects.filter(slug=slug).exists():
+            return CountryReportListView.as_view()(request, country_slug=country_slug, category_slug=slug, *args, **kwargs)
+        
+        # Else treat as a report detail
+        return ReportDetailView.as_view()(request, *args, **kwargs)
+
+
 class GlobalReportListView(ReportListView):
     """
     SEO-friendly listing for Global reports.
@@ -151,8 +168,9 @@ class ReportDetailView(DetailView):
         ).filter(report_count__gt=0).order_by('name')
 
         # Pass URL context for breadcrumbs
-        context['category_slug'] = self.kwargs.get('category_slug', '')
-        context['country_slug'] = self.kwargs.get('country_slug', '')
+        from django.utils.text import slugify
+        context['category_slug'] = self.kwargs.get('category_slug', self.object.category.slug)
+        context['country_slug'] = self.kwargs.get('country_slug', slugify(self.object.region or ''))
         
         context['recaptcha_public_key'] = settings.RECAPTCHA_PUBLIC_KEY
         return context

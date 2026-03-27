@@ -114,7 +114,6 @@ class Report(models.Model):
         else:
             return reverse('report-detail-country', kwargs={
                 'country_slug': slugify(self.region or 'country'),
-                'category_slug': self.category.slug,
                 'slug': self.slug
             })
 
@@ -129,7 +128,6 @@ class Report(models.Model):
         else:
             return reverse('report-methodology-country', kwargs={
                 'country_slug': slugify(self.region or 'country'),
-                'category_slug': self.category.slug,
                 'slug': self.slug
             })
 

@@ -27,6 +27,15 @@ def auto_format_content(text):
     lines = text.split('\n')
     formatted_lines = []
     
+    known_sections = ['Industry Snapshot', 'Report Highlights', 'Key Market Growth Catalysts', 
+                      'Market Challenges and Constraints', 'Strategic Growth Opportunities', 
+                      'Market Coverage Overview', 'Geographic Performance Analysis', 
+                      'Competitive Environment Analysis', 'Leading Market Participants', 
+                      'Long-Term Market Perspective', 'Conclusion', 'Summary', 'Introduction',
+                      'Market Trends', 'Key Findings', 'Analysis', 'Future Outlook', 
+                      'Methodology', 'Appendices', 'About the Author', 'Recommendations',
+                      'Key Insights', 'Market Overview', 'Competitive Landscape', 'Executive Summary']
+    
     for line in lines:
         line = line.strip()
         if not line:
@@ -38,17 +47,21 @@ def auto_format_content(text):
         styled_line = re.sub(r'\*\*(.*?)\*\*', r'<strong>\1</strong>', line)
         styled_line = re.sub(r'\*(.*?)\*', r'<em>\1</em>', styled_line)
         
-        # H1: All uppercase clean_text
+        # Determine if the line looks like a title (Title Case)
+        words = [w for w in clean_text.split() if w.isalpha()]
+        small_words = {'the', 'of', 'is', 'in', 'a', 'not', 'but', 'for', 'with', 'on', 'at', 'to', 'from', 'by', 'an', 'and', 'or', 'nor', 'as'}
+        is_title_case = all(w[0].isupper() for w in words if w.lower() not in small_words) if len(words) >= 2 else False
+        has_mid_colon = ':' in clean_text and len(clean_text.split(':')[0]) < 30
+        
+        # H2: Ends with colon, bolded, in known list, Title Case, or has mid-colon
         if clean_text.isupper() and len(clean_text) < 100 and not clean_text.startswith('-'):
             formatted_lines.append(f'<h1>{clean_text}</h1>')
-        
-        # H2: Clean text ends with colon
-        elif clean_text.endswith(':') and len(clean_text) < 100:
-            # Strip colon that might be followed by markdown markers
-            line_no_colon = re.sub(r':\s*([\*]*)$', r'\1', line)
-            styled_h2 = re.sub(r'\*\*(.*?)\*\*', r'<strong>\1</strong>', line_no_colon)
-            styled_h2 = re.sub(r'\*(.*?)\*', r'<em>\1</em>', styled_h2)
-            formatted_lines.append(f'<h2>{styled_h2}</h2>')
+        elif (clean_text.endswith(':') or (line.startswith('**') and line.endswith('**')) or 
+            clean_text in known_sections or (is_title_case and len(clean_text) < 70) or 
+            (has_mid_colon and len(clean_text) < 80)) and len(clean_text) < 100:
+            # Strip colon and markdown markers for the heading
+            heading_text = clean_text.rstrip(':')
+            formatted_lines.append(f'<h2>{heading_text}</h2>')
             
         # H3: Numbered sections
         elif re.match(r'^\d+\.', clean_text):

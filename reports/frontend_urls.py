@@ -1,7 +1,8 @@
 from django.urls import path
 from .views import (
     ReportListView, ReportDetailView, ReportMethodologyView,
-    CountryReportListView, GlobalReportListView, CategoryOrReportView
+    CountryReportListView, GlobalReportListView, CategoryOrReportView,
+    CountryCategoryOrReportView
 )
 from leads.views import LeadCaptureView, CheckoutView
 
@@ -26,17 +27,17 @@ urlpatterns = [
     # --- Country Reports ---
     # /reports/country-reports/                         → all country reports
     # /reports/country-reports/<country>/               → filter by country (SEO)
-    # /reports/country-reports/<country>/<category>/   → filter by country + category (highest SEO)
     path('country-reports/', CountryReportListView.as_view(), name='country-reports'),
     path('country-reports/page=<int:page>/', CountryReportListView.as_view(), name='country-reports-paginated'),
     path('country-reports/<slug:country_slug>/', CountryReportListView.as_view(), name='country-report-list'),
     path('country-reports/<slug:country_slug>/page=<int:page>/', CountryReportListView.as_view(), name='country-report-list-paginated'),
-    path('country-reports/<slug:country_slug>/<slug:category_slug>/', CountryReportListView.as_view(), name='country-report-list-category'),
-    path('country-reports/<slug:country_slug>/<slug:category_slug>/page=<int:page>/', CountryReportListView.as_view(), name='country-report-list-category-paginated'),
 
-    # /reports/country-reports/<country>/<category>/<slug>/  → country report detail
-    path('country-reports/<slug:country_slug>/<slug:category_slug>/<slug:slug>/', ReportDetailView.as_view(), name='report-detail-country'),
-    path('country-reports/<slug:country_slug>/<slug:category_slug>/<slug:slug>/methodology/', ReportMethodologyView.as_view(), name='report-methodology-country'),
+    # Country report detail OR Category filter dispatcher (excluded category from URL for detail)
+    # /reports/country-reports/<country>/<slug>/
+    path('country-reports/<slug:country_slug>/<slug:slug>/', CountryCategoryOrReportView.as_view(), name='report-detail-country'),
+    path('country-reports/<slug:country_slug>/<slug:slug>/', CountryCategoryOrReportView.as_view(), name='country-report-list-category'),
+    path('country-reports/<slug:country_slug>/<slug:category_slug>/page=<int:page>/', CountryReportListView.as_view(), name='country-report-list-category-paginated'),
+    path('country-reports/<slug:country_slug>/<slug:slug>/methodology/', ReportMethodologyView.as_view(), name='report-methodology-country'),
 
     # --- SEO friendly Category and Report detail dispatcher ---
     # This handles both /reports/<category-slug>/ and /reports/<report-slug>/
