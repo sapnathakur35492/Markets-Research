@@ -20,7 +20,8 @@
 {% if report.image %}
 <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ report.image.url }}">
 {% else %}
-<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo_new.jpg' %}">
+<meta property="og:image"
+    content="{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo_markets_nxt.jpg' %}">
 {% endif %}
 <meta property="article:published_time" content="{{ report.publish_date|date:'c' }}">
 
@@ -114,7 +115,7 @@
     }
 
     .detail-title {
-        font-size: 1.6rem;
+        font-size: 1.3rem;
         font-weight: 700;
         line-height: 1.3;
         color: white;
@@ -172,7 +173,7 @@
         scrollbar-width: none;
         width: 100%;
         position: sticky;
-        top: 130px;
+        top: 90px;
         z-index: 100;
         box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.05);
     }
@@ -284,6 +285,10 @@
         margin-top: 1.5rem !important;
     }
 
+    h1.section-header:empty {
+        display: none !important;
+    }
+
     .section-header {
         position: relative !important;
         font-size: 1.3rem !important;
@@ -384,14 +389,14 @@
         margin: 0;
         display: flex;
         flex-direction: column;
-        gap: 0.75rem;
+        gap: 0.4rem;
     }
 
     .rh-item {
         display: flex;
         align-items: flex-start;
-        gap: 0.75rem;
-        padding: 0.6rem 0.75rem;
+        gap: 0.5rem;
+        padding: 0.4rem 0.75rem;
         background: rgba(255, 255, 255, 0.7);
         border-radius: 8px;
         border: 1px solid rgba(191, 219, 254, 0.5);
@@ -431,9 +436,13 @@
         font-family: 'Inter', sans-serif !important;
         color: #25292d !important;
         font-weight: 500 !important;
-        font-size: 1.1rem !important;
+        font-size: 1rem !important;
         line-height: 1.7 !important;
-        margin-bottom: 1.2rem !important;
+        margin-bottom: 1rem !important;
+    }
+
+    .tab-pane li {
+        margin-bottom: 0.5rem !important;
     }
 
     /* List Normalization */
@@ -478,7 +487,7 @@
 
     .tab-pane h1 {
         color: #1e3a8a !important;
-        font-size: 1.5rem !important;
+        font-size: 1.4rem !important;
         font-weight: 700 !important;
         margin-top: 0;
         margin-bottom: 1.25rem;
@@ -500,7 +509,7 @@
         width: 100%;
         border-collapse: collapse;
         margin: 1.5rem 0;
-        font-size: 0.9rem;
+        font-size: 1rem;
         display: block;
         /* Important for horizontal scroll */
         overflow-x: auto;
@@ -511,7 +520,10 @@
         border: 1px solid #cbd5e1;
         padding: 0.75rem;
         min-width: 120px;
-        /* Ensure columns don't collapse too much */
+        font-family: 'Inter', sans-serif !important;
+        color: #25292d !important;
+        font-weight: 500 !important;
+        font-size: 1rem !important;
     }
 
     .tab-pane th {
@@ -527,12 +539,16 @@
         /* Don't be too huge on desktop */
         height: auto;
         display: block;
-        margin: 1.5rem auto;
-        /* Center image */
         border-radius: 4px;
         border: 1px solid #e2e8f0;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
     }
+
+    .detail-grid-container .tab-pane img {
+        margin: 0;
+    }
+
+
 
     /* Sidebar */
     .detail-sidebar {
@@ -755,50 +771,78 @@
         box-sizing: border-box;
     }
 
-    /* FAQ Section Styling */
+    /* Accordion FAQ Styling */
     .faq-section {
-        margin-top: 1.5rem;
+        margin-top: 2rem;
     }
 
-    .faq-item {
-        background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+    .faq-accordion-item {
         border: 1px solid #e2e8f0;
-        border-left: 4px solid #1e3a8a;
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-bottom: 1.25rem;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-        transition: all 0.3s ease;
+        border-radius: 10px;
+        margin-bottom: 0.75rem;
+        background: #ffffff;
+        overflow: hidden;
+        transition: all 0.2s ease;
     }
 
-    .faq-item:hover {
-        box-shadow: 0 4px 12px rgba(30, 58, 138, 0.1);
-        transform: translateY(-2px);
-        border-left-color: #3b82f6;
+    .faq-accordion-header {
+        width: 100%;
+        padding: 1.1rem 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: none;
+        border: none;
+        cursor: pointer;
+        text-align: left;
+        gap: 1rem;
+        transition: background 0.2s;
     }
 
-    .faq-question {
+    .faq-accordion-header:hover {
+        background: #f8fafc;
+    }
+
+    .faq-question-text {
+        color: #1e3a8a;
         font-weight: 700;
         font-size: 1.05rem;
-        color: #1e3a8a;
-        margin-bottom: 0.75rem;
-        display: flex;
-        align-items: flex-start;
-        gap: 0.5rem;
+        line-height: 1.4;
     }
 
-    .faq-question::before {
-        content: "Q:";
-        font-weight: 800;
-        color: #3b82f6;
+    .q-num {
+        color: #1e3a8a;
+        margin-right: 0.25rem;
+    }
+
+    .faq-arrow {
+        color: #94a3b8;
+        font-size: 0.7rem;
+        transition: transform 0.3s ease;
         flex-shrink: 0;
     }
 
-    .faq-answer {
+    .faq-accordion-item.open .faq-arrow {
+        transform: rotate(180deg);
+    }
+
+    .faq-accordion-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-out;
+        background: #fff;
+    }
+
+    .faq-accordion-item.open .faq-accordion-content {
+        max-height: 800px;
+        border-top: 1px solid #f1f5f9;
+    }
+
+    .faq-answer-inner {
+        padding: 1.25rem 1.75rem;
         color: #475569;
-        line-height: 1.7;
-        text-align: justify;
-        padding-left: 1.75rem;
+        line-height: 1.6;
+        font-size: 1rem;
     }
 
     /* New Sidebar Widgets */
@@ -1676,7 +1720,7 @@
                     {% endif %}<!-- end new-format/legacy block -->
 
                     <!-- FAQs (always at the end of Description, regardless of format) -->
-                    <div class="faq-section" style="margin-top: 3rem;">
+                    <div class="faq-section" style="margin-top: 1.5rem;">
                         {% if report.faqs %}
                         <h1 class="section-header">Frequently Asked Questions</h1>
                         {{ report.faqs|format_faqs }}
@@ -1920,6 +1964,10 @@
 
         <!-- Action Buttons -->
         <div style="margin-bottom: 2rem;">
+            <a href="{% url 'pages:pricing' %}?type={% if 'global' in report.region|lower %}global{% else %}country{% endif %}&slug={{ report.slug }}"
+                class="sidebar-btn btn-green-buy">
+                Buy Now
+            </a>
             <a href="{% url 'request-sample' report.slug %}" class="sidebar-btn btn-red-sample">
                 Download PDF Sample
             </a>
@@ -1929,6 +1977,32 @@
             <a href="{% url 'speak-to-analyst' report.slug %}" class="sidebar-btn btn-blue-analyst">
                 Speak to Analyst
             </a>
+        </div>
+
+        <div class="sidebar-widget">
+            <h1 class="widget-title">Market Snapshot</h1>
+            <div class="snapshot-grid">
+                <div class="snapshot-item">
+                    <i class="fas fa-calendar-check snapshot-icon"></i>
+                    <span class="snapshot-label">Base Year</span>
+                    <span class="snapshot-value">{{ report.base_year|default:"2024" }}</span>
+                </div>
+                <div class="snapshot-item">
+                    <i class="fas fa-chart-line snapshot-icon"></i>
+                    <span class="snapshot-label">Forecast</span>
+                    <span class="snapshot-value">{{ report.forecast_period|default:"2025-2032" }}</span>
+                </div>
+                <div class="snapshot-item">
+                    <i class="fas fa-percentage snapshot-icon"></i>
+                    <span class="snapshot-label">CAGR</span>
+                    <span class="snapshot-value">7.5%</span>
+                </div>
+                <div class="snapshot-item">
+                    <i class="fas fa-globe-americas snapshot-icon"></i>
+                    <span class="snapshot-label">Region</span>
+                    <span class="snapshot-value">{{ report.region|default:"Global" }}</span>
+                </div>
+            </div>
         </div>
 
         <!-- License / Buy Box -->
@@ -1970,32 +2044,6 @@
                     Proceed to Buy
                 </button>
             </form>
-        </div>
-
-        <div class="sidebar-widget">
-            <h1 class="widget-title">Market Snapshot</h1>
-            <div class="snapshot-grid">
-                <div class="snapshot-item">
-                    <i class="fas fa-calendar-check snapshot-icon"></i>
-                    <span class="snapshot-label">Base Year</span>
-                    <span class="snapshot-value">{{ report.base_year|default:"2024" }}</span>
-                </div>
-                <div class="snapshot-item">
-                    <i class="fas fa-chart-line snapshot-icon"></i>
-                    <span class="snapshot-label">Forecast</span>
-                    <span class="snapshot-value">{{ report.forecast_period|default:"2025-2032" }}</span>
-                </div>
-                <div class="snapshot-item">
-                    <i class="fas fa-percentage snapshot-icon"></i>
-                    <span class="snapshot-label">CAGR</span>
-                    <span class="snapshot-value">7.5%</span>
-                </div>
-                <div class="snapshot-item">
-                    <i class="fas fa-globe-americas snapshot-icon"></i>
-                    <span class="snapshot-label">Region</span>
-                    <span class="snapshot-value">{{ report.region|default:"Global" }}</span>
-                </div>
-            </div>
         </div>
 
         {% if related_reports %}
@@ -2200,7 +2248,8 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                        'Accept': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
                     },
                     body: JSON.stringify(data)
                 })
@@ -2208,7 +2257,15 @@
                         if (response.ok) {
                             return response.json();
                         }
-                        return response.json().then(err => { throw new Error(JSON.stringify(err)) });
+                        return response.text().then(text => {
+                            let errorData;
+                            try {
+                                errorData = JSON.parse(text);
+                            } catch (e) {
+                                errorData = { message: text, status: response.status };
+                            }
+                            throw new Error(JSON.stringify(errorData));
+                        });
                     })
                     .then(data => {
                         formContainer.style.display = 'none';
@@ -2219,14 +2276,28 @@
                         grecaptcha.reset(exitIntentWidgetId);
                     })
                     .catch(error => {
-                        console.error('Error:', error);
+                        console.error('Lead submission failed:', error);
                         messageDiv.style.display = 'block';
                         messageDiv.style.color = 'red';
-                        let msg = 'Something went wrong.';
+                        let msg = 'Something went wrong. Please try again.';
+
                         try {
                             const errObj = JSON.parse(error.message);
-                            if (errObj.captcha) msg = "Captcha Error: " + errObj.captcha[0];
-                        } catch (e) { }
+                            if (errObj.captcha) {
+                                msg = "Security Check Error: " + errObj.captcha[0];
+                            } else if (typeof errObj === 'object') {
+                                // Extract first available error message
+                                const firstKey = Object.keys(errObj)[0];
+                                if (firstKey && Array.isArray(errObj[firstKey])) {
+                                    msg = firstKey.replace('_', ' ').toUpperCase() + ": " + errObj[firstKey][0];
+                                } else if (errObj.message) {
+                                    msg = errObj.message;
+                                }
+                            }
+                        } catch (e) {
+                            console.error('Error parsing response:', e);
+                        }
+
                         messageDiv.innerText = msg;
                         btn.disabled = false;
                         btn.innerText = originalText;
@@ -2323,6 +2394,24 @@
 
         // All heading cleanup is now handled server-side by format_report_content filter.
         // No client-side heading manipulation needed.
+
+        // FAQ Accordion Toggle
+        const faqHeaders = document.querySelectorAll('.faq-accordion-header');
+        faqHeaders.forEach(header => {
+            header.addEventListener('click', function () {
+                const item = this.parentElement;
+
+                // Toggle current
+                const isOpen = item.classList.contains('open');
+
+                // Close others
+                document.querySelectorAll('.faq-accordion-item').forEach(i => i.classList.remove('open'));
+
+                if (!isOpen) {
+                    item.classList.add('open');
+                }
+            });
+        });
     });
 
     // Buy Link Update

@@ -189,8 +189,19 @@ class CountryReportListView(ReportListView):
 
         # Country from URL path (e.g. /reports/country-reports/brazil/)
         country_slug = self.kwargs.get('country_slug')
+        matched_region = None
+        
         if country_slug:
-            queryset = queryset.filter(region__iexact=country_slug.replace('-', ' '))
+            # Find the actual region name that matches this slug (robust way to handle 'U.S.' -> 'us')
+            from django.utils.text import slugify
+            all_regions = Report.objects.exclude(region__icontains='Global').values_list('region', flat=True).distinct()
+            matched_region = next((r for r in all_regions if slugify(r) == country_slug), None)
+            
+            if matched_region:
+                queryset = queryset.filter(region=matched_region)
+            else:
+                # Fallback to existing logic
+                queryset = queryset.filter(region__iexact=country_slug.replace('-', ' '))
 
         # Category from URL path (e.g. /reports/country-reports/brazil/healthcare/)
         category_slug = self.kwargs.get('category_slug')
@@ -198,9 +209,19 @@ class CountryReportListView(ReportListView):
             queryset = queryset.filter(category__slug=category_slug)
 
         # Also support legacy ?country= query param
-        selected_country = self.request.GET.get('country')
-        if selected_country and not country_slug:
-            queryset = queryset.filter(region=selected_country)
+        selected_country_param = self.request.GET.get('country')
+        if selected_country_param and not country_slug:
+            # Try robust match for query param too
+            from django.utils.text import slugify
+            all_regions = Report.objects.exclude(region__icontains='Global').values_list('region', flat=True).distinct()
+            param_matched_region = next((r for r in all_regions if r == selected_country_param or slugify(r) == selected_country_param), None)
+            
+            if param_matched_region:
+                queryset = queryset.filter(region=param_matched_region)
+                matched_region = param_matched_region
+            else:
+                queryset = queryset.filter(region=selected_country_param)
+                matched_region = selected_country_param
 
         # Search
         q = self.request.GET.get('q')
@@ -212,6 +233,7 @@ class CountryReportListView(ReportListView):
         if cat_slug and not category_slug:
             queryset = queryset.filter(category__slug=cat_slug)
 
+        self.resolved_region = matched_region # Store for context
         return queryset.order_by('-publish_date')
 
     def get_context_data(self, **kwargs):
@@ -220,7 +242,10 @@ class CountryReportListView(ReportListView):
         context['is_country_reports'] = True
         context['country_slug'] = self.kwargs.get('country_slug', '')
         context['category_slug'] = self.kwargs.get('category_slug', '')
-        context['selected_country'] = self.request.GET.get('country', self.kwargs.get('country_slug', ''))
+        
+        # Use the resolved region name if we found one
+        resolved_region = getattr(self, 'resolved_region', None)
+        context['selected_country'] = resolved_region or self.request.GET.get('country', self.kwargs.get('country_slug', ''))
         
         if self.kwargs.get('country_slug') and self.kwargs.get('category_slug'):
             context['page_url_name'] = 'country-report-list-category-paginated'

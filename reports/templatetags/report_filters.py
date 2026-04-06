@@ -24,6 +24,7 @@ def format_faqs(faq_content):
         return mark_safe(faq_content)
     
     faq_cards = []
+    card_count = 1
     i = 0
     while i < len(paragraphs):
         tag, para = paragraphs[i]
@@ -33,6 +34,7 @@ def format_faqs(faq_content):
             i += 1
             continue
         
+        # Determine if this is a question
         is_question = (
             tag.startswith('h') or
             (len(para) < 250 and (not para.endswith('.') or para.endswith('?'))) or
@@ -45,18 +47,29 @@ def format_faqs(faq_content):
             _, answer = paragraphs[i + 1]
             answer = answer.strip()
             
-            question = re.sub(r'^(Q|Question|Q\d+)\s*:\s*', '', question, flags=re.IGNORECASE)
-            answer = re.sub(r'^(A|Answer|Ans)\s*:\s*', '', answer, flags=re.IGNORECASE)
+            # Clean prefixes
+            question = re.sub(r'^(Q|Question|Q\d+)\s*[:.]\s*', '', question, flags=re.IGNORECASE)
+            question = re.sub(r'<[^>]+>', '', question)
+            answer = re.sub(r'^(A|Answer|Ans)\s*[:.]\s*', '', answer, flags=re.IGNORECASE)
             
-            faq_card = f'''<div class="faq-item">
-    <div class="faq-question">{question}</div>
-    <div class="faq-answer">{answer}</div>
+            faq_card = f'''
+<div class="faq-accordion-item">
+    <button class="faq-accordion-header" type="button">
+        <span class="faq-question-text"><span class="q-num">Q{card_count}.</span> {question}</span>
+        <span class="faq-arrow">▼</span>
+    </button>
+    <div class="faq-accordion-content">
+        <div class="faq-answer-inner">{answer}</div>
+    </div>
 </div>'''
             faq_cards.append(faq_card)
+            card_count += 1
             i += 2
         else:
-            faq_card = f'''<div class="faq-item">
-    <div class="faq-answer">{para}</div>
+            # Fallback for single blocks
+            faq_card = f'''
+<div class="faq-accordion-item">
+    <div class="faq-answer-inner">{para}</div>
 </div>'''
             faq_cards.append(faq_card)
             i += 1
@@ -133,14 +146,14 @@ def format_market_coverage(content):
             value = parts[1].strip()
             
             if is_first and (key_clean.lower() == 'parameter' or key_clean.lower() == 'details'):
-                rows.append(f'''<tr style="background: #1e3a8a; border-bottom: 2px solid #1e3a8a;"><th style="padding: 1rem 1.25rem; font-weight: 700; color: #ffffff; width: 40%; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em;">{key_clean}</th><th style="padding: 1rem 1.25rem; font-weight: 700; color: #ffffff; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em;">{value}</th></tr>''')
+                rows.append(f'''<tr style="background: #1e3a8a; border-bottom: 2px solid #1e3a8a;"><th style="padding: 1rem 1.25rem; font-weight: 700; color: #ffffff; width: 40%; text-transform: uppercase; font-size: 1rem; letter-spacing: 0.05em;">{key_clean}</th><th style="padding: 1rem 1.25rem; font-weight: 700; color: #ffffff; text-transform: uppercase; font-size: 1rem; letter-spacing: 0.05em;">{value}</th></tr>''')
                 is_first = False
                 continue
 
-            rows.append(f'''<tr style="border-bottom: 1px solid #e2e8f0;"><td style="padding: 1rem 1.25rem; font-weight: 600; color: #1e3a8a; background: #ffffff; width: 40%; font-size: 0.95rem;">{key_clean}</td><td style="padding: 1rem 1.25rem; color: #334155; font-size: 0.95rem; line-height: 1.5; background: #ffffff;">{value}</td></tr>''')
+            rows.append(f'''<tr style="border-bottom: 1px solid #e2e8f0;"><td style="padding: 1rem 1.25rem; font-weight: 600; color: #1e3a8a; background: #ffffff; width: 40%; font-size: 1rem;">{key_clean}</td><td style="padding: 1rem 1.25rem; color: #25292d; font-size: 1rem; line-height: 1.7; background: #ffffff;">{value}</td></tr>''')
             is_first = False
         else:
-            rows.append(f'''<tr style="border-bottom: 1px solid #f1f5f9;"><td colspan="2" style="padding: 1.1rem 1.5rem; color: #64748b; font-style: italic; background: #f8fafc; font-size: 0.95rem;">{clean_item}</td></tr>''')
+            rows.append(f'''<tr style="border-bottom: 1px solid #f1f5f9;"><td colspan="2" style="padding: 1.1rem 1.5rem; color: #25292d; font-style: italic; background: #f8fafc; font-size: 1rem;">{clean_item}</td></tr>''')
 
     if not rows: return mark_safe(content)
     table_html = f'''<div class="market-coverage-wrapper" style="margin: 1rem 0 2rem 0; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; background: white;"><table style="width: 100%; border-collapse: collapse; text-align: left;"><tbody>{''.join(rows)}</tbody></table></div>'''
@@ -299,10 +312,13 @@ def get_category_image_url(category_name):
         'Healthcare & Life Sciences': 'Healthcare.jpg',
         'Heavy Machinery & Equipment': 'Heavy Machinery.jpg',
         'Industrial Automation & Mobility': 'Industrial Automation.jpg',
-        'Information Technology & Electronics': 'Information Technology.jpg'
+        'Information Technology & Electronics': 'Information Technology.jpg',
+        'Banking, Financial Services & Insurance': 'BFSI.jpg',
+        'Energy & Power': 'Energy.jpg'
     }
     for k, v in mapping.items():
-        if k in category_name: return f'/static/images/{v}'
+        if k.lower() in category_name.lower():
+            return f'/static/images/{v}'
     return f'/static/images/{category_name}.jpg'
 
 
@@ -589,10 +605,10 @@ def _render_market_coverage_table(line_data):
     for line in line_data:
         if '|' in line:
             k, v = line.split('|', 1)
-            rows.append(f'<tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding: 1rem; font-weight: 700; color: #1e3a8a; width: 35%; background: #f8fafc;">{k.strip()}</td><td style="padding: 1rem; color: #334155;">{v.strip()}</td></tr>')
+            rows.append(f'<tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding: 1rem; font-weight: 700; color: #1e3a8a; width: 35%; background: #f8fafc; font-size: 1rem;">{k.strip()}</td><td style="padding: 1rem; color: #25292d; font-size: 1rem; line-height: 1.7;">{v.strip()}</td></tr>')
     return f'<div style="margin: 2rem 0; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;"><table style="width: 100%; border-collapse: collapse;"><tbody>{"".join(rows)}</tbody></table></div>'
 
 def _render_report_highlights(items, h_text="Report Highlights"):
     """Premium Highlights box."""
-    lis = "".join(f'<li style="display: flex; gap: 1rem; padding: 0.3rem 0;"><span style="color: #10b981;">✓</span><span style="color: #1e293b; font-weight: 500;">{i}</span></li>' for i in items)
+    lis = "".join(f'<li style="display: flex; gap: 0.5rem; padding: 0.2rem 0;"><span style="color: #10b981;">✓</span><span style="color: #1e293b; font-weight: 500;">{i}</span></li>' for i in items)
     return f'<h1 class="section-header">{h_text}</h1><div style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-left: 6px solid #1e3a8a; padding: 1.5rem 2rem; border-radius: 12px; margin: 2rem 0; box-shadow: 0 4px 10px rgba(0,0,0,0.05);"><ul style="list-style: none; padding: 0; margin: 0;">{lis}</ul></div>'

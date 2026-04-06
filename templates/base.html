@@ -417,7 +417,7 @@
 
         header {
             background: #ffffff;
-            height: 130px;
+            height: 90px;
             /* Matches logo height for a clean fit */
             display: flex;
             align-items: center;
@@ -428,6 +428,9 @@
             box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
         }
 
+        a.logo img {
+            max-height: 40px;
+        }
 
 
         @media (max-width: 991px) {
@@ -634,7 +637,7 @@
             </button>
 
             <a href="{% url 'home' %}" class="logo">
-                <img src="{% static 'images/logo_new.jpg' %}" alt="Markets NXT"
+                <img src="{% static 'images/logo_markets_nxt.jpg' %}" alt="Markets NXT"
                     style="height: 130px; width: auto; display: block;">
             </a>
 

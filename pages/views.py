@@ -119,41 +119,70 @@ class PricingView(TemplateView):
     def get_context_data(self, **kwargs):
         from reports.models import Report
         from django.db.models import Avg
+        from django.shortcuts import get_object_or_404
         context = super().get_context_data(**kwargs)
         
-        # Get actual averages from the database
-        global_stats = Report.objects.filter(region__icontains='Global').aggregate(
-            single=Avg('single_user_price'),
-            multi=Avg('multi_user_price'),
-            enterprise=Avg('enterprise_price'),
-            datapack=Avg('data_pack_price')
-        )
+        slug = self.request.GET.get('slug')
+        pricing_type = self.request.GET.get('type', 'all')
+        report = None
         
-        country_stats = Report.objects.exclude(region__icontains='Global').aggregate(
-            single=Avg('single_user_price'),
-            multi=Avg('multi_user_price'),
-            enterprise=Avg('enterprise_price'),
-            datapack=Avg('data_pack_price')
-        )
+        if slug:
+            report = get_object_or_404(Report, slug=slug)
+            context['report'] = report
+            # Determine type from report if not explicitly provided or if conflicting
+            if 'global' in report.region.lower():
+                pricing_type = 'global'
+            else:
+                pricing_type = 'country'
         
-        # Default fallbacks only if no data exists
-        context['global_prices'] = {
-            'single': int(global_stats['single'] or 4550),
-            'multi': int(global_stats['multi'] or 5450),
-            'enterprise': int(global_stats['enterprise'] or 6950),
-            'datapack': int(global_stats['datapack'] or 3150)
-        }
+        context['pricing_type'] = pricing_type
+
+        # Get stats
+        if report:
+            # If report exists, we use its specific prices
+            context['global_prices'] = {
+                'single': report.single_user_price,
+                'multi': report.multi_user_price,
+                'enterprise': report.enterprise_price,
+                'datapack': report.data_pack_price
+            }
+            context['country_prices'] = context['global_prices'] # Same for display logic if locked to one
+        else:
+            # Fallback to averages
+            global_stats = Report.objects.filter(region__icontains='Global').aggregate(
+                single=Avg('single_user_price'),
+                multi=Avg('multi_user_price'),
+                enterprise=Avg('enterprise_price'),
+                datapack=Avg('data_pack_price')
+            )
+            
+            country_stats = Report.objects.exclude(region__icontains='Global').aggregate(
+                single=Avg('single_user_price'),
+                multi=Avg('multi_user_price'),
+                enterprise=Avg('enterprise_price'),
+                datapack=Avg('data_pack_price')
+            )
+            
+            context['global_prices'] = {
+                'single': int(global_stats['single'] or 4550),
+                'multi': int(global_stats['multi'] or 5450),
+                'enterprise': int(global_stats['enterprise'] or 6950),
+                'datapack': int(global_stats['datapack'] or 3150)
+            }
+            
+            context['country_prices'] = {
+                'single': int(country_stats['single'] or 1850),
+                'multi': int(country_stats['multi'] or 2450),
+                'enterprise': int(country_stats['enterprise'] or 3150),
+                'datapack': int(country_stats['datapack'] or 1050)
+            }
         
-        context['country_prices'] = {
-            'single': int(country_stats['single'] or 1850),
-            'multi': int(country_stats['multi'] or 2450),
-            'enterprise': int(country_stats['enterprise'] or 3150),
-            'datapack': int(country_stats['datapack'] or 1050)
-        }
-        
-        # We'll pass global_prices as 'prices' for the initial load
-        context['prices'] = context['global_prices']
-        
+        # Initial prices based on type
+        if pricing_type == 'country':
+            context['prices'] = context['country_prices']
+        else:
+            context['prices'] = context['global_prices']
+            
         context['meta_title'] = 'Pricing & Licensing Options - Markets NXT'
         context['meta_description'] = 'Explore flexible licensing options for Markets NXT research reports including Single User, Multi-User, and Enterprise licenses.'
         return context

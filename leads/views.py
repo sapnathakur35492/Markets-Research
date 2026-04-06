@@ -4,6 +4,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.http import JsonResponse
 from django.urls import reverse
 from django.contrib import messages
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 from reports.models import Report
 from .models import Lead
 from .forms import LeadForm, CheckoutForm
@@ -194,11 +196,22 @@ Client Relations Desk"""
         logger.error(f"Error sending lead emails: {e}", exc_info=True)
         # In a thread, we can't show messages to user, so we just log clearly
 
+@method_decorator(csrf_exempt, name='dispatch')
 class LeadCreateAPIView(generics.CreateAPIView):
     queryset = Lead.objects.all()
     serializer_class = LeadSerializer
+    authentication_classes = [] # Disable CSRF/Session enforcement
+    permission_classes = []      # Allow public lead creation
+
+    def post(self, request, *args, **kwargs):
+        try:
+            return super().post(request, *args, **kwargs)
+        except Exception as e:
+            logger.error(f"Error in LeadCreateAPIView: {e}", exc_info=True)
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
     def perform_create(self, serializer):
+        logger.info(f"Creating lead from API: {serializer.validated_data.get('email')}")
         lead = serializer.save()
         # Run email in thread
         threading.Thread(target=send_lead_emails_task, args=(lead,)).start()
