@@ -365,6 +365,7 @@ header {
     font-size: 0.9rem;
 }
 
+
 /* Section Title & Footer */
 .section-header {
     margin-bottom: 3rem;
@@ -555,4 +556,42 @@ footer {
     .legal-content-box h1 {
         font-size: 1.75rem;
     }
+}
+/* ── TOC raw pass-through styles ─────────────────────── */
+.toc-raw-content h2 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #1e3a8a;
+    margin-bottom: 1rem;
+    padding-left: 0;
+    border-left: 4px solid #1e3a8a;
+    padding-left: 0.75rem;
+}
+.toc-raw-content ol {
+    list-style: decimal;
+    padding-left: 1.6rem;
+    margin: 0.4rem 0;
+}
+.toc-raw-content ol ol {
+    list-style: decimal;
+    padding-left: 1.8rem;
+    margin: 0.2rem 0;
+}
+.toc-raw-content ol ol ol {
+    list-style: decimal;
+    padding-left: 2rem;
+}
+.toc-raw-content li {
+    font-size: 1rem;
+    color: #1e293b;
+    font-weight: 500;
+    line-height: 1.8;
+    padding: 0.1rem 0;
+    font-family: 'Inter', sans-serif;
+}
+.toc-raw-content > ol > li {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #1e3a8a;
+    margin-top: 0.4rem;
 }

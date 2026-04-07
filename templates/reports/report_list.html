@@ -477,17 +477,28 @@
             </nav>
 
             <h3
-                style="margin-bottom: 1rem; color: #1e40af; border-bottom: 2px solid #bfdbfe; padding-bottom: 5px; font-size: 1rem; display: flex; align-items: center; gap: 8px;">
+                style="margin-bottom: 1rem; color: #1e40af; border-bottom: 2px solid #bfdbfe; padding-bottom: 5px; font-size: 1rem; border-top: 1px solid #f1f5f9; padding-top: 1.5rem; display: flex; align-items: center; gap: 8px;">
                 <i class="fas fa-th-large"></i> Browse by Categories
             </h3>
-            <nav>
+
+            <!-- Category Search -->
+            <div style="margin-bottom: 12px; position: relative; padding: 0 5px;">
+                <input type="text" id="sidebarCategorySearch" onkeyup="filterSidebarCategories()"
+                    placeholder="Search category..."
+                    style="width: 100%; padding: 8px 10px 8px 30px; border: 1px solid #bfdbfe; border-radius: 4px; font-size: 0.85rem; outline: none; background: #fff;">
+                <i class="fas fa-search"
+                    style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 0.8rem;"></i>
+            </div>
+
+            <nav id="sidebarCategoryList">
                 <a href="{% if country_slug %}{% url 'country-report-list' country_slug %}{% else %}{% url 'report-list' %}{% endif %}"
-                    class="vmr-cat-link {% if not current_category %}active{% endif %}">
+                    class="vmr-cat-link {% if not current_category %}active{% endif %}" data-category="all">
                     All Categories
                 </a>
                 {% for cat in categories %}
-                <a href="{{ cat.get_absolute_url }}"
-                    class="vmr-cat-link {% if current_category == cat.slug %}active{% endif %}">
+                <a href="{% if country_slug %}{% url 'country-report-list-category' country_slug cat.slug %}{% else %}{{ cat.get_absolute_url }}{% endif %}"
+                    class="vmr-cat-link {% if current_category == cat.slug %}active{% endif %}"
+                    data-category="{{ cat.name|lower }}">
                     {{ cat.name }}
                 </a>
                 {% endfor %}
@@ -500,11 +511,11 @@
 
         <!-- Mobile Category Filter (Visible < 992px) -->
         <div class="mobile-cat-filter">
-            <a href="{% url 'report-list' %}" class="mobile-cat-pill {% if not current_category %}active{% endif %}">
+            <a href="{% if country_slug %}{% url 'country-report-list' country_slug %}{% else %}{% url 'report-list' %}{% endif %}" class="mobile-cat-pill {% if not current_category %}active{% endif %}">
                 All
             </a>
             {% for cat in categories %}
-            <a href="{{ cat.get_absolute_url }}"
+            <a href="{% if country_slug %}{% url 'country-report-list-category' country_slug cat.slug %}{% else %}{{ cat.get_absolute_url }}{% endif %}"
                 class="mobile-cat-pill {% if current_category == cat.slug %}active{% endif %}">
                 {{ cat.name }}
             </a>
@@ -710,6 +721,21 @@
         links.forEach(link => {
             const country = link.getAttribute('data-country');
             if (country === 'all' || country.includes(filter)) {
+                link.style.display = 'block';
+            } else {
+                link.style.display = 'none';
+            }
+        });
+    }
+
+    function filterSidebarCategories() {
+        const input = document.getElementById('sidebarCategorySearch');
+        const filter = input.value.toLowerCase().trim();
+        const links = document.querySelectorAll('#sidebarCategoryList .vmr-cat-link');
+
+        links.forEach(link => {
+            const category = link.getAttribute('data-category');
+            if (category === 'all' || category.includes(filter)) {
                 link.style.display = 'block';
             } else {
                 link.style.display = 'none';

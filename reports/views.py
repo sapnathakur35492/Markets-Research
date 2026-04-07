@@ -33,17 +33,20 @@ class ReportListView(ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        # Default to Global reports unless specified otherwise
-        queryset = Report.objects.filter(region__icontains='Global').select_related('category').all()
+        # Category from URL slug (new SEO format)
+        cat_slug = self.kwargs.get('category_slug') or self.request.GET.get('category')
+        
+        if cat_slug:
+            # If we are filtering by category, show ALL reports for that category (Global + Countries)
+            queryset = Report.objects.filter(category__slug=cat_slug).select_related('category').all()
+        else:
+            # Default to Global reports for the main listing if no category is selected
+            queryset = Report.objects.filter(region__icontains='Global').select_related('category').all()
+            
         # Search
         q = self.request.GET.get('q')
         if q:
             queryset = queryset.filter(Q(title__icontains=q) | Q(summary__icontains=q))
-        
-        # Category from URL slug (new SEO format)
-        cat_slug = self.kwargs.get('category_slug') or self.request.GET.get('category')
-        if cat_slug:
-            queryset = queryset.filter(category__slug=cat_slug)
             
         return queryset.order_by('-publish_date')
 
@@ -98,7 +101,10 @@ class CategoryOrReportView(View):
         
         # Check if it's a category
         if Category.objects.filter(slug=slug).exists():
-            return ReportListView.as_view()(request, category_slug=slug, *args, **kwargs)
+            # Build clean kwargs — replace 'slug' with 'category_slug'
+            clean_kwargs = {k: v for k, v in kwargs.items() if k != 'slug'}
+            clean_kwargs['category_slug'] = slug
+            return ReportListView.as_view()(request, *args, **clean_kwargs)
         
         # Else treat as a report detail (legacy/direct URL)
         return ReportDetailView.as_view()(request, *args, **kwargs)
@@ -115,7 +121,10 @@ class CountryCategoryOrReportView(View):
         
         # Check if it's a category
         if Category.objects.filter(slug=slug).exists():
-            return CountryReportListView.as_view()(request, country_slug=country_slug, category_slug=slug, *args, **kwargs)
+            # Build clean kwargs — replace 'slug' with 'category_slug', keep 'country_slug'
+            clean_kwargs = {k: v for k, v in kwargs.items() if k != 'slug'}
+            clean_kwargs['category_slug'] = slug
+            return CountryReportListView.as_view()(request, *args, **clean_kwargs)
         
         # Else treat as a report detail
         return ReportDetailView.as_view()(request, *args, **kwargs)

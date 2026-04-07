@@ -23,6 +23,19 @@ def auto_format_content(text):
     """
     if not text:
         return ''
+        
+    # Extract protected blocks to prevent them from being formatted
+    protected_blocks = []
+    
+    def protect_block(match):
+        protected_blocks.append(match.group(0))
+        return f'__PROTECTED_BLOCK_{len(protected_blocks)-1}__'
+        
+    # Protect TOC block
+    text = re.sub(r'(?i)<!--\s*TOC_START\s*-->.*?<!--\s*TOC_END\s*-->', protect_block, text, flags=re.DOTALL)
+    
+    # Protect FAQ block
+    text = re.sub(r'(?i)<!--\s*FAQ_START\s*-->.*?<!--\s*FAQ_END\s*-->', protect_block, text, flags=re.DOTALL)
     
     lines = text.split('\n')
     formatted_lines = []
@@ -98,7 +111,13 @@ def auto_format_content(text):
     if in_list:
         processed_html.append('</ul>')
             
-    return '\n'.join(processed_html)
+    final_html = '\n'.join(processed_html)
+    
+    # Restore protected blocks
+    for i, block in enumerate(protected_blocks):
+        final_html = final_html.replace(f'__PROTECTED_BLOCK_{i}__', block)
+        
+    return final_html
 
 
 def parse_content_sections(content):
@@ -163,73 +182,78 @@ def parse_content_sections(content):
     # The TOC is the chapter structure (Chapter 01, 02, 03, etc. with subsections)
     toc_content = ''
     
-    # Find all chapter headings and their subsections
-    chapter_pattern = r'<p>Chapter \d+.*?</p>(?:.*?(?=<p>Chapter \d+|<p>Market Segmentation|$))'
-    chapters = re.findall(chapter_pattern, content, re.DOTALL | re.IGNORECASE)
-    
-    if chapters:
-        # Build TOC from chapter headings
-        toc_parts = []
-        for chapter in chapters:
-            # Extract just the chapter heading and its immediate subsections (h3 tags)
-            chapter_heading = re.search(r'<p>(Chapter \d+.*?)</p>', chapter)
-            if chapter_heading:
-                toc_parts.append(f'<p>{chapter_heading.group(1)}</p>')
-                
-                # Extract subsections (h3 tags) within this chapter
-                subsections = re.findall(r'<h3>(.*?)</h3>', chapter)
-                for subsection in subsections[:10]:  # Limit to first 10 subsections per chapter
-                    toc_parts.append(f'<h3>{subsection}</h3>')
+    # First, look for explicit TOC markers
+    toc_marker_match = re.search(r'(?:<[^>]*>)?\s*<!--\s*TOC_START\s*-->\s*(?:</[^>]*>)?(.*?)(?:<[^>]*>)?\s*<!--\s*TOC_END\s*-->\s*(?:</[^>]*>)?', content, re.DOTALL | re.IGNORECASE)
+    if toc_marker_match:
+        toc_content = toc_marker_match.group(1).strip()
+    else:
+        # Find all chapter headings and their subsections
+        chapter_pattern = r'<p>Chapter \d+.*?</p>(?:.*?(?=<p>Chapter \d+|<p>Market Segmentation|$))'
+        chapters = re.findall(chapter_pattern, content, re.DOTALL | re.IGNORECASE)
         
-        toc_content = '\n'.join(toc_parts)
-    
-    # Alternative: Look for explicit "Table of Contents" heading
-    if not toc_content:
-        toc_patterns = [
-            r'(?i)<[ph][1-6]?>Table\s+of\s+Contents</[ph][1-6]?>',
-            r'(?i)<p>Table\s+of\s+Contents</p>',
-            r'(?i)<p>TOC</p>',
-        ]
+        if chapters:
+            # Build TOC from chapter headings
+            toc_parts = []
+            for chapter in chapters:
+                # Extract just the chapter heading and its immediate subsections (h3 tags)
+                chapter_heading = re.search(r'<p>(Chapter \d+.*?)</p>', chapter)
+                if chapter_heading:
+                    toc_parts.append(f'<p>{chapter_heading.group(1)}</p>')
+                    
+                    # Extract subsections (h3 tags) within this chapter
+                    subsections = re.findall(r'<h3>(.*?)</h3>', chapter)
+                    for subsection in subsections[:10]:  # Limit to first 10 subsections per chapter
+                        toc_parts.append(f'<h3>{subsection}</h3>')
+            
+            toc_content = '\n'.join(toc_parts)
         
-        toc_start = None
-        for pattern in toc_patterns:
-            toc_match = re.search(pattern, content)
-            if toc_match:
-                toc_start = toc_match.start()
-                break
-        
-        if toc_start is not None:
-            # Find where TOC ends - look for the next major heading
-            toc_end_patterns = [
-                r'(?i)<[ph][1-6]?>(?:Market\s+)?Segmentation</[ph][1-6]?>',
-                r'(?i)<p>(?:Market\s+)?Segmentation</p>',
-                r'(?i)<[ph][1-6]?>Methodology</[ph][1-6]?>',
-                r'(?i)<p>Methodology</p>',
-                r'(?i)<[ph][1-6]?>Chapter\s+\d+',
-                r'(?i)<p>Chapter\s+\d+',
-                r'(?i)<[ph][1-6]?>FAQ',
-                r'(?i)<p>FAQ',
+        # Alternative: Look for explicit "Table of Contents" heading
+        if not toc_content:
+            toc_patterns = [
+                r'(?i)<[ph][1-6]?>Table\s+of\s+Contents</[ph][1-6]?>',
+                r'(?i)<p>Table\s+of\s+Contents</p>',
+                r'(?i)<p>TOC</p>',
             ]
             
-            toc_end = None
-            remaining_after_toc = content[toc_start:]
+            toc_start = None
+            for pattern in toc_patterns:
+                toc_match = re.search(pattern, content)
+                if toc_match:
+                    toc_start = toc_match.start()
+                    break
             
-            # Skip the TOC heading itself and look for the next heading
-            first_heading_end = re.search(r'</[ph][1-6]?>|</p>', remaining_after_toc)
-            if first_heading_end:
-                search_start = first_heading_end.end()
-                for pattern in toc_end_patterns:
-                    end_match = re.search(pattern, remaining_after_toc[search_start:])
-                    if end_match:
-                        toc_end = toc_start + search_start + end_match.start()
-                        break
-            
-            if toc_end:
-                # Extract content AFTER the heading
-                toc_content = content[toc_start + search_start:toc_end].strip() if first_heading_end else content[toc_start:toc_end].strip()
-            else:
-                # If no end found, take a reasonable amount after heading
-                toc_content = remaining_after_toc[search_start:2000].strip() if first_heading_end else remaining_after_toc[:2000].strip()
+            if toc_start is not None:
+                # Find where TOC ends - look for the next major heading
+                toc_end_patterns = [
+                    r'(?i)<[ph][1-6]?>(?:Market\s+)?Segmentation</[ph][1-6]?>',
+                    r'(?i)<p>(?:Market\s+)?Segmentation</p>',
+                    r'(?i)<[ph][1-6]?>Methodology</[ph][1-6]?>',
+                    r'(?i)<p>Methodology</p>',
+                    r'(?i)<[ph][1-6]?>Chapter\s+\d+',
+                    r'(?i)<p>Chapter\s+\d+',
+                    r'(?i)<[ph][1-6]?>FAQ',
+                    r'(?i)<p>FAQ',
+                ]
+                
+                toc_end = None
+                remaining_after_toc = content[toc_start:]
+                
+                # Skip the TOC heading itself and look for the next heading
+                first_heading_end = re.search(r'</[ph][1-6]?>|</p>', remaining_after_toc)
+                if first_heading_end:
+                    search_start = first_heading_end.end()
+                    for pattern in toc_end_patterns:
+                        end_match = re.search(pattern, remaining_after_toc[search_start:])
+                        if end_match:
+                            toc_end = toc_start + search_start + end_match.start()
+                            break
+                
+                if toc_end:
+                    # Extract content AFTER the heading
+                    toc_content = content[toc_start + search_start:toc_end].strip() if first_heading_end else content[toc_start:toc_end].strip()
+                else:
+                    # If no end found, take a reasonable amount after heading
+                    toc_content = remaining_after_toc[search_start:2000].strip() if first_heading_end else remaining_after_toc[:2000].strip()
     
     # Extract Segmentation content - look for "Segmentation" or "Market Segmentation" heading
     segmentation_content = ''
@@ -278,7 +302,11 @@ def parse_content_sections(content):
     
     # Extract FAQs content - look for "Frequently Asked Questions" or "FAQ" heading
     faqs_content = ''
-    faq_patterns = [
+    faq_marker_match = re.search(r'(?:<[^>]*>)?\s*<!--\s*FAQ_START\s*-->\s*(?:</[^>]*>)?(.*?)(?:<[^>]*>)?\s*<!--\s*FAQ_END\s*-->\s*(?:</[^>]*>)?', content, re.DOTALL | re.IGNORECASE)
+    if faq_marker_match:
+        faqs_content = faq_marker_match.group(1).strip()
+    else:
+        faq_patterns = [
         r'(?i)<[ph][1-6]?>Frequently\s+Asked\s+Questions</[ph][1-6]?>',
         r'(?i)<p>Frequently\s+Asked\s+Questions</p>',
         r'(?i)<[ph][1-6]?>FAQ[s]?</[ph][1-6]?>',
@@ -287,45 +315,51 @@ def parse_content_sections(content):
         r'(?i)<p>Report\s+FAQ[s]?</p>',
     ]
     
-    faq_start = None
-    for pattern in faq_patterns:
-        faq_match = re.search(pattern, content)
-        if faq_match:
-            faq_start = faq_match.start()
-            break
-    
-    if faq_start is not None:
-        # FAQs are typically at the end
-        faq_end_patterns = [
-            r'(?i)<[ph][1-6]?>Table\s+of\s+Contents',
-            r'(?i)<p>Table\s+of\s+Contents',
-            r'(?i)<[ph][1-6]?>Chapter\s+\d+',
-            r'(?i)<p>Chapter\s+\d+',
-        ]
+        faq_start = None
+        for pattern in faq_patterns:
+            faq_match = re.search(pattern, content)
+            if faq_match:
+                faq_start = faq_match.start()
+                break
         
-        remaining_after_faq = content[faq_start:]
-        
-        # Skip the FAQ heading itself (template will add styled H2 heading)
-        first_heading_end = re.search(r'</[ph][1-6]?>|</p>', remaining_after_faq)
-        if first_heading_end:
-            search_start = first_heading_end.end()
-            faq_end = None
-            for pattern in faq_end_patterns:
-                end_match = re.search(pattern, remaining_after_faq[search_start:])
-                if end_match:
-                    faq_end = faq_start + search_start + end_match.start()
-                    break
+        if faq_start is not None:
+            # FAQs are typically at the end
+            faq_end_patterns = [
+                r'(?i)<[ph][1-6]?>Table\s+of\s+Contents',
+                r'(?i)<p>Table\s+of\s+Contents',
+                r'(?i)<[ph][1-6]?>Chapter\s+\d+',
+                r'(?i)<p>Chapter\s+\d+',
+            ]
             
-            if faq_end:
-                # Extract content AFTER the heading
-                faqs_content = content[faq_start + search_start:faq_end].strip()
-            else:
-                # If no end found, take everything after FAQ heading
-                faqs_content = remaining_after_faq[search_start:].strip()
+            remaining_after_faq = content[faq_start:]
+            
+            # Skip the FAQ heading itself (template will add styled H2 heading)
+            first_heading_end = re.search(r'</[ph][1-6]?>|</p>', remaining_after_faq)
+            if first_heading_end:
+                search_start = first_heading_end.end()
+                faq_end = None
+                for pattern in faq_end_patterns:
+                    end_match = re.search(pattern, remaining_after_faq[search_start:])
+                    if end_match:
+                        faq_end = faq_start + search_start + end_match.start()
+                        break
+                
+                if faq_end:
+                    # Extract content AFTER the heading
+                    faqs_content = content[faq_start + search_start:faq_end].strip()
+                else:
+                    # If no end found, take everything after FAQ heading
+                    faqs_content = remaining_after_faq[search_start:].strip()
     
     # Create cleaned summary by removing chapters, TOC, Segmentation, and FAQs
     # The summary should only contain the 10 named content sections
     cleaned_summary = content
+    
+    # Remove TOC markers block
+    cleaned_summary = re.sub(r'(?:<[^>]*>)?\s*<!--\s*TOC_START\s*-->.*?<!--\s*TOC_END\s*-->\s*(?:</[^>]*>)?', '', cleaned_summary, flags=re.DOTALL | re.IGNORECASE)
+    
+    # Remove FAQs markers block
+    cleaned_summary = re.sub(r'(?:<[^>]*>)?\s*<!--\s*FAQ_START\s*-->.*?<!--\s*FAQ_END\s*-->\s*(?:</[^>]*>)?', '', cleaned_summary, flags=re.DOTALL | re.IGNORECASE)
     
     # Remove all chapters (Chapter 01, 02, 03, etc.) from summary
     chapter_removal_pattern = r'(?i)(?:<p>|<[ph][1-6]?>)Chapter \d+.*?(?:</p>|</[ph][1-6]?>).*?(?=(?:<p>|<[ph][1-6]?>)(?:Chapter \d+|Report Highlights|Industry Snapshot|Key Market Growth Catalysts|Market Challenges|Strategic Growth Opportunities|Market Coverage|Geographic Performance|Competitive Environment|Leading Market Participants|Long-Term Market Perspective|Frequently Asked|Market Segmentation|Methodology)|$)'

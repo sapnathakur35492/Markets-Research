@@ -12,69 +12,80 @@ register = template.Library()
 @register.filter(name='format_faqs')
 def format_faqs(faq_content):
     """
-    Convert FAQ paragraphs into styled FAQ cards.
+    Convert FAQ HTML into styled accordion cards.
+    Splits on h2/h3 headings (questions) and captures everything between them as answer.
+    Handles both <h3>Q</h3><p>A</p> and plain-text answers without p tags.
     """
     if not faq_content:
         return ''
-    
-    # Extract all tags (p, h1-h6, li)
-    paragraphs = re.findall(r'<(p|h[1-6]|li)>(.*?)</\1>', faq_content, re.DOTALL)
-    
-    if not paragraphs:
-        return mark_safe(faq_content)
-    
-    faq_cards = []
-    card_count = 1
+
+    # Strategy 1: Split on h2/h3 tags — each heading is a question,
+    # everything up to the next heading is the answer.
+    parts = re.split(r'(<h[23][^>]*>.*?</h[23]>)', faq_content, flags=re.DOTALL | re.IGNORECASE)
+
+    qa_pairs = []
     i = 0
-    while i < len(paragraphs):
-        tag, para = paragraphs[i]
-        para = para.strip()
-        
-        if not para:
+    while i < len(parts):
+        chunk = parts[i].strip()
+        if re.match(r'<h[23]', chunk, re.IGNORECASE):
+            question = re.sub(r'<[^>]+>', '', chunk).strip()
+            # Answer is everything in the next non-heading chunk
+            answer_raw = parts[i + 1].strip() if i + 1 < len(parts) else ''
+            # Strip inner p tags but keep text
+            answer = re.sub(r'</?p[^>]*>', ' ', answer_raw, flags=re.IGNORECASE).strip()
+            answer = re.sub(r'<[^>]+>', '', answer).strip()
+            if question:
+                qa_pairs.append((question, answer))
+            i += 2
+        else:
             i += 1
-            continue
-        
-        # Determine if this is a question
-        is_question = (
-            tag.startswith('h') or
-            (len(para) < 250 and (not para.endswith('.') or para.endswith('?'))) or
-            any(keyword in para.lower() for keyword in ['what', 'why', 'how', 'which', 'who', 'when', 'where', 'faq', 'question']) or
-            re.match(r'^(Q|Question|Q\d+)\s*:', para, re.IGNORECASE)
-        )
-        
-        if is_question and i + 1 < len(paragraphs):
-            question = para
-            _, answer = paragraphs[i + 1]
-            answer = answer.strip()
-            
-            # Clean prefixes
-            question = re.sub(r'^(Q|Question|Q\d+)\s*[:.]\s*', '', question, flags=re.IGNORECASE)
-            question = re.sub(r'<[^>]+>', '', question)
-            answer = re.sub(r'^(A|Answer|Ans)\s*[:.]\s*', '', answer, flags=re.IGNORECASE)
-            
-            faq_card = f'''
+
+    # Strategy 2: fallback — extract p tags as Q-A pairs (ends with ?)
+    if not qa_pairs:
+        paragraphs = re.findall(r'<(?:p|h[1-6]|li)[^>]*>(.*?)</(?:p|h[1-6]|li)>', faq_content, re.DOTALL)
+        cleaned = []
+        for p in paragraphs:
+            text = re.sub(r'<[^>]+>', '', p).strip()
+            text = re.sub(r'[\u200b\uFEFF\xa0]+', ' ', text).strip()
+            if text:
+                cleaned.append(text)
+
+        j = 0
+        while j < len(cleaned):
+            para = cleaned[j]
+            is_q = para.strip().endswith('?') or bool(re.match(r'^Q\d+[\.\s]', para, re.IGNORECASE))
+            if is_q:
+                question = re.sub(r'^(Q\d+|Question\s*\d*)\s*[:.]?\s*', '', para, flags=re.IGNORECASE).strip()
+                answer = cleaned[j + 1] if j + 1 < len(cleaned) else ''
+                qa_pairs.append((question, answer))
+                j += 2
+            else:
+                j += 1
+
+    if not qa_pairs:
+        return mark_safe(faq_content)
+
+    faq_cards = []
+    for idx, (question, answer) in enumerate(qa_pairs, 1):
+        faq_cards.append(f'''
 <div class="faq-accordion-item">
     <button class="faq-accordion-header" type="button">
-        <span class="faq-question-text"><span class="q-num">Q{card_count}.</span> {question}</span>
+        <span class="faq-question-text"><span class="q-num">Q{idx}.</span> {question}</span>
         <span class="faq-arrow">▼</span>
     </button>
     <div class="faq-accordion-content">
         <div class="faq-answer-inner">{answer}</div>
     </div>
-</div>'''
-            faq_cards.append(faq_card)
-            card_count += 1
-            i += 2
-        else:
-            # Fallback for single blocks
-            faq_card = f'''
-<div class="faq-accordion-item">
-    <div class="faq-answer-inner">{para}</div>
-</div>'''
-            faq_cards.append(faq_card)
-            i += 1
-    
+</div>''')
+
     return mark_safe('\n'.join(faq_cards))
+
+
+
+
+
+
+
 
 
 @register.filter(name='extract_companies')
@@ -228,6 +239,11 @@ def extract_toc_from_segmentation(content):
     The Excel importer puts TOC as an <ol> at the very end of the segmentation field.
     """
     if not content: return ''
+    
+    toc_match = re.search(r'<!--\s*TOC_START\s*-->(.*?)<!--\s*TOC_END\s*-->', content, re.IGNORECASE | re.DOTALL)
+    if toc_match:
+        return toc_match.group(1).strip()
+        
     # Find FAQ_END marker (TOC comes after it)
     m = re.search(r'<!--\s*FAQ_END\s*-->\s*(?:</[^>]+>)?', content, re.IGNORECASE)
     if m:
@@ -238,72 +254,120 @@ def extract_toc_from_segmentation(content):
 @register.filter(name='format_toc')
 def format_toc(content):
     """
-    Render raw Excel TOC HTML into a clean Chapter XX / 1.1, 1.2 styled list.
-    Handles nesting level by tracking the tag depth.
+    Render TOC HTML with Chapter XX headings and 1.1/1.2 numbered sub-items.
+    Handles both new format (everything inside outer <ol>) and legacy format
+    (chapters as loose p/h tags, sub-items in nested <ol>).
     """
-    if not content: return ''
+    if not content:
+        return ''
 
-    # Normalize markers for depth
-    text = content
-    # Chapter markers (Root-level LI frequently in H or P tags)
-    text = re.sub(r'<(?:h[1-6]|p)[^>]*>\s*<li[^>]*>(.*?)(?:</(?:h[1-6]|p)>|(?=<ol)|(?=<ul>))', r'\n__CH__\1\n', text, flags=re.IGNORECASE | re.DOTALL)
-    
-    # Nested item markers
-    def mark_nested(m, level=1):
-        inner = m.group(1)
-        # Recurse for deeper nesting
-        inner = re.sub(r'<ol[^>]*>(.*?)</ol>', lambda sub: mark_nested(sub, level + 1), inner, flags=re.IGNORECASE | re.DOTALL)
-        # Mark current level items
-        lvl_marker = f'__S{level}__'
-        inner = re.sub(r'<li[^>]*>(?!\s*__CH__)(.*?)(?:</li>|(?=<ol)|(?=<ul>))', f'\n{lvl_marker}\\1\n', inner, flags=re.IGNORECASE | re.DOTALL)
-        return inner
-    
-    text = re.sub(r'<ol[^>]*>(.*?)</ol>', lambda m: mark_nested(m, 1), text, flags=re.IGNORECASE | re.DOTALL)
-    
-    # Strip remaining tags
-    text = re.sub(r'<[^>]+>', '', text)
-    lines = [l.strip() for l in text.split('\n') if l.strip()]
+    # Strip TOC markers
+    content = re.sub(r'<!--\s*TOC_START\s*-->', '', content, flags=re.IGNORECASE)
+    content = re.sub(r'<!--\s*TOC_END\s*-->', '', content, flags=re.IGNORECASE)
+
+    # Strip the h2 "Table of Contents" heading — the template already shows the tab title
+    content = re.sub(r'<h[1-6][^>]*>\s*Table\s+of\s+Contents\s*</h[1-6]>', '', content, flags=re.IGNORECASE)
 
     output = []
-    stack = [0, 0, 0, 0, 0] # [Chapter, S1, S2, S3, S4]
+    ch_count = 0
+    sub_counters = [0] * 6   # sub_counters[depth] for depth 2,3,4...
 
-    for line in lines:
-        title = line.strip()
-        title = re.sub(r'[\u200b\uFEFF\xa0]+', '', title).strip()
-        if not title: continue
+    # Tokenize into list tags and text
+    tokens = re.split(r'(</?(?:ol|ul|li)[^>]*>)', content, flags=re.IGNORECASE)
 
-        if '__CH__' in line:
-            stack[0] += 1
-            stack[1:] = [0] * (len(stack) - 1)
-            clean_title = title.replace('__CH__', '').strip()
-            # Don't double 'Chapter' if it's already in the text
-            prefix = f'Chapter {stack[0]:02d} ' if 'chapter' not in clean_title.lower() else ''
-            output.append(f'<div style="font-weight:700; color:#1e3a8a; font-size:1.3rem; margin-top:1.6rem; margin-bottom:0.3rem;">{prefix}{clean_title}</div>')
-            
-        elif '__S' in line:
-            # Detect level from marker
-            m = re.search(r'__S(\d+)__', line)
-            lvl = int(m.group(1)) if m else 1
-            stack[lvl] += 1
-            stack[lvl+1:] = [0] * (len(stack) - lvl - 1) # Reset deeper levels
-            
-            clean_title = re.sub(r'__S\d+__', '', title).strip()
-            # If title already starts with numbering (1.1, etc.), use it, else generate
-            if re.match(r'^\d+(\.[\d\.]+)+\s', clean_title):
-                num_label = ""
+    depth = 0        # current list nesting depth (1 = outermost ol)
+    in_li = False
+    li_depth = 0
+    li_text_parts = []
+
+    def flush_li(li_d, text):
+        """Emit a formatted line for a completed <li> at depth li_d."""
+        nonlocal ch_count
+        raw = re.sub(r'<[^>]+>', '', text).strip()
+        raw = re.sub(r'[\u200b\uFEFF\xa0]+', ' ', raw).strip()
+        if not raw:
+            return
+
+        if li_d == 1:
+            # Top-level → Chapter heading
+            ch_count += 1
+            # Reset all sub counters
+            for i in range(len(sub_counters)):
+                sub_counters[i] = 0
+            prefix = f'Chapter {ch_count:02d} ' if not raw.lower().startswith('chapter') else ''
+            output.append(
+                f'<div style="font-weight:700; color:#1e3a8a; font-size:1.2rem;'
+                f' margin-top:1.4rem; margin-bottom:0.2rem;">{prefix}{raw}</div>'
+            )
+        else:
+            # Sub-item at depth li_d (2 = first sub-level, 3 = second, etc.)
+            idx = li_d - 2   # index into sub_counters
+            if idx < 0: idx = 0
+            sub_counters[idx] += 1
+            # Reset deeper counters
+            for i in range(idx + 1, len(sub_counters)):
+                sub_counters[i] = 0
+
+            # Build numeric label: e.g. "3.2 " for chapter 3, sub-item 2
+            if idx == 0:
+                num_label = f'{ch_count}.{sub_counters[0]} '
+            elif idx == 1:
+                num_label = f'{ch_count}.{sub_counters[0]}.{sub_counters[1]} '
             else:
-                parts = [str(stack[i]) for i in range(lvl + 1) if stack[i] > 0]
-                num_label = ".".join(parts) + " " if parts else ""
-            
-            indent = 1.6 * lvl
-            output.append(f'<div style="font-size:1.1rem; color:#25292d; font-weight:500; padding:0.25rem 0 0.25rem {indent}rem; line-height:1.7; font-family:\'Inter\', sans-serif;">{num_label}{clean_title}</div>')
+                parts = [str(ch_count)] + [str(sub_counters[i]) for i in range(idx + 1)]
+                num_label = '.'.join(parts) + ' '
+
+            # If title already starts with a number like "3.2", don't double-add
+            if re.match(r'^\d+(\.\d+)+\s', raw):
+                num_label = ''
+
+            indent = 1.6 * (li_d - 1)
+            output.append(
+                f'<div style="font-size:1rem; color:#25292d; font-weight:500;'
+                f' padding:0.15rem 0 0.15rem {indent}rem; line-height:1.75;'
+                f' font-family:\'Inter\', sans-serif;">{num_label}{raw}</div>'
+            )
+
+    for token in tokens:
+        if not token:
+            continue
+        tag = re.match(r'<(/?)(ol|ul|li)([^>]*)>', token, re.IGNORECASE)
+        if tag:
+            closing, name, _ = tag.group(1), tag.group(2).lower(), tag.group(3)
+            if name in ('ol', 'ul'):
+                if closing:
+                    depth = max(0, depth - 1)
+                else:
+                    depth += 1
+            elif name == 'li':
+                if closing:
+                    if in_li:
+                        flush_li(li_depth, ''.join(li_text_parts))
+                        li_text_parts = []
+                        in_li = False
+                else:
+                    if in_li:
+                        # Unclosed li — flush previous
+                        flush_li(li_depth, ''.join(li_text_parts))
+                        li_text_parts = []
+                    in_li = True
+                    li_depth = depth
+        else:
+            if in_li:
+                li_text_parts.append(token)
+
+    # Flush any trailing unclosed li
+    if in_li and li_text_parts:
+        flush_li(li_depth, ''.join(li_text_parts))
 
     return mark_safe('\n'.join(output)) if output else mark_safe(content)
+
 
 
 @register.filter(name='get_category_image_url')
 def get_category_image_url(category_name):
     """Return path to category image."""
+    from urllib.parse import quote
     if not category_name: return '/static/images/default_category.jpg'
     mapping = {
         'Aerospace, Defense & Security': 'Aerospace, Defense & Security.jpg',
@@ -316,10 +380,12 @@ def get_category_image_url(category_name):
         'Banking, Financial Services & Insurance': 'BFSI.jpg',
         'Energy & Power': 'Energy.jpg'
     }
+    # Normalize: replace "and" with "&" so both forms match
+    normalized_name = category_name.lower().replace(' and ', ' & ')
     for k, v in mapping.items():
-        if k.lower() in category_name.lower():
-            return f'/static/images/{v}'
-    return f'/static/images/{category_name}.jpg'
+        if k.lower() in normalized_name:
+            return f'/static/images/{quote(v)}'
+    return f'/static/images/{quote(category_name + ".jpg")}'
 
 
 @register.filter(name='linebreak_list')
@@ -492,8 +558,11 @@ def extract_section(content, section_name):
         if not m: m = re.search(r'<!--\s*(?:FAQ|QUESTIONS)?_?START\s*-->(.*)', content, re.IGNORECASE | re.DOTALL)
         if m: return mark_safe(m.group(1).strip())
 
-    # 2. TOC Fallback Extraction (Last List)
+    # 2. TOC Marker and Fallback Extraction (Last List)
     if any(k in keyword for k in ['toc', 'table of contents']):
+        m = re.search(r'<!--\s*TOC_START\s*-->(.*?)<!--\s*TOC_END\s*-->', content, re.IGNORECASE | re.DOTALL)
+        if m: return mark_safe(m.group(1).strip())
+        
         lists = list(re.finditer(r'<(ol|ul)[^>]*>(.*?)</\1>', content, re.IGNORECASE | re.DOTALL))
         if lists:
             for m in reversed(lists):
