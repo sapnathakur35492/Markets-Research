@@ -600,6 +600,101 @@
         }
     </style>
     {% block extra_head %}{% endblock %}
+    <style>
+        /* Integrated Search Suggestions Styles */
+        .search-suggestions-container {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 0 0 16px 16px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+            z-index: 9999;
+            max-height: 450px;
+            overflow-y: auto;
+            display: none;
+            border: 1px solid #e2e8f0;
+            border-top: none;
+            margin-top: -1px; /* Overlap the bottom border of the form */
+        }
+
+        /* Style for when suggestions are active */
+        .hero-search-form.has-suggestions {
+            border-bottom-left-radius: 0 !important;
+            border-bottom-right-radius: 0 !important;
+            box-shadow: none !important;
+        }
+
+        .reports-search-form.has-suggestions input {
+            border-bottom-left-radius: 0 !important;
+            border-bottom-right-radius: 0 !important;
+        }
+
+        .search-suggestion-item {
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            color: #1e293b !important;
+            border-bottom: 1px solid rgba(241, 245, 249, 0.8);
+        }
+
+        .search-suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-suggestion-item:hover, .search-suggestion-item.active {
+            background: #f8fafc;
+            color: #2563eb !important;
+            padding-left: 28px; /* Slight indent on hover */
+        }
+
+        .search-suggestion-item i {
+            color: #2563eb;
+            font-size: 1rem;
+            opacity: 0.7;
+        }
+
+        .search-suggestion-title {
+            font-size: 1rem;
+            font-weight: 600;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            color: inherit;
+        }
+
+        .no-suggestions {
+            padding: 30px 20px;
+            color: #64748b;
+            text-align: center;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        /* Responsive refinements */
+        @media (max-width: 768px) {
+            .search-suggestions-container {
+                border-radius: 12px;
+                margin-top: 5px;
+            }
+            .search-suggestion-item {
+                padding: 12px 18px;
+            }
+        }
+
+        /* Ensure parents are properly contained and allow floating dropdowns */
+        .hero-search-wrapper, .reports-search-inner, .reports-search-form {
+            position: relative !important;
+            overflow: visible !important;
+        }
+    </style>
 </head>
 
 <body>
@@ -1233,6 +1328,151 @@
             });
         });
     </script>
-</body>
+    <!-- Search Suggestions JS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInputs = document.querySelectorAll('input[name="q"]');
+            
+            searchInputs.forEach(input => {
+                const form = input.closest('form');
+                if (!form) return;
+
+                // Create suggestions container
+                const suggestionsContainer = document.createElement('div');
+                suggestionsContainer.className = 'search-suggestions-container';
+                
+                // Add to a relative parent
+                let parent = input.parentElement;
+                if (form.classList.contains('hero-search-form') || form.classList.contains('reports-search-form')) {
+                    parent = form; 
+                } else if (input.parentElement.classList.contains('reports-search-inner')) {
+                    parent = input.parentElement;
+                }
+                
+                parent.style.position = 'relative';
+                // Force visibility on parents to prevent clipping
+                let current = parent;
+                while (current && current !== document.body) {
+                    if (getComputedStyle(current).overflow === 'hidden') {
+                        current.style.overflow = 'visible';
+                    }
+                    current = current.parentElement;
+                }
+                
+                parent.appendChild(suggestionsContainer);
+
+                let debounceTimer;
+                let activeIndex = -1;
+
+                input.setAttribute('autocomplete', 'off');
+
+                input.addEventListener('input', function() {
+                    clearTimeout(debounceTimer);
+                    const query = this.value.trim();
+
+                    if (query.length < 2) {
+                        suggestionsContainer.style.display = 'none';
+                        form.classList.remove('has-suggestions');
+                        return;
+                    }
+
+                    debounceTimer = setTimeout(() => {
+                        fetch(`/api/reports/search-suggestions/?q=${encodeURIComponent(query)}`)
+                            .then(response => {
+                                if (!response.ok) throw new Error('Network response was not ok');
+                                return response.json();
+                            })
+                            .then(data => {
+                                renderSuggestions(data, suggestionsContainer);
+                                if (data.length > 0) {
+                                    form.classList.add('has-suggestions');
+                                } else {
+                                    form.classList.remove('has-suggestions');
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error fetching suggestions:', error);
+                                suggestionsContainer.style.display = 'none';
+                                form.classList.remove('has-suggestions');
+                            });
+                    }, 300);
+                });
+
+                input.addEventListener('keydown', function(e) {
+                    const items = suggestionsContainer.querySelectorAll('.search-suggestion-item');
+                    if (suggestionsContainer.style.display === 'none' || !items.length) return;
+
+                    if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        activeIndex = (activeIndex + 1) % items.length;
+                        updateActiveItem(items);
+                    } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        activeIndex = (activeIndex - 1 + items.length) % items.length;
+                        updateActiveItem(items);
+                    } else if (e.key === 'Enter' && activeIndex > -1) {
+                        e.preventDefault();
+                        items[activeIndex].click();
+                    } else if (e.key === 'Escape') {
+                        suggestionsContainer.style.display = 'none';
+                        form.classList.remove('has-suggestions');
+                    }
+                });
+
+                function updateActiveItem(items) {
+                    items.forEach((item, index) => {
+                        if (index === activeIndex) {
+                            item.classList.add('active');
+                            item.scrollIntoView({ block: 'nearest' });
+                        } else {
+                            item.classList.remove('active');
+                        }
+                    });
+                }
+
+                function renderSuggestions(data, container) {
+                    container.innerHTML = '';
+                    activeIndex = -1;
+
+                    if (data.length === 0) {
+                        container.style.display = 'none'; 
+                        form.classList.remove('has-suggestions');
+                    } else {
+                        data.forEach(item => {
+                            const suggestion = document.createElement('a');
+                            suggestion.href = item.url;
+                            suggestion.className = 'search-suggestion-item';
+                            suggestion.innerHTML = `
+                                <i class="fas fa-file-alt"></i>
+                                <div style="display: flex; flex-direction: column;">
+                                    <span class="search-suggestion-title">${item.title}</span>
+                                    <span style="font-size: 0.75rem; color: #64748b; font-weight: 500;">Market Intelligence Report</span>
+                                </div>
+                            `;
+                            container.appendChild(suggestion);
+                        });
+                        container.style.display = 'block';
+                    }
+                }
+
+                // Close suggestions when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!input.contains(e.target) && !suggestionsContainer.contains(e.target)) {
+                        suggestionsContainer.style.display = 'none';
+                        form.classList.remove('has-suggestions');
+                    }
+                });
+
+                // Show again on focus if query exists
+                input.addEventListener('focus', function() {
+                    if (this.value.trim().length >= 2 && suggestionsContainer.children.length > 0) {
+                        suggestionsContainer.style.display = 'block';
+                        form.classList.add('has-suggestions');
+                    }
+                });
+            });
+        });
+    </script>
+    </body>
 
 </html>

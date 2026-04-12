@@ -1,8 +1,9 @@
 from django.urls import path
-from .views import ReportListAPIView, ReportDetailAPIView, CategoryListAPIView
+from .views import ReportListAPIView, ReportDetailAPIView, CategoryListAPIView, ReportSearchSuggestionsView
 
 urlpatterns = [
     path('categories/', CategoryListAPIView.as_view(), name='api-category-list'),
     path('reports/', ReportListAPIView.as_view(), name='api-report-list'),
+    path('reports/search-suggestions/', ReportSearchSuggestionsView.as_view(), name='api-report-search-suggestions'),
     path('reports/<slug:slug>/', ReportDetailAPIView.as_view(), name='api-report-detail'),
 ]

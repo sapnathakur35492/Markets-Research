@@ -614,12 +614,14 @@
             {% endif %}
 
             <!-- Modern Search embedded in header -->
-            <form method="get" action="" style="margin-top: 1.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <form method="get" action="" class="reports-search-form" style="margin-top: 1.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap; position: relative;">
                 {% if selected_country %}
                 <input type="hidden" name="country" value="{{ selected_country }}">
                 {% endif %}
-                <input type="text" name="q" value="{{ search_query }}" placeholder="Search market, industry..."
-                    style="flex: 1; padding: 0.8rem 1rem; border: 1px solid #bfdbfe; border-radius: 4px; outline: none; min-width: 200px;">
+                <div class="reports-search-inner" style="flex: 1; position: relative; min-width: 200px;">
+                    <input type="text" name="q" value="{{ search_query }}" placeholder="Search market, industry..."
+                        style="width: 100%; padding: 0.8rem 1rem; border: 1px solid #bfdbfe; border-radius: 4px; outline: none;">
+                </div>
                 <button type="submit"
                     style="background: #2563eb; color: white; border: none; padding: 0 1.5rem; border-radius: 4px; font-weight: 700; cursor: pointer; height: 46px;">
                     Search

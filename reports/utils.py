@@ -37,6 +37,9 @@ def auto_format_content(text):
     # Protect FAQ block
     text = re.sub(r'(?i)<!--\s*FAQ_START\s*-->.*?<!--\s*FAQ_END\s*-->', protect_block, text, flags=re.DOTALL)
     
+    # Protect Segmentation block
+    text = re.sub(r'(?i)<!--\s*SEGMENT(?:ATION)?_?START\s*-->.*?<!--\s*SEGMENT(?:ATION)?_?END\s*-->', protect_block, text, flags=re.DOTALL)
+    
     lines = text.split('\n')
     formatted_lines = []
     
@@ -255,19 +258,25 @@ def parse_content_sections(content):
                     # If no end found, take a reasonable amount after heading
                     toc_content = remaining_after_toc[search_start:2000].strip() if first_heading_end else remaining_after_toc[:2000].strip()
     
-    # Extract Segmentation content - look for "Segmentation" or "Market Segmentation" heading
+    # Extract Segmentation content - look for explicit markers first, then "Segmentation" heading
     segmentation_content = ''
-    seg_patterns = [
-        r'(?i)<[ph][1-6]?>(?:Market\s+)?Segmentation</[ph][1-6]?>',
-        r'(?i)<p>(?:Market\s+)?Segmentation</p>',
-    ]
     
+    # First, look for explicit Segmentation markers
     seg_start = None
-    for pattern in seg_patterns:
-        seg_match = re.search(pattern, content)
-        if seg_match:
-            seg_start = seg_match.start()
-            break
+    seg_marker_match = re.search(r'(?:<[^>]*>)?\s*<!--\s*SEGMENT(?:ATION)?_?START\s*-->\s*(?:</[^>]*>)?(.*?)(?:<[^>]*>)?\s*<!--\s*SEGMENT(?:ATION)?_?END\s*-->\s*(?:</[^>]*>)?', content, re.DOTALL | re.IGNORECASE)
+    if seg_marker_match:
+        segmentation_content = seg_marker_match.group(1).strip()
+    else:
+        seg_patterns = [
+            r'(?i)<[ph][1-6]?>(?:Market\s+)?Segmentation</[ph][1-6]?>',
+            r'(?i)<p>(?:Market\s+)?Segmentation</p>',
+        ]
+        
+        for pattern in seg_patterns:
+            seg_match = re.search(pattern, content)
+            if seg_match:
+                seg_start = seg_match.start()
+                break
     
     if seg_start is not None:
         # Find where Segmentation ends - look for next major heading
@@ -302,6 +311,7 @@ def parse_content_sections(content):
     
     # Extract FAQs content - look for "Frequently Asked Questions" or "FAQ" heading
     faqs_content = ''
+    faq_start = None
     faq_marker_match = re.search(r'(?:<[^>]*>)?\s*<!--\s*FAQ_START\s*-->\s*(?:</[^>]*>)?(.*?)(?:<[^>]*>)?\s*<!--\s*FAQ_END\s*-->\s*(?:</[^>]*>)?', content, re.DOTALL | re.IGNORECASE)
     if faq_marker_match:
         faqs_content = faq_marker_match.group(1).strip()
@@ -315,7 +325,6 @@ def parse_content_sections(content):
         r'(?i)<p>Report\s+FAQ[s]?</p>',
     ]
     
-        faq_start = None
         for pattern in faq_patterns:
             faq_match = re.search(pattern, content)
             if faq_match:
@@ -368,11 +377,11 @@ def parse_content_sections(content):
     # Remove explicit "Table of Contents" heading section if found
     cleaned_summary = re.sub(r'(?i)(?:<p>|<[ph][1-6]?>)Table\s+of\s+Contents(?:</p>|</[ph][1-6]?>).*?(?=(?:<p>|<[ph][1-6]?>)(?:Chapter\s+\d+|Report Highlights)|$)', '', cleaned_summary, flags=re.DOTALL)
 
-    # Remove Segmentation section from summary
-    cleaned_summary = re.sub(r'(?i)(?:<p>|<[ph][1-6]?>)(?:Market\s+)?Segmentation(?:</p>|</[ph][1-6]?>).*?(?=(?:<p>|<[ph][1-6]?>)(?:Methodology|Frequently Asked|Chapter \d+)|$)', '', cleaned_summary, flags=re.DOTALL)
+    # Remove Segmentation markers block
+    cleaned_summary = re.sub(r'(?:<[^>]*>)?\s*<!--\s*SEGMENT(?:ATION)?_?START\s*-->.*?<!--\s*SEGMENT(?:ATION)?_?END\s*-->\s*(?:</[^>]*>)?', '', cleaned_summary, flags=re.DOTALL | re.IGNORECASE)
     
     # Remove FAQs section from summary
-    cleaned_summary = re.sub(r'(?i)(?:<p>|<[ph][1-6]?>)Frequently\s+Asked\s+Questions(?:</p>|</[ph][1-6]?>).*?$', '', cleaned_summary, flags=re.DOTALL)
+    cleaned_summary = re.sub(r'(?i)(?:<p>|<[ph][1-6]?>)Frequently\s+Asked\s+Questions(?:</p>|</[ph][1-6]?>).*?$', '', cleaned_summary, flags=re.DOTALL | re.IGNORECASE)
     cleaned_summary = re.sub(r'(?i)(?:<p>|<[ph][1-6]?>)FAQ[s]?(?:</p>|</[ph][1-6]?>).*?$', '', cleaned_summary, flags=re.DOTALL)
     
     cleaned_summary = cleaned_summary.strip()

@@ -199,6 +199,11 @@ def format_segmentation(content):
     text = re.sub(r'</(?:p|h[1-6]|li)>', '\n', text)
     text = re.sub(r'<[^>]+>', '', text)
     lines = [line.strip() for line in text.split('\n') if line.strip()]
+    
+    # Remove redundant "Market Segmentation" title if it exists at the start
+    if lines and lines[0].lower() == 'market segmentation':
+        lines = lines[1:]
+
     formatted_output = []
     current_list = []
     for line in lines:
@@ -469,7 +474,15 @@ def exclude_report_tabs(content):
     """Truncates content before TOC/Segmentation/Methodology/FAQs."""
     if not content: return ''
     # 1. Identifier Check (Primary)
-    markers = [r'<!--\s*FAQ_START\s*-->', r'FAQ_START', r'TOC_START', r'SEGMENTATION_START']
+    markers = [
+        r'<!--\s*FAQ_START\s*-->', 
+        r'FAQ_START', 
+        r'TOC_START', 
+        r'SEGMENTATION_START',
+        r'SEGMENT_START',
+        r'SEGMENTATION_END',
+        r'SEGMENT_END'
+    ]
     for p in markers:
         m = re.search(p, content, re.IGNORECASE)
         if m: return content[:m.start()]
@@ -552,13 +565,18 @@ def extract_section(content, section_name):
     if not content: return ''
     keyword = section_name.lower().strip()
 
-    # 1. FAQ Marker Extraction
+    # 1. Segmentation Marker Extraction (New)
+    if 'segmentation' in keyword:
+        m = re.search(r'<!--\s*SEGMENT(?:ATION)?_?START\s*-->(.*?)<!--\s*SEGMENT(?:ATION)?_?END\s*-->', content, re.IGNORECASE | re.DOTALL)
+        if m: return mark_safe(m.group(1).strip())
+
+    # 2. FAQ Marker Extraction
     if 'faq' in keyword:
         m = re.search(r'<!--\s*(?:FAQ|QUESTIONS)?_?START\s*-->(.*?)<!--\s*(?:FAQ|QUESTIONS)?_?END\s*-->', content, re.IGNORECASE | re.DOTALL)
         if not m: m = re.search(r'<!--\s*(?:FAQ|QUESTIONS)?_?START\s*-->(.*)', content, re.IGNORECASE | re.DOTALL)
         if m: return mark_safe(m.group(1).strip())
 
-    # 2. TOC Marker and Fallback Extraction (Last List)
+    # 3. TOC Marker and Fallback Extraction (Last List)
     if any(k in keyword for k in ['toc', 'table of contents']):
         m = re.search(r'<!--\s*TOC_START\s*-->(.*?)<!--\s*TOC_END\s*-->', content, re.IGNORECASE | re.DOTALL)
         if m: return mark_safe(m.group(1).strip())
@@ -568,7 +586,7 @@ def extract_section(content, section_name):
             for m in reversed(lists):
                 if len(re.findall(r'<li>', m.group(0))) > 5: return mark_safe(m.group(0))
 
-    # 3. Dynamic Section Extraction (Line by Line)
+    # 4. Dynamic Section Extraction (Line by Line)
     content = _sanitize_html(content)
     text = re.sub(r'<h([1-6])[^>]*>(.*?)</h\1>', r'\n###H\1###\2###HEND###\n', content, flags=re.IGNORECASE | re.DOTALL)
     text = re.sub(r'<(?:p|br)[^>]*>', '\n', text, flags=re.IGNORECASE)

@@ -191,9 +191,10 @@ class ReportAdmin(admin.ModelAdmin):
                     category=category,
                     import_batch=batch,
                     sub_category=str(row.get('sub cate', row.get('sub_category', ''))).strip(),
-                    meta_title=str(row.get('meta tit', row.get('meta title', row.get('meta_title', '')))).strip(),
-                    meta_description=str(row.get('meta de', row.get('meta des', row.get('meta_description', '')))).strip(),
-                    meta_keywords=str(row.get('meta ke', row.get('meta key', row.get('meta_keywords', '')))).strip(),
+                    # SEO Fields - Specifically matching headers from user's Excel
+                    meta_title=str(row.get('meta title', row.get('meta tit', row.get('meta_title', '')))).strip(),
+                    meta_description=str(row.get('meta description', row.get('meta description:', row.get('meta des', row.get('meta_description', ''))))).strip(),
+                    meta_keywords=str(row.get('meta keywords', row.get('meta keywords:', row.get('meta key', row.get('meta_keywords', ''))))).strip(),
                     summary=parsed_data.get('cleaned_summary', formatted_content) if parsed_data.get('cleaned_summary') else str(row.get('summary', '')).strip(),
                     toc=parsed_data.get('toc', '') if parsed_data.get('toc') else auto_format_content(str(row.get('toc', '')).strip()),
                     segmentation=parsed_data.get('segmentation', '') if parsed_data.get('segmentation') else auto_format_content(str(row.get('segmentation', '')).strip()),

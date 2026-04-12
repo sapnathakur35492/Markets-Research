@@ -301,3 +301,30 @@ class ReportDetailAPIView(generics.RetrieveAPIView):
     queryset = Report.objects.all()
     serializer_class = ReportDetailSerializer
     lookup_field = 'slug'
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from django.urls import reverse
+
+class ReportSearchSuggestionsView(APIView):
+    """
+    API endpoint for search autocomplete/suggestions.
+    Returns matching report titles and their detail URLs.
+    """
+    def get(self, request):
+        q = request.GET.get('q', '')
+        if len(q) < 2:
+            return Response([])
+        
+        # Search in title and summary
+        reports = Report.objects.filter(
+            Q(title__icontains=q) | Q(summary__icontains=q)
+        ).select_related('category').only('title', 'slug', 'category__slug', 'region')[:10]
+        
+        results = []
+        for r in reports:
+            results.append({
+                'title': r.title,
+                'url': r.get_absolute_url()
+            })
+        return Response(results)
