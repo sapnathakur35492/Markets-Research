@@ -511,7 +511,8 @@
 
         <!-- Mobile Category Filter (Visible < 992px) -->
         <div class="mobile-cat-filter">
-            <a href="{% if country_slug %}{% url 'country-report-list' country_slug %}{% else %}{% url 'report-list' %}{% endif %}" class="mobile-cat-pill {% if not current_category %}active{% endif %}">
+            <a href="{% if country_slug %}{% url 'country-report-list' country_slug %}{% else %}{% url 'report-list' %}{% endif %}"
+                class="mobile-cat-pill {% if not current_category %}active{% endif %}">
                 All
             </a>
             {% for cat in categories %}
@@ -525,9 +526,9 @@
         <!-- Header / Search -->
         <div class="vmr-header">
             {% if is_country_reports %}
-            <h2 style="font-size: 1.5rem; margin-bottom: 0.3rem; color: #000; font-weight: 800;">Country Reports —
+            <h2 style="font-size: 1.3em; margin-bottom: 0.3rem; color: #000; font-weight: 800;">Country Reports —
                 Market Intelligence by Geography</h2>
-            <p style="font-weight: 700; color: #475569; margin-bottom: 1.5rem; font-size: 1.1rem;">Markets NXT — A
+            <p style="font-weight: 700; color: #475569; margin-bottom: 1.2rem; font-size: 1.1rem;">Markets NXT — A
                 Montclaire & Stein Venture</p>
 
             <!-- Scrollable Context Section -->
@@ -535,7 +536,7 @@
                 style="max-height: 220px; overflow-y: auto; background: rgba(255, 255, 255, 0.6); padding: 1.25rem; border-radius: 8px; border: 1px solid #bfdbfe; margin-bottom: 1.5rem; position: relative; scrollbar-width: thin; scrollbar-color: #bfdbfe transparent;">
                 <div class="country-content-section" style="color: #334155; line-height: 1.7; text-align: justify;">
                     <h2
-                        style="font-size: 1.3rem; color: #000; font-weight: 700; margin-top: 0; margin-bottom: 0.75rem;">
+                        style="font-size: 1.1rem; color: #000; font-weight: 700; margin-top: 0; margin-bottom: 0.75rem;">
                         A Century of Global Intelligence Behind Every Report</h2>
                     <p style="margin-bottom: 1.2rem;">Markets NXT builds on a legacy dating to the early 1900s, when
                         economists Edgar Montclaire and Johann Stein began advising enterprises across Europe and North
@@ -544,7 +545,7 @@
                         geographies — forming the analytical foundation behind every report we publish today.</p>
 
                     <h2
-                        style="font-size: 1.3rem; color: #000; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.75rem;">
+                        style="font-size: 1.1rem; color: #000; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.75rem;">
                         Why Country-Level Intelligence Matters</h2>
                     <p style="margin-bottom: 0.8rem;">Global markets are not uniform. Regulatory environments, consumer
                         behavior, industrial composition, and competitive dynamics differ significantly by country.
@@ -562,7 +563,7 @@
                     </ul>
 
                     <h2
-                        style="font-size: 1.3rem; color: #000; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.75rem;">
+                        style="font-size: 1.1rem; color: #000; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.75rem;">
                         What Our Country Reports Cover</h2>
                     <p style="margin-bottom: 1.2rem;">Each report delivers institutional-grade intelligence across:
                         market sizing and forecasting, industry segmentation, competitive landscape, regulatory
@@ -570,7 +571,7 @@
                         conservative, multi-source validated methodology.</p>
 
                     <h2
-                        style="font-size: 1.3rem; color: #000; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.75rem;">
+                        style="font-size: 1.1rem; color: #000; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.75rem;">
                         Institutional Rigour at the Most Competitive Pricing</h2>
                     <p style="margin-bottom: 1.2rem;">Markets NXT offers country-specific research at the most
                         competitive pricing in the industry, without compromising analytical standards. Our reports
@@ -578,7 +579,7 @@
                         intelligence without enterprise-level costs.</p>
 
                     <h2
-                        style="font-size: 1.3rem; color: #000; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.75rem;">
+                        style="font-size: 1.1rem; color: #000; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.75rem;">
                         Explore Reports by Country</h2>
                     <p>Browse and filter below to find market research reports for the country of your interest.
                         Coverage spans North America, Europe, Asia Pacific, Latin America, the Middle East, and Africa.
@@ -614,7 +615,8 @@
             {% endif %}
 
             <!-- Modern Search embedded in header -->
-            <form method="get" action="" class="reports-search-form" style="margin-top: 1.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap; position: relative;">
+            <form method="get" action="" class="reports-search-form"
+                style="margin-top: 1.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap; position: relative;">
                 {% if selected_country %}
                 <input type="hidden" name="country" value="{{ selected_country }}">
                 {% endif %}

@@ -40,6 +40,12 @@ class ReportAdmin(admin.ModelAdmin):
     list_filter = ('category', 'region', 'format_type')
     search_fields = ('title', 'slug', 'summary')
     readonly_fields = ('sample_url_slug', 'discount_url_slug', 'inquiry_url_slug')
+    exclude = (
+        'report_highlights', 'industry_snapshot', 'market_growth_catalysts',
+        'market_challenges', 'strategic_opportunities', 'market_coverage',
+        'geographic_analysis', 'competitive_environment', 'leading_participants',
+        'long_term_perspective'
+    )
     prepopulated_fields = {'slug': ('title',)}
     change_list_template = "admin/reports_changelist.html"
     actions = ['export_to_excel', 'update_price_action']

@@ -5,12 +5,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Markets NXT{% endblock %}</title>
+
     {% block meta %}
-    <meta name="robots" content="{% block robots %}index, follow{% endblock %}">
     <meta name="description"
         content="{% block meta_description %}Markets NXT – Leading Global Market Research & Strategic Intelligence Provider. Access thousands of industry-specific reports and forecasts.{% endblock %}">
     <meta name="keywords"
         content="{% block meta_keywords %}market research, market reports, industry analysis, business intelligence{% endblock %}">
+    <meta name="robots" content="{% block robots %}index, follow{% endblock %}">
     {% endblock %}
 
     {% if site_config.google_search_console_verification_code %}
@@ -30,7 +32,6 @@
     </script>
     {% endif %}
 
-    <title>{% block title %}Markets NXT{% endblock %}</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=Poppins:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
@@ -616,7 +617,8 @@
             display: none;
             border: 1px solid #e2e8f0;
             border-top: none;
-            margin-top: -1px; /* Overlap the bottom border of the form */
+            margin-top: -1px;
+            /* Overlap the bottom border of the form */
         }
 
         /* Style for when suggestions are active */
@@ -647,10 +649,12 @@
             border-bottom: none;
         }
 
-        .search-suggestion-item:hover, .search-suggestion-item.active {
+        .search-suggestion-item:hover,
+        .search-suggestion-item.active {
             background: #f8fafc;
             color: #2563eb !important;
-            padding-left: 28px; /* Slight indent on hover */
+            padding-left: 28px;
+            /* Slight indent on hover */
         }
 
         .search-suggestion-item i {
@@ -684,13 +688,16 @@
                 border-radius: 12px;
                 margin-top: 5px;
             }
+
             .search-suggestion-item {
                 padding: 12px 18px;
             }
         }
 
         /* Ensure parents are properly contained and allow floating dropdowns */
-        .hero-search-wrapper, .reports-search-inner, .reports-search-form {
+        .hero-search-wrapper,
+        .reports-search-inner,
+        .reports-search-form {
             position: relative !important;
             overflow: visible !important;
         }
@@ -1330,9 +1337,9 @@
     </script>
     <!-- Search Suggestions JS -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const searchInputs = document.querySelectorAll('input[name="q"]');
-            
+
             searchInputs.forEach(input => {
                 const form = input.closest('form');
                 if (!form) return;
@@ -1340,15 +1347,15 @@
                 // Create suggestions container
                 const suggestionsContainer = document.createElement('div');
                 suggestionsContainer.className = 'search-suggestions-container';
-                
+
                 // Add to a relative parent
                 let parent = input.parentElement;
                 if (form.classList.contains('hero-search-form') || form.classList.contains('reports-search-form')) {
-                    parent = form; 
+                    parent = form;
                 } else if (input.parentElement.classList.contains('reports-search-inner')) {
                     parent = input.parentElement;
                 }
-                
+
                 parent.style.position = 'relative';
                 // Force visibility on parents to prevent clipping
                 let current = parent;
@@ -1358,7 +1365,7 @@
                     }
                     current = current.parentElement;
                 }
-                
+
                 parent.appendChild(suggestionsContainer);
 
                 let debounceTimer;
@@ -1366,7 +1373,7 @@
 
                 input.setAttribute('autocomplete', 'off');
 
-                input.addEventListener('input', function() {
+                input.addEventListener('input', function () {
                     clearTimeout(debounceTimer);
                     const query = this.value.trim();
 
@@ -1398,7 +1405,7 @@
                     }, 300);
                 });
 
-                input.addEventListener('keydown', function(e) {
+                input.addEventListener('keydown', function (e) {
                     const items = suggestionsContainer.querySelectorAll('.search-suggestion-item');
                     if (suggestionsContainer.style.display === 'none' || !items.length) return;
 
@@ -1435,7 +1442,7 @@
                     activeIndex = -1;
 
                     if (data.length === 0) {
-                        container.style.display = 'none'; 
+                        container.style.display = 'none';
                         form.classList.remove('has-suggestions');
                     } else {
                         data.forEach(item => {
@@ -1456,7 +1463,7 @@
                 }
 
                 // Close suggestions when clicking outside
-                document.addEventListener('click', function(e) {
+                document.addEventListener('click', function (e) {
                     if (!input.contains(e.target) && !suggestionsContainer.contains(e.target)) {
                         suggestionsContainer.style.display = 'none';
                         form.classList.remove('has-suggestions');
@@ -1464,7 +1471,7 @@
                 });
 
                 // Show again on focus if query exists
-                input.addEventListener('focus', function() {
+                input.addEventListener('focus', function () {
                     if (this.value.trim().length >= 2 && suggestionsContainer.children.length > 0) {
                         suggestionsContainer.style.display = 'block';
                         form.classList.add('has-suggestions');
@@ -1473,6 +1480,6 @@
             });
         });
     </script>
-    </body>
+</body>
 
 </html>

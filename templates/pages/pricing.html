@@ -20,10 +20,10 @@
     }
 
     .pricing-title {
-        font-size: 2.1rem;
+        font-size: 1.6rem;
         font-weight: 800;
         color: var(--pricing-primary);
-        margin-bottom: 1rem;
+        margin-bottom: 0rem;
         letter-spacing: -0.02em;
     }
 
@@ -146,7 +146,7 @@
         /* Align titles to same height */
     }
 
-    .card-desc {
+    .pricing-card .card-desc {
         font-size: 0.82rem;
         color: #64748b;
         text-align: left;
@@ -176,7 +176,7 @@
     }
 
     .price-amount {
-        font-size: 2.25rem;
+        font-size: 1.8rem;
         font-weight: 800;
         color: var(--pricing-primary);
         letter-spacing: -0.05em;
@@ -237,11 +237,14 @@
     }
 
     @keyframes flash-pulse {
-        0%, 100% {
+
+        0%,
+        100% {
             box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7);
             transform: scale(1);
             filter: brightness(1);
         }
+
         50% {
             box-shadow: 0 0 0 15px rgba(22, 163, 74, 0);
             transform: scale(1.03);
@@ -261,15 +264,15 @@
     }
 
     .help-banner h2 {
-        font-size: 2rem;
-        margin-bottom: 1rem;
+        font-size: 1.5rem;
+        margin-bottom: 0;
     }
 
     .help-banner p {
         font-size: 1.1rem;
         opacity: 0.9;
         max-width: 600px;
-        margin: 0 auto 2rem;
+        margin: 0 auto 1rem;
     }
 
     .btn-help-contact {
@@ -314,7 +317,7 @@
 <section class="pricing-hero">
     <div class="container">
         <div
-            style="margin-bottom: 1rem; font-weight: 700; color: var(--pricing-secondary); text-transform: uppercase; letter-spacing: 2px;">
+            style="margin-bottom: 0rem; font-weight: 700; color: var(--pricing-secondary); text-transform: uppercase; letter-spacing: 2px;">
             Pricing & Plans
         </div>
         <h1 class="pricing-title">Report Access & Licensing Options</h1>
@@ -358,7 +361,8 @@
                     <li><i class="fas fa-check-circle"></i> 15 days of complimentary analyst support post-purchase</li>
                 </ul>
                 {% if report %}
-                <a href="{% url 'checkout' report.slug 'single' %}" class="card-action-btn btn-buy-now">Proceed To Buy</a>
+                <a href="{% url 'checkout' report.slug 'single' %}" class="card-action-btn btn-buy-now">Proceed To
+                    Buy</a>
                 {% else %}
                 <a href="{% url 'report-list' %}" class="card-action-btn btn-buy-now">View Reports</a>
                 {% endif %}
@@ -382,7 +386,8 @@
                     <li><i class="fas fa-check-circle"></i> 30 days of complimentary analyst support post-purchase</li>
                 </ul>
                 {% if report %}
-                <a href="{% url 'checkout' report.slug 'multi' %}" class="card-action-btn btn-buy-now">Proceed To Buy</a>
+                <a href="{% url 'checkout' report.slug 'multi' %}" class="card-action-btn btn-buy-now">Proceed To
+                    Buy</a>
                 {% else %}
                 <a href="{% url 'report-list' %}" class="card-action-btn btn-buy-now">View Reports</a>
                 {% endif %}
@@ -406,7 +411,8 @@
                     <li><i class="fas fa-check-circle"></i> 45 days of complimentary analyst support post-purchase</li>
                 </ul>
                 {% if report %}
-                <a href="{% url 'checkout' report.slug 'enterprise' %}" class="card-action-btn btn-buy-now">Proceed To Buy</a>
+                <a href="{% url 'checkout' report.slug 'enterprise' %}" class="card-action-btn btn-buy-now">Proceed To
+                    Buy</a>
                 {% else %}
                 <a href="{% url 'report-list' %}" class="card-action-btn btn-buy-now">View Reports</a>
                 {% endif %}
@@ -430,7 +436,8 @@
                     <li><i class="fas fa-check-circle"></i> Growth analysis data points</li>
                 </ul>
                 {% if report %}
-                <a href="{% url 'checkout' report.slug 'datapack' %}" class="card-action-btn btn-buy-now">Proceed To Buy</a>
+                <a href="{% url 'checkout' report.slug 'datapack' %}" class="card-action-btn btn-buy-now">Proceed To
+                    Buy</a>
                 {% else %}
                 <a href="{% url 'report-list' %}" class="card-action-btn btn-buy-now">View Reports</a>
                 {% endif %}

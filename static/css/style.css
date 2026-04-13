@@ -150,7 +150,7 @@ header {
 }
 
 .hero-content h1 {
-    font-size: 3.5rem;
+    font-size: 1.7rem;
     line-height: 1.1;
     margin-bottom: 1.5rem;
     font-weight: 800;
@@ -398,7 +398,7 @@ footer {
 /* Mobile */
 @media (max-width: 768px) {
     .hero-content h1 {
-        font-size: 2.5rem;
+        font-size: 1.7rem;
     }
 
     .floating-cards {
@@ -514,7 +514,7 @@ footer {
 }
 
 .legal-content-box h1 {
-    font-size: 2.5rem;
+    font-size: 1.4rem;
     font-weight: 700;
     margin-bottom: 2rem;
     color: #000428;
@@ -523,7 +523,7 @@ footer {
 }
 
 .legal-content-box h2 {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     font-weight: 600;
     margin-top: 2.5rem;
     margin-bottom: 1rem;
@@ -557,6 +557,7 @@ footer {
         font-size: 1.75rem;
     }
 }
+
 /* ── TOC raw pass-through styles ─────────────────────── */
 .toc-raw-content h2 {
     font-size: 1.35rem;
@@ -567,20 +568,24 @@ footer {
     border-left: 4px solid #1e3a8a;
     padding-left: 0.75rem;
 }
+
 .toc-raw-content ol {
     list-style: decimal;
     padding-left: 1.6rem;
     margin: 0.4rem 0;
 }
+
 .toc-raw-content ol ol {
     list-style: decimal;
     padding-left: 1.8rem;
     margin: 0.2rem 0;
 }
+
 .toc-raw-content ol ol ol {
     list-style: decimal;
     padding-left: 2rem;
 }
+
 .toc-raw-content li {
     font-size: 1rem;
     color: #1e293b;
@@ -589,7 +594,8 @@ footer {
     padding: 0.1rem 0;
     font-family: 'Inter', sans-serif;
 }
-.toc-raw-content > ol > li {
+
+.toc-raw-content>ol>li {
     font-size: 1.05rem;
     font-weight: 600;
     color: #1e3a8a;
