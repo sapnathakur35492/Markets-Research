@@ -14,6 +14,10 @@
         content="{% block meta_keywords %}market research, market reports, industry analysis, business intelligence{% endblock %}">
     <meta name="robots" content="{% block robots %}index, follow{% endblock %}">
     {% endblock %}
+    
+    {% if canonical_url %}
+    <link rel="canonical" href="{{ canonical_url }}">
+    {% endif %}
 
     {% if site_config.google_search_console_verification_code %}
     <meta name="google-site-verification" content="{{ site_config.google_search_console_verification_code }}" />

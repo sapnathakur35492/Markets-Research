@@ -17,6 +17,8 @@ class BlogPostListView(ListView):
         # Section 2: Previous up to 10 (Only those older than the latest)
         context['previous_posts'] = all_posts[5:15]
         
+        # SEO: Canonical URL
+        context['canonical_url'] = self.request.build_absolute_uri(self.request.path)
         return context
 
     def get_queryset(self):
@@ -27,3 +29,9 @@ class BlogPostDetailView(DetailView):
     model = BlogPost
     template_name = "blog/post_detail.html"
     context_object_name = "post"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # SEO: Canonical URL
+        context['canonical_url'] = self.request.build_absolute_uri(self.object.get_absolute_url())
+        return context

@@ -56,6 +56,10 @@ class BlogPost(models.Model):
             self.slug = slugify(self.title)
         super().save(*args, **kwargs)
 
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('blog-detail', kwargs={'slug': self.slug})
+
     @property
     def read_time(self):
         import math

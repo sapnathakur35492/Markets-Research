@@ -270,17 +270,17 @@
     }
 
     .tab-body h2 {
-        font-size: 1.2rem !important;
+        font-size: 1rem !important;
     }
 
     .tab-body h3 {
-        font-size: 1.2rem !important;
+        font-size: 1rem !important;
     }
 
     .tab-body h4,
     .tab-body h5,
     .tab-body h6 {
-        font-size: 1.1rem !important;
+        font-size: 1rem !important;
         font-weight: 600 !important;
         color: #1e3a8a !important;
         margin-top: 1.5rem !important;
@@ -329,7 +329,7 @@
 
     /* H2 Subheader - for short lines detected as sub-sections */
     .tab-body .section-subheader {
-        font-size: 1.1rem;
+        font-size: 1rem;
         font-weight: 700;
         color: #1e3a8a;
         margin: 1.75rem 0 0.4rem 0;
@@ -451,7 +451,7 @@
         margin-bottom: 0.4rem;
         color: #25292d;
         font-weight: 500;
-        font-size: 1.2rem;
+        font-size: 1rem;
         line-height: 1.6rem;
     }
 
@@ -974,53 +974,7 @@
         transform: translateY(-2px);
     }
 
-    /* Market Snapshot Widget */
-    .snapshot-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1rem;
-    }
 
-    .snapshot-item {
-        background: white;
-        padding: 1rem;
-        border-radius: 12px;
-        text-align: center;
-        border: 1px solid #e2e8f0;
-        transition: all 0.3s ease;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 0.25rem;
-    }
-
-    .snapshot-item:hover {
-        border-color: #3b82f6;
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
-        transform: translateY(-2px);
-    }
-
-    .snapshot-icon {
-        font-size: 1.1rem;
-        color: #3b82f6;
-        margin-bottom: 0.25rem;
-    }
-
-    .snapshot-label {
-        font-size: 0.75rem;
-        color: #64748b;
-        text-transform: uppercase;
-        font-weight: 700;
-        letter-spacing: 0.05em;
-        display: block;
-    }
-
-    .snapshot-value {
-        font-size: 1rem;
-        font-weight: 800;
-        color: #1e3a8a;
-    }
 
     /* Key Players Widget */
     .company-tags {
@@ -1981,28 +1935,31 @@
             </a>
         </div>
 
+        <!-- Why Choose Us Widget -->
         <div class="sidebar-widget">
-            <h1 class="widget-title">Market Snapshot</h1>
-            <div class="snapshot-grid">
-                <div class="snapshot-item">
-                    <i class="fas fa-calendar-check snapshot-icon"></i>
-                    <span class="snapshot-label">Base Year</span>
-                    <span class="snapshot-value">{{ report.base_year|default:"2024" }}</span>
+            <h1 class="section-header widget-title"
+                style="margin: 0 0 1rem 0 !important; font-size: 1.15rem !important;">Why Choose Us?</h1>
+            <div class="trust-signals">
+                <div class="trust-item">
+                    <div class="trust-icon">✓</div>
+                    <div class="trust-text">
+                        <h4>Expert Analysts</h4>
+                        <p>Industry veterans with deep domain expertise.</p>
+                    </div>
                 </div>
-                <div class="snapshot-item">
-                    <i class="fas fa-chart-line snapshot-icon"></i>
-                    <span class="snapshot-label">Forecast</span>
-                    <span class="snapshot-value">{{ report.forecast_period|default:"2025-2032" }}</span>
+                <div class="trust-item">
+                    <div class="trust-icon">✓</div>
+                    <div class="trust-text">
+                        <h4>Quality Assurance</h4>
+                        <p>Rigorous data validation & verification.</p>
+                    </div>
                 </div>
-                <div class="snapshot-item">
-                    <i class="fas fa-percentage snapshot-icon"></i>
-                    <span class="snapshot-label">CAGR</span>
-                    <span class="snapshot-value">7.5%</span>
-                </div>
-                <div class="snapshot-item">
-                    <i class="fas fa-globe-americas snapshot-icon"></i>
-                    <span class="snapshot-label">Region</span>
-                    <span class="snapshot-value">{{ report.region|default:"Global" }}</span>
+                <div class="trust-item">
+                    <div class="trust-icon">✓</div>
+                    <div class="trust-text">
+                        <h4>24/7 Support</h4>
+                        <p>Dedicated assistance for all your queries.</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -2078,34 +2035,6 @@
         {% endif %}
         {% endwith %}
 
-        <!-- Why Choose Us Widget -->
-        <div class="sidebar-widget">
-            <h1 class="section-header widget-title"
-                style="margin: 0 0 1rem 0 !important; font-size: 1.15rem !important;">Why Choose Us?</h1>
-            <div class="trust-signals">
-                <div class="trust-item">
-                    <div class="trust-icon">✓</div>
-                    <div class="trust-text">
-                        <h4>Expert Analysts</h4>
-                        <p>Industry veterans with deep domain expertise.</p>
-                    </div>
-                </div>
-                <div class="trust-item">
-                    <div class="trust-icon">✓</div>
-                    <div class="trust-text">
-                        <h4>Quality Assurance</h4>
-                        <p>Rigorous data validation & verification.</p>
-                    </div>
-                </div>
-                <div class="trust-item">
-                    <div class="trust-icon">✓</div>
-                    <div class="trust-text">
-                        <h4>24/7 Support</h4>
-                        <p>Dedicated assistance for all your queries.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <!-- Browse by Category Widget -->
         {% if all_categories %}
@@ -2752,19 +2681,8 @@
 
         // Exit Intent Logic (Desktop)
         document.addEventListener('mouseleave', function (e) {
-            if (e.clientY < 10) {
-                showPopup();
-            }
-        });
-
-        // Mobile Triggers (Timer and Scroll)
-        // 1. Timer: Show after 30 seconds
-        setTimeout(showPopup, 30000);
-
-        // 2. Scroll: Show after scrolling 50% of the page
-        window.addEventListener('scroll', function () {
-            const scrollPercentage = (window.scrollY + window.innerHeight) / document.documentElement.scrollHeight * 100;
-            if (scrollPercentage > 50) {
+            // Trigger when mouse moves out of the top of the window
+            if (e.clientY < 5) {
                 showPopup();
             }
         });

@@ -179,7 +179,7 @@ def format_list(content):
     lines = re.findall(r'<(?:p|h[1-6])>(.*?)</(?:p|h[1-6])>', content, re.DOTALL)
     if not lines: lines = [line.strip() for line in content.split('\n') if line.strip()]
     if not lines: return mark_safe(content)
-    li_items = [f'<li style="margin-bottom: 0.4rem; color: #334155; font-weight: 500; font-size: 1.2rem;">{re.sub(r"<[^>]+>", "", line).strip()}</li>' for line in lines if line.strip()]
+    li_items = [f'<li style="margin-bottom: 0.4rem; color: #334155; font-weight: 500; font-size: 1rem;">{re.sub(r"<[^>]+>", "", line).strip()}</li>' for line in lines if line.strip()]
     if not li_items: return mark_safe(content)
     return mark_safe(f'<ul style="list-style-type: disc; padding-left: 1.5rem; margin: 1rem 0;">{"".join(li_items)}</ul>')
 
@@ -211,9 +211,9 @@ def format_segmentation(content):
             if current_list:
                 formatted_output.append(f'<ul style="list-style-type: disc; padding-left: 2rem; margin-bottom: 1.5rem;">{"".join(current_list)}</ul>')
                 current_list = []
-            formatted_output.append(f'<div style="font-weight: 800; color: #1e3a8a; font-size: 1.3rem; margin-top: 1.8rem; margin-bottom: 0.8rem;">{line}</div>')
+            formatted_output.append(f'<div style="font-weight: 800; color: #1e3a8a; font-size: 1rem; margin-top: 1.8rem; margin-bottom: 0.8rem;">{line}</div>')
         else:
-            current_list.append(f'<li style="margin-bottom: 0.5rem; color: #334155; font-size: 1.15rem; font-weight: 500;">{line}</li>')
+            current_list.append(f'<li style="margin-bottom: 0.5rem; color: #334155; font-size: 1rem; font-weight: 500;">{line}</li>')
     if current_list:
         formatted_output.append(f'<ul style="list-style-type: disc; padding-left: 2rem; margin-bottom: 1.5rem;">{"".join(current_list)}</ul>')
     if not formatted_output: return mark_safe(content)
@@ -301,7 +301,7 @@ def format_toc(content):
                 sub_counters[i] = 0
             prefix = f'Chapter {ch_count:02d} ' if not raw.lower().startswith('chapter') else ''
             output.append(
-                f'<div style="font-weight:700; color:#1e3a8a; font-size:1.2rem;'
+                f'<div style="font-weight:700; color:#1e3a8a; font-size:1rem;'
                 f' margin-top:1.4rem; margin-bottom:0.2rem;">{prefix}{raw}</div>'
             )
         else:

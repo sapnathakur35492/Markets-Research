@@ -24,6 +24,9 @@ class HomeView(TemplateView):
         context['latest_reports'] = Report.objects.filter(region__icontains='Global').select_related('category').order_by('-publish_date')[:12]
         # Get latest 3 published blog posts
         context['latest_blog_posts'] = BlogPost.objects.filter(is_published=True).order_by('-publish_date')[:3]
+        
+        # SEO: Canonical URL
+        context['canonical_url'] = self.request.build_absolute_uri('/')
         return context
 
 class ReportListView(ListView):
@@ -85,6 +88,9 @@ class ReportListView(ListView):
             context['noindex'] = True
             
         context['recaptcha_public_key'] = settings.RECAPTCHA_PUBLIC_KEY
+        
+        # SEO: Canonical URL (Clean URL without query parameters)
+        context['canonical_url'] = self.request.build_absolute_uri(self.request.path)
         return context
 
 from django.shortcuts import get_object_or_404, redirect
@@ -182,6 +188,9 @@ class ReportDetailView(DetailView):
         context['country_slug'] = self.kwargs.get('country_slug', slugify(self.object.region or ''))
         
         context['recaptcha_public_key'] = settings.RECAPTCHA_PUBLIC_KEY
+
+        # SEO: Canonical URL
+        context['canonical_url'] = self.request.build_absolute_uri(self.object.get_absolute_url())
         return context
 
 class CountryReportListView(ReportListView):
