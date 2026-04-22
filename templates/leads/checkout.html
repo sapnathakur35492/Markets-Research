@@ -378,11 +378,11 @@
 
             e.preventDefault(); // Stop default for AJAX
 
-            // Update country code and country name
+            // Update country code (using ISO-2 for PayPal STC) and country name
             const countryData = iti.getSelectedCountryData();
-            if (countryData.dialCode) {
-                countryCodeInput.value = "+" + countryData.dialCode;
-                console.log("Setting country code to:", countryCodeInput.value);
+            if (countryData.iso2) {
+                countryCodeInput.value = countryData.iso2.toUpperCase();
+                console.log("Setting ISO country code for STC:", countryCodeInput.value);
             }
 
             // Auto-fill country name if empty
@@ -570,9 +570,19 @@
         // Handle URL parameters for payment messages
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('payment') === 'failed') {
+            const reason = urlParams.get('reason');
+            let text = 'Your payment could not be processed. Please try again or contact support.';
+            if (reason) {
+                // If it's a domestic card issue or similar, suggest checking the card
+                if (reason.includes('DECLINED') || reason.includes('INSTRUMENT_DECLINED')) {
+                    text = 'Transaction declined. Please use an overseas bank-issued card or PayPal buyer account as domestic cards are not supported.';
+                } else {
+                    text += ` (Reason: ${reason})`;
+                }
+            }
             Swal.fire({
                 title: 'Payment Failed',
-                text: 'Your payment could not be processed. Please try again or contact support.',
+                text: text,
                 icon: 'error',
                 confirmButtonColor: '#3b82f6'
             });

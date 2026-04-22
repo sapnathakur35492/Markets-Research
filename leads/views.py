@@ -23,6 +23,71 @@ import uuid
 
 logger = logging.getLogger(__name__)
 
+def clean_paypal_payload(data):
+    """
+    Recursively remove None, empty strings, and empty objects from the payload.
+    Ensures PayPal doesn't throw validation errors for empty fields.
+    """
+    if isinstance(data, dict):
+        return {
+            k: clean_paypal_payload(v) 
+            for k, v in data.items() 
+            if v not in [None, "", [], {}]
+        }
+    elif isinstance(data, list):
+        return [
+            clean_paypal_payload(i) 
+            for i in data 
+            if i not in [None, "", [], {}]
+        ]
+    return data
+
+def set_paypal_stc(tracking_id, lead, access_token=None):
+    """
+    Invokes the RISK/STC (Set Transaction Context) API.
+    https://developer.paypal.com/docs/limited-release/raas/v1/api/
+    """
+    try:
+        token = access_token or get_paypal_access_token()
+        if not token:
+            return False
+            
+        base_url = get_paypal_base_url()
+        # The endpoint for STC is /v1/risk/transaction-contexts/{tracking_id}
+        url = f"{base_url}/v1/risk/transaction-contexts/{tracking_id}"
+        
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {token}"
+        }
+        
+        # Industry pack fields for Digital Goods
+        stc_data = {
+            "additional_data": [
+                {"key": "sender_account_id", "value": str(lead.id)},
+                {"key": "sender_first_name", "value": lead.first_name},
+                {"key": "sender_last_name", "value": lead.last_name},
+                {"key": "sender_email", "value": lead.email},
+                {"key": "sender_phone", "value": lead.phone},
+                {"key": "sender_country_code", "value": lead.country_code or "US"}
+            ]
+        }
+        
+        # Filter out empty values
+        stc_data["additional_data"] = [
+            item for item in stc_data["additional_data"] if item["value"]
+        ]
+        
+        response = requests.put(url, headers=headers, json=stc_data, timeout=10)
+        if response.status_code not in [200, 204]:
+            logger.error(f"PayPal STC API failed ({response.status_code}): {response.text}")
+            return False
+        return True
+    except Exception as e:
+        logger.error(f"Error in PayPal STC: {e}")
+        return False
+
+
 def get_paypal_base_url():
     mode = os.environ.get('PAYPAL_MODE', 'sandbox')
     return "https://api-m.paypal.com" if mode == 'live' else "https://api-m.sandbox.paypal.com"
@@ -525,44 +590,104 @@ class CreatePayPalOrderView(View):
             # Format price correctly for PayPal (must be string with 2 decimal places)
             price_str = "{:.2f}".format(float(price))
 
+            # Generate Tracking ID for STC (Risk assessment)
+            # This will be passed back in return_url to be used in capture
+            tracking_id = f"MNXT-TRK-{lead.id}-{uuid.uuid4().hex[:6]}"
+            set_paypal_stc(tracking_id, lead, access_token=token)
+
+            # Construct return URLs — use HTTPS in production via SECURE_PROXY_SSL_HEADER
+            host = request.get_host()
+            protocol = 'https' if request.is_secure() else 'http'
+            return_url = f"{protocol}://{host}/api/leads/paypal-return/?lead_id={lead.id}&tracking_id={tracking_id}"
+            cancel_url  = f"{protocol}://{host}/api/leads/paypal-cancel/?lead_id={lead.id}"
+
             payload = {
                 "intent": "CAPTURE",
+                "payment_source": {
+                    "paypal": {
+                        "experience_context": {
+                            "brand_name": "Markets NXT",
+                            "shipping_preference": "NO_SHIPPING",
+                            "user_action": "PAY_NOW",
+                            "return_url": return_url,
+                            "cancel_url": cancel_url,
+                            "payment_method_selected": "PAYPAL",
+                            "payment_method_preference": "IMMEDIATE_PAYMENT_REQUIRED"
+                        },
+                        "email_address": lead.email,
+                        "name": {
+                            "given_name": lead.first_name,
+                            "surname": lead.last_name
+                        },
+                        "phone": {
+                            "phone_number": {
+                                "national_number": lead.phone.replace(' ', '').replace('-', '').replace('(', '').replace(')', '') if lead.phone else None
+                            }
+                        }
+                    }
+                },
                 "purchase_units": [{
                     "reference_id": f"lead-{lead.id}",
                     "amount": {
                         "currency_code": "USD",
-                        "value": price_str
+                        "value": price_str,
+                        "breakdown": {
+                            "item_total": {
+                                "currency_code": "USD",
+                                "value": price_str
+                            }
+                        }
                     },
-                    "description": f"{lead.report.title[:120]} - {lead.get_license_type_display()}"
-                }],
-                "application_context": {
-                    "return_url": return_url,
-                    "cancel_url": cancel_url,
-                    "brand_name": "Markets NXT",
-                    "user_action": "PAY_NOW",
-                    "shipping_preference": "NO_SHIPPING"
-                }
+                    "items": [{
+                        "name": lead.report.title[:127],
+                        "description": f"{lead.get_license_type_display()} License",
+                        "quantity": "1",
+                        "unit_amount": {
+                            "currency_code": "USD",
+                            "value": price_str
+                        },
+                        "category": "DIGITAL_GOODS"
+                    }],
+                    "soft_descriptor": "Markets NXT",
+                    "invoice_id": f"MNXT-{lead.id}-{uuid.uuid4().hex[:6].upper()}"
+                }]
             }
+
+            # Remove null/empty values to prevent PayPal validation errors
+            payload = clean_paypal_payload(payload)
+
+            # --- DEBUG LOGGING FOR LOCAL TESTING ---
+            logger.info("--- PAYPAL CREATE ORDER PAYLOAD ---")
+            logger.info(json.dumps(payload, indent=2))
+            # ----------------------------------------
 
             headers = {
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {token}",
-                # Idempotency key: same lead always gets same order → prevents duplicate charges
-                "PayPal-Request-Id": f"order-lead-{lead.id}"
+                # Unique Id for each transaction attempt
+                "PayPal-Request-Id": str(uuid.uuid4())
             }
 
             response = requests.post(url, headers=headers, json=payload, timeout=30)
+            
+            # --- DEBUG LOGGING FOR LOCAL TESTING ---
+            logger.info(f"--- PAYPAL CREATE ORDER RESPONSE ({response.status_code}) ---")
+            logger.info(response.text)
+            # ----------------------------------------
 
             if response.status_code in [200, 201]:
                 order_data = response.json()
                 links = order_data.get('links', [])
-                approve_url = next((link['href'] for link in links if link['rel'] == 'approve'), None)
+                
+                # Modern flows with payment_source often use 'payer-action' instead of 'approve'
+                # We check for both to ensure compatibility
+                approve_url = next((link['href'] for link in links if link['rel'] in ['approve', 'payer-action']), None)
 
                 if approve_url:
                     return JsonResponse({'approve_url': approve_url})
                 else:
-                    logger.error(f"No approve link in PayPal response: {order_data}")
-                    return JsonResponse({'error': 'No approve link found from PayPal'}, status=500)
+                    logger.error(f"No usable redirect link found in PayPal response: {order_data}")
+                    return JsonResponse({'error': 'No payment redirect link found from PayPal'}, status=500)
             else:
                 logger.error(f"PayPal Order Creation Failed ({response.status_code}): {response.text}")
                 return JsonResponse({'error': 'Failed to create PayPal order. Please try again.'}, status=500)
@@ -603,17 +728,47 @@ class PayPalReturnView(View):
             headers = {
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {access_token}",
-                # Idempotency key prevents double-charge on retry/refresh
-                "PayPal-Request-Id": f"capture-lead-{lead_id}-{token[:12]}"
+                # Unique Id for each capture attempt
+                "PayPal-Request-Id": str(uuid.uuid4()),
             }
+            
+            # Pass the tracking_id from the STC/RISK API call if available
+            tracking_id = request.GET.get('tracking_id')
+            if tracking_id:
+                headers["PayPal-Client-Metadata-Id"] = tracking_id
+
+            # --- DEBUG LOGGING FOR LOCAL TESTING ---
+            logger.info("--- PAYPAL CAPTURE REQUEST HEADERS ---")
+            logger.info(headers)
+            # ----------------------------------------
 
             response = requests.post(url, headers=headers, json={}, timeout=30)
+            
+            # --- DEBUG LOGGING FOR LOCAL TESTING ---
+            logger.info(f"--- PAYPAL CAPTURE RESPONSE ({response.status_code}) ---")
+            logger.info(response.text)
+            # ----------------------------------------
 
             # ── SUCCESS ──
             if response.status_code in [200, 201]:
                 capture_data = response.json()
-                payer = capture_data.get('payer', {})
+                
+                # Ensure the capture status is COMPLETED
+                purchase_units = capture_data.get('purchase_units', [])
+                capture_status = None
+                if purchase_units:
+                    payments = purchase_units[0].get('payments', {})
+                    captures = payments.get('captures', [])
+                    if captures:
+                        capture_status = captures[0].get('status')
+                
+                if capture_status != 'COMPLETED':
+                    logger.error(f"PayPal Order {token} failed: Status is {capture_status}")
+                    url_license = lead.license_type
+                    if url_license == 'data': url_license = 'datapack'
+                    return redirect(reverse('checkout', kwargs={'slug': lead.report.slug, 'license_type': url_license}) + f"?payment=failed&reason={capture_status}")
 
+                payer = capture_data.get('payer', {})
                 lead.message = f"{lead.message}\n\n[PAYPAL ORDER ID: {token}] [CAPTURED]"
 
                 if payer:
