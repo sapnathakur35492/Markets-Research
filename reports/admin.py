@@ -54,17 +54,44 @@ class ReportAdmin(admin.ModelAdmin):
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename=Reports_Export.csv'
         writer = csv.writer(response)
-        headers = ['ID', 'Title', 'Slug', 'Category', 'Publish Date', 'Region', 'Price (Single)', 'Absolute URL']
+        headers = ['ID', 'Title', 'Publish Date', 'Region', 'Absolute URL', 'Buy Now', 'Download PDF Sample', 'Ask For Discount', 'Speak to Analyst']
         writer.writerow(headers)
 
         for obj in queryset:
             report_url = "N/A"
+            buy_now_url = "N/A"
+            sample_url = "N/A"
+            discount_url = "N/A"
+            analyst_url = "N/A"
+            
             try:
+                # Absolute URL
                 report_path = reverse('report-detail', kwargs={'slug': obj.slug})
                 report_url = request.build_absolute_uri(report_path)
+                
+                # Buy Now Link (Points to Pricing page as per template)
+                region_type = 'global' if obj.region and 'global' in obj.region.lower() else 'country'
+                pricing_path = reverse('pages:pricing') + f"?type={region_type}&slug={obj.slug}"
+                buy_now_url = request.build_absolute_uri(pricing_path)
+                
+                # CTA Links
+                sample_url = request.build_absolute_uri(reverse('request-sample', kwargs={'slug': obj.slug}))
+                discount_url = request.build_absolute_uri(reverse('ask-for-discount', kwargs={'slug': obj.slug}))
+                analyst_url = request.build_absolute_uri(reverse('speak-to-analyst', kwargs={'slug': obj.slug}))
             except:
                 pass
-            writer.writerow([obj.id, obj.title, obj.slug, obj.category.name if obj.category else "N/A", obj.publish_date, obj.region, obj.single_user_price, report_url])
+                
+            writer.writerow([
+                obj.id, 
+                obj.title, 
+                obj.publish_date, 
+                obj.region, 
+                report_url,
+                buy_now_url,
+                sample_url,
+                discount_url,
+                analyst_url
+            ])
         return response
     
     export_to_excel.short_description = "Export Selected to CSV"
