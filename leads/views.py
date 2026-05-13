@@ -92,6 +92,9 @@ def get_paypal_base_url():
     mode = os.environ.get('PAYPAL_MODE', 'sandbox')
     return "https://api-m.paypal.com" if mode == 'live' else "https://api-m.sandbox.paypal.com"
 
+def get_site_base_url():
+    return "https://marketsnxt.com"
+
 def get_paypal_access_token():
     try:
         client_id = os.environ.get('PAYPAL_CLIENT_ID')
@@ -122,9 +125,10 @@ def get_paypal_access_token():
         logger.error(f"Error getting PayPal Token: {e}")
         return None
 
-def verify_paypal_payment(order_id):
+def verify_paypal_payment(order_id, expected_price=None):
     """
-    Verifies that the PayPal order is actually completed/approved.
+    Verifies that the PayPal order is actually COMPLETED and the payment is captured.
+    Also verifies the amount if expected_price is provided.
     Returns (True, None) if valid, (False, error_message) if invalid.
     """
     try:
@@ -140,17 +144,51 @@ def verify_paypal_payment(order_id):
             "Authorization": f"Bearer {token}"
         }
 
-        response = requests.get(url, headers=headers, timeout=15)  # ← timeout added
+        response = requests.get(url, headers=headers, timeout=15)
         if response.status_code != 200:
             return False, f"Could not retrieve order details: {response.text}"
 
         order_data = response.json()
         order_status = order_data.get('status')
 
-        if order_status == 'COMPLETED':
-            return True, None
+        # 1. Check Order Status
+        if order_status != 'COMPLETED':
+            return False, f"Order status is {order_status}, not COMPLETED"
 
-        return False, f"Payment status is {order_status}, not COMPLETED"
+        # 2. Check Capture Status (Internal Verification for Debit/Credit)
+        purchase_units = order_data.get('purchase_units', [])
+        capture_status = None
+        capture_id = None
+        
+        if purchase_units:
+            payments = purchase_units[0].get('payments', {})
+            captures = payments.get('captures', [])
+            
+            # Verify Amount
+            if expected_price:
+                actual_amount = None
+                if captures:
+                    actual_amount = captures[0].get('amount', {}).get('value')
+                
+                if not actual_amount: # Fallback to purchase_unit amount
+                    actual_amount = purchase_units[0].get('amount', {}).get('value')
+
+                if not actual_amount or float(actual_amount) != float(expected_price):
+                    logger.warning(f"Price mismatch: Expected {expected_price}, got {actual_amount}")
+                    return False, "Payment amount mismatch detected"
+
+            if captures:
+                capture_status = captures[0].get('status')
+                capture_id = captures[0].get('id')
+        
+        if capture_status != 'COMPLETED':
+            # eCheck or pending bank debit might show as PENDING
+            error_msg = f"Capture status is {capture_status or 'MISSING'}"
+            if capture_status == 'PENDING':
+                error_msg += " (Bank debit/eCheck pending)"
+            return False, error_msg
+
+        return True, capture_id
 
     except Exception as e:
         logger.error(f"Payment verification error: {e}")
@@ -534,14 +572,21 @@ class CapturePaymentView(View):
 
             # Retrieve the lead
             lead = get_object_or_404(Lead, id=lead_id)
-            
-            # Verify Payment with PayPal
-            is_valid, error = verify_paypal_payment(order_id)
-            if not is_valid:
-                 return JsonResponse({'status': 'error', 'message': f'Payment verification failed: {error}'}, status=400)
 
-            # Mark as paid
-            lead.message = f"{lead.message}\n\n[PAYPAL ORDER ID: {order_id}] [VERIFIED]"
+            # Get expected price
+            price = 0
+            if lead.license_type == 'single':     price = lead.report.single_user_price
+            elif lead.license_type == 'multi':    price = lead.report.multi_user_price
+            elif lead.license_type == 'enterprise': price = lead.report.enterprise_price
+            elif lead.license_type == 'data':     price = lead.report.data_pack_price
+
+            # Verify Payment with PayPal (includes deep capture verification)
+            is_valid, result = verify_paypal_payment(order_id, expected_price=price)
+            if not is_valid:
+                 return JsonResponse({'status': 'error', 'message': f'Payment verification failed: {result}'}, status=400)
+
+            # Mark as paid (result is capture_id)
+            lead.message = f"{lead.message}\n\n[PAYPAL ORDER ID: {order_id}] [CAPTURE ID: {result}] [VERIFIED]"
             lead.save()
 
             # Trigger emails in background
@@ -581,25 +626,19 @@ class CreatePayPalOrderView(View):
             base_url = get_paypal_base_url()
             url = f"{base_url}/v2/checkout/orders"
 
-            # Construct return URLs — use HTTPS in production via SECURE_PROXY_SSL_HEADER
-            host = request.get_host()
-            protocol = 'https' if request.is_secure() else 'http'
-            return_url = f"{protocol}://{host}/api/leads/paypal-return/?lead_id={lead.id}"
-            cancel_url  = f"{protocol}://{host}/api/leads/paypal-cancel/?lead_id={lead.id}"
-
-            # Format price correctly for PayPal (must be string with 2 decimal places)
-            price_str = "{:.2f}".format(float(price))
-
             # Generate Tracking ID for STC (Risk assessment)
-            # This will be passed back in return_url to be used in capture
+            # This must be done BEFORE constructing the return_url
             tracking_id = f"MNXT-TRK-{lead.id}-{uuid.uuid4().hex[:6]}"
             set_paypal_stc(tracking_id, lead, access_token=token)
 
-            # Construct return URLs — use HTTPS in production via SECURE_PROXY_SSL_HEADER
-            host = request.get_host()
-            protocol = 'https' if request.is_secure() else 'http'
-            return_url = f"{protocol}://{host}/api/leads/paypal-return/?lead_id={lead.id}&tracking_id={tracking_id}"
-            cancel_url  = f"{protocol}://{host}/api/leads/paypal-cancel/?lead_id={lead.id}"
+            # Construct redirection URLs
+            # CRITICAL: Always use production domain for redirects to avoid 'localhost' issues with live credentials
+            site_base = get_site_base_url()
+            return_url = f"{site_base}/api/leads/paypal-return/?lead_id={lead.id}&tracking_id={tracking_id}"
+            cancel_url  = f"{site_base}/api/leads/paypal-cancel/?lead_id={lead.id}"
+
+            # Format price correctly for PayPal (must be string with 2 decimal places)
+            price_str = "{:.2f}".format(float(price))
 
             payload = {
                 "intent": "CAPTURE",
@@ -753,12 +792,35 @@ class PayPalReturnView(View):
             if response.status_code in [200, 201]:
                 capture_data = response.json()
                 
-                # Ensure the capture status is COMPLETED
+                # Ensure the capture status is COMPLETED and verify amount
                 purchase_units = capture_data.get('purchase_units', [])
                 capture_status = None
+                
                 if purchase_units:
+                    # Get expected price for verification
+                    expected_price = 0
+                    if lead.license_type == 'single':     expected_price = lead.report.single_user_price
+                    elif lead.license_type == 'multi':    expected_price = lead.report.multi_user_price
+                    elif lead.license_type == 'enterprise': expected_price = lead.report.enterprise_price
+                    elif lead.license_type == 'data':     expected_price = lead.report.data_pack_price
+                    
                     payments = purchase_units[0].get('payments', {})
                     captures = payments.get('captures', [])
+
+                    # Verify captured amount
+                    actual_amount = None
+                    if captures:
+                        actual_amount = captures[0].get('amount', {}).get('value')
+                    
+                    if not actual_amount: # Fallback to purchase_unit amount
+                         actual_amount = purchase_units[0].get('amount', {}).get('value')
+                    
+                    if not actual_amount or float(actual_amount) != float(expected_price):
+                        logger.error(f"PayPal Amount Mismatch for lead {lead.id}: Expected {expected_price}, got {actual_amount}")
+                        url_license = lead.license_type
+                        if url_license == 'data': url_license = 'datapack'
+                        return redirect(reverse('checkout', kwargs={'slug': lead.report.slug, 'license_type': url_license}) + "?payment=failed&reason=amount_mismatch")
+
                     if captures:
                         capture_status = captures[0].get('status')
                 
