@@ -437,7 +437,7 @@ def _sanitize_html(content):
     # 4. Remove empty/whitespace-only headings
     def remove_ghosts(m):
         inner = m.group(2)
-        if '<!--' in inner and 'IMAGE_PLACEHOLDER' in inner:
+        if '<!--' in inner and ('IMAGE_PLACEHOLDER' in inner or 'ANALYST_FINDINGS' in inner):
             return m.group(0)
         visible = re.sub(r'<[^>]+>', '', inner)
         visible = re.sub(r'[\u200b\uFEFF\xa0\s&nbsp;]+', '', visible).strip()
@@ -445,8 +445,10 @@ def _sanitize_html(content):
         return m.group(0)
     content = re.sub(r'<(h[1-6])[^>]*>(.*?)</\1>', remove_ghosts, content, flags=re.IGNORECASE | re.DOTALL)
     
-    # 5. Unwrap Image Placeholders from headings (Prevents blue vertical line on maps)
+    # 5. Unwrap Image Placeholders and Analyst Findings markers from headings
     content = re.sub(r'<h[1-6][^>]*>\s*(<!--\s*IMAGE_PLACEHOLDER_\d+\s*-->)\s*</h[1-6]>', r'\1', content, flags=re.IGNORECASE | re.DOTALL)
+    content = re.sub(r'<h[1-6][^>]*>\s*(<!--\s*ANALYST_FINDINGS_START\s*-->)\s*</h[1-6]>', r'\1', content, flags=re.IGNORECASE | re.DOTALL)
+    content = re.sub(r'<h[1-6][^>]*>\s*(<!--\s*ANALYST_FINDINGS_END\s*-->)\s*</h[1-6]>', r'\1', content, flags=re.IGNORECASE | re.DOTALL)
     
     # 6. Collapse double-nested headings (e.g. <h2><h2>Text</h2></h2>)
     content = re.sub(r'<(h[1-6])[^>]*>\s*<(h\1)[^>]*>(.*?)</\2>\s*</\1>', r'<\1>\3</\1>', content, flags=re.IGNORECASE | re.DOTALL)
@@ -500,6 +502,10 @@ def _render_modern_format(html_content, report_obj, is_tab_content=False):
     if isinstance(report_obj, str): region, slug = report_obj, None
     elif report_obj: region, slug = getattr(report_obj, 'region', 'global'), getattr(report_obj, 'slug', None)
     else: region, slug = 'global', None
+    
+    # 0. Analyst Findings
+    af_pat = re.compile(r'<!--\s*ANALYST_FINDINGS_START\s*-->(.*?)<!--\s*ANALYST_FINDINGS_END\s*-->', re.IGNORECASE | re.DOTALL)
+    html_content = af_pat.sub(lambda m: _render_analyst_findings(m.group(1)), html_content)
     
     # 1. Images
     html_content = html_content.replace('<!-- IMAGE_PLACEHOLDER_1 -->', _render_bar_chart(slug))
@@ -633,6 +639,122 @@ def _render_legacy_format(content, report_obj):
     """Old format logic."""
     # (Simplified legacy logic to keep the file size manageable)
     return mark_safe(content)
+
+
+def _render_analyst_findings(content):
+    """Render Analyst Findings and Recommendations in a colorful dark blue style."""
+    if not content: return ''
+    
+    # Extract Title
+    title_match = re.search(r'<h[1-6][^>]*>(.*?)</h[1-6]>', content, re.IGNORECASE)
+    main_title = title_match.group(1).strip() if title_match else "Analyst Findings and Recommendations"
+    # CRITICAL FIX: The title might contain nested tags like <h2> due to Excel export
+    main_title = re.sub(r'<[^>]+>', '', main_title).strip()
+    if not main_title: main_title = "Analyst Findings and Recommendations"
+    
+    # Extract paragraphs
+    paragraphs = re.findall(r'<p[^>]*>(.*?)</p>', content, re.IGNORECASE | re.DOTALL)
+    if not paragraphs:
+        clean = re.sub(r'<h[1-6][^>]*>.*?</h[1-6]>', '', content, flags=re.IGNORECASE)
+        paragraphs = [p.strip() for p in clean.split('\n') if p.strip()]
+        
+    findings = []
+    recommendation = ""
+    
+    for p in paragraphs:
+        if not p.strip(): continue
+        clean_text = re.sub(r'<[^>]+>', '', p).strip()
+        if 'recommendation' in clean_text.lower()[:35]:
+            recommendation = p
+        else:
+            findings.append(p)
+            
+    findings_html = []
+    for f in findings:
+        strong_match = re.match(r'^\s*<strong[^>]*>(.*?):?\s*</strong>\s*:?\s*(.*)$', f, re.IGNORECASE | re.DOTALL)
+        if strong_match:
+            f_title = strong_match.group(1).strip()
+            f_text = strong_match.group(2).strip()
+        else:
+            parts = re.split(r':|—|-', f, 1)
+            if len(parts) == 2 and len(re.sub(r'<[^>]+>', '', parts[0])) < 60:
+                f_title = re.sub(r'<[^>]+>', '', parts[0]).strip()
+                f_text = parts[1].strip()
+            else:
+                f_title = "KEY FINDING"
+                f_text = f
+                
+        # Clean up any leading dashes or colons that might have been left over if the strong tag didn't include them
+        f_title = re.sub(r'<[^>]+>', '', f_title).strip()
+        f_text = re.sub(r'^[:\-—]\s*', '', f_text).strip()
+        
+        findings_html.append(f'''
+        <div style="flex: 1 1 300px; min-width: 280px; background: #182C44; border: 1px solid #233F5E; border-radius: 6px; padding: 1.25rem;">
+            <div style="color: #93B0CC; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 0.75rem;">
+                {f_title.upper()}
+            </div>
+            <div style="color: #F8FAFC; font-size: 0.95rem; line-height: 1.6;">
+                {f_text}
+            </div>
+        </div>
+        ''')
+        
+    findings_row = f'''<div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+        {''.join(findings_html)}
+    </div>''' if findings_html else ''
+    
+    rec_title = "ANALYST RECOMMENDATION"
+    rec_text = recommendation
+    strong_match = re.match(r'^\s*<strong[^>]*>(.*?):?\s*</strong>\s*:?\s*(.*)$', recommendation, re.IGNORECASE | re.DOTALL)
+    if strong_match:
+        strong_title = strong_match.group(1).strip()
+        rec_text = strong_match.group(2).strip()
+        
+        # Clean strong title to remove "Analyst Recommendation"
+        clean_strong_title = re.sub(r'^Analyst\s+Recommendation[^a-zA-Z0-9]*', '', strong_title, flags=re.IGNORECASE).strip()
+        clean_strong_title = re.sub(r'<[^>]+>', '', clean_strong_title).strip()
+        
+        if clean_strong_title:
+            rec_text = f"<strong style=\"color: white;\">{clean_strong_title}:</strong> {rec_text}"
+            
+        if not rec_text: 
+             rec_text = recommendation  
+    else:
+        rec_text = re.sub(r'^(<[^>]+>)?\s*Analyst\s+Recommendation[^a-zA-Z0-9]*', '', recommendation, flags=re.IGNORECASE).strip()
+        if not rec_text: rec_text = recommendation
+        
+    rec_html = f'''
+    <style>
+        .analyst-rec-content, .analyst-rec-content * {{
+            color: #FFFFFF !important;
+        }}
+    </style>
+    <div style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); border-radius: 6px; padding: 1.25rem; display: flex; gap: 1rem; align-items: flex-start; border: none;">
+        <div style="background: rgba(255,255,255,0.15); border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 0.1rem;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <div>
+            <div style="color: #E0F2FE; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 0.5rem;">
+                {rec_title}
+            </div>
+            <div class="analyst-rec-content" style="color: #FFFFFF; font-size: 0.95rem; line-height: 1.6;">
+                {rec_text}
+            </div>
+        </div>
+    </div>
+    ''' if recommendation else ''
+    
+    return f'''
+    <div style="background: #0D1F34; border-radius: 8px; padding: 1.5rem; margin: 2.5rem 0; font-family: 'Inter', system-ui, -apple-system, sans-serif; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+        <div style="margin-bottom: 1.5rem; border-bottom: 1px solid #1C324E; padding-bottom: 1rem;">
+            <div style="color: white; font-size: 1.15rem; font-weight: 700;">
+                {main_title}
+            </div>
+        </div>
+        {findings_row}
+        {rec_html}
+    </div>
+    '''
 
 
 def _render_bar_chart(slug):
