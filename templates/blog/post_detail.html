@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load report_filters %}
 
 {% block title %}{{ post.meta_title|default:post.title }} - Markets NXT{% endblock %}
 
@@ -302,7 +303,7 @@
         </script>
 
         <div class="blog-article-body">
-            {{ post.content|safe }}
+            {{ post.content|format_blog_content|safe }}
         </div>
 
         <div style="margin-top: 4rem; text-align: center;">

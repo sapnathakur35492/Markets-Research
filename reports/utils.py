@@ -39,6 +39,9 @@ def auto_format_content(text):
     
     # Protect Segmentation block
     text = re.sub(r'(?i)<!--\s*SEGMENT(?:ATION)?_?START\s*-->.*?<!--\s*SEGMENT(?:ATION)?_?END\s*-->', protect_block, text, flags=re.DOTALL)
+
+    # Protect Our Take block
+    text = re.sub(r'(?i)<!--\s*OUR_TAKE_START\s*-->.*?<!--\s*OUR_TAKE_END\s*-->', protect_block, text, flags=re.DOTALL)
     
     lines = text.split('\n')
     formatted_lines = []
@@ -55,6 +58,11 @@ def auto_format_content(text):
     for line in lines:
         line = line.strip()
         if not line:
+            continue
+
+        # Pass protected block placeholders through untouched
+        if re.match(r'^__PROTECTED_BLOCK_\d+__$', line):
+            formatted_lines.append(line)
             continue
             
         clean_text = line.replace('**', '').replace('*', '').strip()

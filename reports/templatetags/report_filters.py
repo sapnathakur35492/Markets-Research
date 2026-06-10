@@ -821,3 +821,94 @@ def _render_report_highlights(items, h_text="Report Highlights"):
     """Premium Highlights box."""
     lis = "".join(f'<li style="display: flex; gap: 0.5rem; padding: 0.2rem 0;"><span style="color: #10b981;">✓</span><span style="color: #1e293b; font-weight: 500;">{i}</span></li>' for i in items)
     return f'<h1 class="section-header">{h_text}</h1><div style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-left: 6px solid #1e3a8a; padding: 1.5rem 2rem; border-radius: 12px; margin: 2rem 0; box-shadow: 0 4px 10px rgba(0,0,0,0.05);"><ul style="list-style: none; padding: 0; margin: 0;">{lis}</ul></div>'
+
+
+@register.filter(name='format_blog_content')
+def format_blog_content(content):
+    """
+    Parse blog content, extract 'Our Take' section if present,
+    strip it from the main content, and render it at the end of the post.
+    """
+    if not content:
+        return ''
+        
+    import re
+    # Pattern to find OUR_TAKE block
+    ot_pattern = re.compile(
+        r'<!--\s*OUR_TAKE_START\s*-->(.*?)<!--\s*OUR_TAKE_END\s*-->',
+        re.IGNORECASE | re.DOTALL
+    )
+    
+    match = ot_pattern.search(content)
+    if not match:
+        return mark_safe(content)
+        
+    raw_our_take = match.group(1).strip()
+    
+    # Strip the OUR_TAKE block from main content
+    main_content = ot_pattern.sub('', content).strip()
+    
+    # Clean up outer wrapper div and h3 inside OUR_TAKE block
+    cleaned_our_take = raw_our_take
+    # Remove outer <div class="our-take">...</div>
+    cleaned_our_take = re.sub(
+        r'<div[^>]*class=["\']our-take["\'][^>]*>', '', cleaned_our_take, flags=re.IGNORECASE
+    )
+    # Remove trailing </div>
+    cleaned_our_take = re.sub(
+        r'</div>\s*$', '', cleaned_our_take.strip(), flags=re.IGNORECASE
+    )
+    # Remove any <h3>Our Take</h3>
+    cleaned_our_take = re.sub(
+        r'<h[1-6][^>]*>.*?Our\s+Take.*?</h[1-6]>', '', cleaned_our_take,
+        flags=re.IGNORECASE | re.DOTALL
+    ).strip()
+    
+    # Render the styled "Our Take" card
+    our_take_html = f'''
+    <style>
+        .blog-article-body .our-take-box, 
+        .blog-article-body .our-take-box * {{
+            color: #FFFFFF !important;
+        }}
+        .blog-article-body .our-take-box p {{
+            margin-bottom: 0 !important;
+            line-height: 1.6 !important;
+            font-size: 0.95rem !important;
+            color: #FFFFFF !important;
+        }}
+        .blog-article-body .our-take-box strong {{
+            color: #FFFFFF !important;
+            font-weight: 700 !important;
+        }}
+        .our-take-box {{
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            border-radius: 8px;
+            padding: 1.25rem;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+            border: none;
+            margin: 2.5rem 0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }}
+    </style>
+    <div class="our-take-box">
+        <div style="background: rgba(255,255,255,0.15); border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 0.1rem;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A5 5 0 0 0 8 8c0 1 .3 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"></path><line x1="9" y1="18" x2="15" y2="18"></line><line x1="10" y1="22" x2="14" y2="22"></line></svg>
+        </div>
+        <div>
+            <div style="color: #E0F2FE; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 0.5rem;">
+                OUR TAKE
+            </div>
+            <div class="our-take-content">
+                {cleaned_our_take}
+            </div>
+        </div>
+    </div>
+    '''
+    
+    # Append the "Our Take" section to the end of the main content
+    final_content = f"{main_content}\n{our_take_html}"
+    return mark_safe(final_content)
