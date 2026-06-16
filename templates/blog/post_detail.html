@@ -77,7 +77,7 @@
     <style>
         .blog-header-section {
             background: linear-gradient(135deg, #000428 0%, #004e92 100%) !important;
-            padding: 50px 0 50px !important;
+            padding: 40px 0 32px !important;
             height: auto !important;
             margin-top: 0 !important;
             position: relative !important;
@@ -120,9 +120,7 @@
                     {{ post.category.name|default:"Uncategorized" }}
                 </span>
             </div>
-            <h1 class="blog-title"
-                style="white-space: nowrap !important; display: block !important; width: fit-content !important; margin-left: auto !important; margin-right: auto !important; font-size: 1.4rem; text-align: center !important; margin:15px 0 10px;">
-                {{ post.title }}</h1>
+            <h1 class="blog-title">{{ post.title }}</h1>
 
             <div class="blog-author-info"
                 style="display: flex !important; flex-wrap: nowrap !important; align-items: center !important; justify-content: center !important; gap: 2rem !important; white-space: nowrap !important; width: 100% !important; font-size: 0.85rem;">

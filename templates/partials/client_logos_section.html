@@ -1,0 +1,59 @@
+{% load static %}
+<section class="clients-section">
+    <div class="clients-container">
+        <div class="clients-header">
+            <div class="clients-intro">
+                <span class="clients-label" style="font-size: 16px;">OUR CLIENTS</span>
+                <h2>Trusted by Global Leaders</h2>
+                <p>Fortune 500 companies and leading consultancies rely on MarketsNXT.</p>
+            </div>
+            <div class="clients-stats">
+                <div class="clients-stat">
+                    <span class="clients-stat-value">550+</span>
+                    <span class="clients-stat-label">Enterprise Clients</span>
+                </div>
+                <div class="clients-stat">
+                    <span class="clients-stat-value">100+</span>
+                    <span class="clients-stat-label">Countries Served</span>
+                </div>
+                <div class="clients-stat">
+                    <span class="clients-stat-value">50+</span>
+                    <span class="clients-stat-label">Years Trusted</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="clients-divider"></div>
+
+        <div class="clients-carousel-wrapper">
+            <button type="button" class="clients-nav clients-nav-prev" aria-label="Previous logos">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </button>
+
+            <div class="clients-logos-viewport">
+                <div class="clients-logos-track">
+                    <div class="client-logo-card"><img src="{% static 'images/clients/bain-company.png' %}" alt="Bain &amp; Company"></div>
+                    <div class="client-logo-card"><img src="{% static 'images/clients/oracle.png' %}" alt="Oracle"></div>
+                    <div class="client-logo-card"><img src="{% static 'images/clients/accenture.png' %}" alt="Accenture"></div>
+                    <div class="client-logo-card"><img src="{% static 'images/clients/bcg.png' %}" alt="BCG"></div>
+                    <div class="client-logo-card"><img src="{% static 'images/clients/ey.png' %}" alt="EY"></div>
+                    <div class="client-logo-card"><img src="{% static 'images/clients/amazon.png' %}" alt="Amazon"></div>
+                    <div class="client-logo-card"><img src="{% static 'images/clients/walmart.png' %}" alt="Walmart"></div>
+                    <div class="client-logo-card"><img src="{% static 'images/clients/siemens.png' %}" alt="Siemens"></div>
+                    <div class="client-logo-card"><img src="{% static 'images/clients/3m.png' %}" alt="3M"></div>
+                    <div class="client-logo-card"><img src="{% static 'images/clients/hyundai.png' %}" alt="Hyundai"></div>
+                    <div class="client-logo-card"><img src="{% static 'images/clients/deloitte.png' %}" alt="Deloitte"></div>
+                    <div class="client-logo-card"><img src="{% static 'images/clients/verizon.png' %}" alt="Verizon"></div>
+                </div>
+            </div>
+
+            <button type="button" class="clients-nav clients-nav-next" aria-label="Next logos">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+            </button>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,402 @@
+{% load static %}
+<section class="reviews-section" id="client-reviews">
+    <div class="reviews-container">
+        <div class="reviews-header">
+            <div class="reviews-intro">
+                <span class="reviews-label" style="font-size: 16px;">
+                    What Our Clients Say About Us
+                </span>
+                <h2>Trusted by Industry Leaders Worldwide</h2>
+            </div>
+        </div>
+
+
+            <div class="reviews-carousel">
+                <button type="button" class="reviews-nav reviews-nav-prev" aria-label="Previous review">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                </button>
+
+                <div class="reviews-slider">
+                    <div class="reviews-slide active" data-index="0">
+                        <span class="reviews-quote-mark reviews-quote-open">&ldquo;</span>
+                        <p class="reviews-text">We were evaluating opportunities in the specialty industrial coatings space across Southeast Asia, and sourcing reliable channel-level data was proving difficult. Most datasets we reviewed were either outdated or too broad to support decision-making. MarketsNXT was able to structure the research around distributor networks, import dependencies, and regional consumption trends in a way that was directly usable for our internal planning. The turnaround time was also practical considering the complexity of the request.</p>
+                        <div class="reviews-attribution">
+                            <p class="reviews-role">Director – Strategic Market Intelligence</p>
+                            <p class="reviews-company">PPG Industries</p>
+                        </div>
+                        <span class="reviews-quote-mark reviews-quote-close">&rdquo;</span>
+                    </div>
+
+                    <div class="reviews-slide" data-index="1">
+                        <span class="reviews-quote-mark reviews-quote-open">&ldquo;</span>
+                        <p class="reviews-text">Our team needed niche procurement and pricing insights related to offshore subsea equipment where publicly available information was fragmented. MarketsNXT managed to consolidate supplier-level insights, project pipeline data, and regional demand indicators into a report that was more actionable than what we had received from larger firms previously. What stood out was their ability to refine the scope during the engagement rather than forcing a standard template.</p>
+                        <div class="reviews-attribution">
+                            <p class="reviews-role">Senior Sourcing Manager</p>
+                            <p class="reviews-company">Baker Hughes</p>
+                        </div>
+                        <span class="reviews-quote-mark reviews-quote-close">&rdquo;</span>
+                    </div>
+
+                    <div class="reviews-slide" data-index="2">
+                        <span class="reviews-quote-mark reviews-quote-open">&ldquo;</span>
+                        <p class="reviews-text">The responsiveness of the MarketsNXT team was one of the strongest aspects of our engagement. We had multiple rounds of technical questions related to methodology, market sizing assumptions, and regional segmentation, and every query was addressed with clarity and supporting rationale. Their team remained accessible throughout the process, which made internal stakeholder discussions much easier on our side.</p>
+                        <div class="reviews-attribution">
+                            <p class="reviews-role">Senior Manager</p>
+                            <p class="reviews-company">LEK Consulting</p>
+                        </div>
+                        <span class="reviews-quote-mark reviews-quote-close">&rdquo;</span>
+                    </div>
+
+                    <div class="reviews-slide" data-index="3">
+                        <span class="reviews-quote-mark reviews-quote-open">&ldquo;</span>
+                        <p class="reviews-text">We were already familiar with the industry reputation associated with Montclair and Stein through previous market intelligence engagements, so MarketsNXT was a natural consideration when we started evaluating research partners for a broader chemicals outlook study. The wider market coverage, especially across secondary suppliers and regional manufacturing clusters, gave us a more complete view than many larger syndicated providers. The final output was balanced and commercially relevant.</p>
+                        <div class="reviews-attribution">
+                            <p class="reviews-role">Global Strategy Lead</p>
+                            <p class="reviews-company">Boston Consulting Group</p>
+                            <img src="{% static 'images/clients/bcg.png' %}" alt="Boston Consulting Group" class="reviews-company-logo">
+                        </div>
+                        <span class="reviews-quote-mark reviews-quote-close">&rdquo;</span>
+                    </div>
+
+                    <div class="reviews-slide" data-index="4">
+                        <span class="reviews-quote-mark reviews-quote-open">&ldquo;</span>
+                        <p class="reviews-text">We approached MarketsNXT for research related to a niche engineered materials segment where most providers were relying heavily on assumptions due to limited disclosure from manufacturers. Their team combined primary discussions with trade-flow analysis and end-use mapping to build a market picture that aligned closely with what we were observing internally. The report helped validate expansion priorities without overstating market potential.</p>
+                        <div class="reviews-attribution">
+                            <p class="reviews-role">Business Development Manager</p>
+                            <p class="reviews-company">Celanese Corporation</p>
+                        </div>
+                        <span class="reviews-quote-mark reviews-quote-close">&rdquo;</span>
+                    </div>
+                </div>
+
+                <button type="button" class="reviews-nav reviews-nav-next" aria-label="Next review">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .reviews-section {
+        background: #ffffff;
+        padding: 3.5rem 0 4rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .reviews-container {
+        max-width: var(--container-width);
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    .reviews-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .reviews-label {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        color: #2563eb;
+        margin-bottom: 0.75rem;
+    }
+
+    .reviews-intro h2 {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin: 0;
+        line-height: 1.2;
+    }
+
+    .reviews-view-all {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: #2563eb;
+        color: #ffffff;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        padding: 0.85rem 1.35rem;
+        border-radius: 999px;
+        text-decoration: none;
+        white-space: nowrap;
+        transition: background 0.2s;
+        flex-shrink: 0;
+    }
+
+    .reviews-view-all:hover {
+        background: #1d4ed8;
+        color: #ffffff;
+    }
+
+    .reviews-body {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 2rem;
+        align-items: stretch;
+    }
+
+    .reviews-ratings {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .reviews-rating-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1.35rem 1.5rem;
+        box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+    }
+
+    .reviews-rating-brand {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 0.75rem;
+    }
+
+    .reviews-trustpilot-star {
+        color: #00b67a;
+    }
+
+    .reviews-rating-score {
+        font-size: 1.65rem;
+        font-weight: 800;
+        color: #0f172a;
+        line-height: 1;
+        margin-bottom: 0.65rem;
+    }
+
+    .reviews-rating-score span {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #64748b;
+    }
+
+    .reviews-stars {
+        display: flex;
+        gap: 0.15rem;
+    }
+
+    .reviews-stars .star {
+        width: 18px;
+        height: 18px;
+        background: #e2e8f0;
+        clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    }
+
+    .reviews-stars .star.filled {
+        background: #f59e0b;
+    }
+
+    .reviews-carousel {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        min-width: 0;
+    }
+
+    .reviews-nav {
+        flex-shrink: 0;
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        border: 2px solid #2563eb;
+        background: #ffffff;
+        color: #2563eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .reviews-nav:hover {
+        background: #2563eb;
+        color: #ffffff;
+    }
+
+    .reviews-slider {
+        flex: 1;
+        position: relative;
+        min-height: 320px;
+        min-width: 0;
+    }
+
+    .reviews-slide {
+        display: none;
+        background: #f1f5f9;
+        border-radius: 14px;
+        padding: 2rem 2.25rem 1.75rem;
+        position: relative;
+        min-height: 320px;
+        box-sizing: border-box;
+    }
+
+    .reviews-slide.active {
+        display: block;
+        animation: reviewsFadeIn 0.35s ease;
+    }
+
+    @keyframes reviewsFadeIn {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .reviews-quote-mark {
+        position: absolute;
+        font-size: 4rem;
+        line-height: 1;
+        color: #f97316;
+        font-family: Georgia, serif;
+        font-weight: 700;
+        pointer-events: none;
+        user-select: none;
+    }
+
+    .reviews-quote-open {
+        top: 0.75rem;
+        left: 1.25rem;
+    }
+
+    .reviews-quote-close {
+        bottom: 0.5rem;
+        right: 1.25rem;
+    }
+
+    .reviews-text {
+        color: #475569;
+        font-size: 0.95rem;
+        line-height: 1.75;
+        margin: 1.5rem 0 1.75rem;
+        padding: 0 1rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .reviews-attribution {
+        position: relative;
+        z-index: 1;
+        padding: 0 1rem;
+    }
+
+    .reviews-role {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #334155;
+        margin: 0 0 0.2rem;
+    }
+
+    .reviews-company {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0;
+    }
+
+    .reviews-company-logo {
+        display: block;
+        margin-top: 0.75rem;
+        max-height: 32px;
+        max-width: 120px;
+        object-fit: contain;
+    }
+
+    @media (max-width: 1024px) {
+        .reviews-body {
+            grid-template-columns: 1fr;
+        }
+
+        .reviews-ratings {
+            flex-direction: row;
+        }
+
+        .reviews-rating-card {
+            flex: 1;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .reviews-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .reviews-view-all {
+            font-size: 0.68rem;
+            padding: 0.75rem 1.1rem;
+        }
+
+        .reviews-ratings {
+            flex-direction: column;
+        }
+
+        .reviews-slide,
+        .reviews-slider {
+            min-height: 380px;
+        }
+
+        .reviews-text {
+            font-size: 0.88rem;
+            padding: 0;
+        }
+
+        .reviews-attribution {
+            padding: 0;
+        }
+
+        .reviews-nav {
+            width: 36px;
+            height: 36px;
+        }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var section = document.getElementById('client-reviews');
+    if (!section) return;
+
+    var slides = section.querySelectorAll('.reviews-slide');
+    var prevBtn = section.querySelector('.reviews-nav-prev');
+    var nextBtn = section.querySelector('.reviews-nav-next');
+    var current = 0;
+    var total = slides.length;
+
+    function showSlide(index) {
+        current = (index + total) % total;
+        slides.forEach(function (slide, i) {
+            slide.classList.toggle('active', i === current);
+        });
+    }
+
+    if (prevBtn) {
+        prevBtn.addEventListener('click', function () {
+            showSlide(current - 1);
+        });
+    }
+
+    if (nextBtn) {
+        nextBtn.addEventListener('click', function () {
+            showSlide(current + 1);
+        });
+    }
+});
+</script>
